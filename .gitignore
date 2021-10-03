@@ -1,5 +1,5 @@
 # assignment
-adventure.zip
+analyzer.zip
 
 # ocaml
 *.cmo
@@ -16,4 +16,5 @@ _build
 *~
 \#*\#
 .DS_Store
+
 
