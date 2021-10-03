@@ -56,21 +56,24 @@ let post_ids subreddit =
 
 let find_post post_id posts = List.find (fun x -> x.id = post_id) posts
 
-let author subreddit post = (find_post post subreddit.posts).author
+let author subreddit post_id =
+  (find_post post_id subreddit.posts).author
 
-let created_utc subreddit post =
-  (find_post post subreddit.posts).created_utc
+let created_utc subreddit post_id =
+  (find_post post_id subreddit.posts).created_utc
 
-let id subreddit post = (find_post post subreddit.posts).id
+let id subreddit post_id = (find_post post_id subreddit.posts).id
 
-let num_comments subreddit post =
-  (find_post post subreddit.posts).num_comments
+let num_comments subreddit post_id =
+  (find_post post_id subreddit.posts).num_comments
 
-let num_crossposts subreddit post =
-  (find_post post subreddit.posts).num_crossposts
+let num_crossposts subreddit post_id =
+  (find_post post_id subreddit.posts).num_crossposts
 
-let selftext subreddit post = (find_post post subreddit.posts).selftext
+let selftext subreddit post_id =
+  (find_post post_id subreddit.posts).selftext
 
-let spoiler subreddit post = (find_post post subreddit.posts).spoiler
+let spoiler subreddit post_id =
+  (find_post post_id subreddit.posts).spoiler
 
-let title subreddit post = (find_post post subreddit.posts).title
+let title subreddit post_id = (find_post post_id subreddit.posts).title
