@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "properties": {
+    "rooms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "exits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "room id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "room id"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "exits"
+        ]
+      }
+    },
+    "start room": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "rooms",
+    "start room"
+  ]
+}
