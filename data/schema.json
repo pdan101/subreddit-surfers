@@ -1,49 +1,66 @@
 {
   "type": "object",
   "properties": {
-    "rooms": {
+    "posts": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
+          "author": {
+            "type": "string"
+          },
+          "created_utc": {
+            "type": "int"
+          },
           "id": {
             "type": "string"
           },
-          "description": {
+          "num_comments": {
+            "type": "int"
+          },
+          "num_crossposts": {
+            "type": "int"
+          },
+          "selftext": {
             "type": "string"
           },
-          "exits": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "room id": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "name",
-                "room id"
-              ]
-            }
+          "spoiler": {
+            "type": "bool"
+          },
+          "title": {
+            "type": "string"
           }
         },
         "required": [
+          "author",
+          "created_utc",
           "id",
-          "description",
-          "exits"
+          "num_comments",
+          "num_crossposts",
+          "selftext",
+          "spoiler",
+          "title"
         ]
       }
     },
-    "start room": {
+    "subreddit_name": {
+      "type": "string"
+    },
+    "subreddit_id": {
+      "type": "string"
+    },
+    "subreddit_subscribers": {
+      "type": "int"
+    },
+    "subreddit_type": {
       "type": "string"
     }
   },
   "required": [
-    "rooms",
-    "start room"
+    "posts",
+    "subreddit_name",
+    "subreddit_id",
+    "subreddit_subscribers",
+    "subreddit_type"
   ]
 }
