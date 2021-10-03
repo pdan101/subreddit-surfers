@@ -3,49 +3,61 @@
     converts it into more usable types, which can be used in function
     applications. *)
 
-type t
-(** The abstract type of values representing adventures. *)
+type author = string
+(** The type of author name. *)
 
-type room_id = string
-(** The type of room identifiers. *)
+type post
+(** The abstract type of values representing a specific reddit post. *)
 
-type exit_name = string
-(** The type of exit names. *)
+type subreddit
+(** The abstract type of values representing a specific subreddit.*)
 
-exception UnknownRoom of room_id
-(** Raised when an unknown room is encountered. *)
+val from_json : Yojson.Basic.t -> subreddit
+(** [from_json json] is the subreddit that [json] represents. Requires:
+    [j] is a valid JSON subreddit representation. *)
 
-exception UnknownExit of exit_name
-(** Raised when an unknown exit is encountered. *)
+val subreddit_name : subreddit -> string
+(** [subreddit_name subreddit] is the name of the subreddit in
+    [subreddit]. *)
 
-val from_json : Yojson.Basic.t -> t
-(** [from_json j] is the adventure that [j] represents. Requires: [j] is
-    a valid JSON adventure representation. *)
+val subreddit_subscribers : subreddit -> int
+(** [subreddit_subscribers subreddit] is the number of subscribers in
+    [subreddit]. *)
 
-val start_room : t -> room_id
-(** [start_room a] is the identifier of the starting room in adventure
-    [a]. *)
+val subreddit_type : subreddit -> string
+(** [subreddit_type subreddit] is the publicity type of [subreddit]. *)
 
-val room_ids : t -> room_id list
-(** [room_ids a] is a set-like list of all of the room identifiers in
-    adventure [a]. *)
+val post_ids : subreddit -> string list
+(** [post_ids subreddit] is a set-like list of the posts in subreddit
+    [subreddit] sorted by their ids.*)
 
-val description : t -> room_id -> string
-(** [description a r] is the description of room [r] in adventure [a].
-    Raises [UnknownRoom r] if [r] is not a room identifier in [a]. *)
+val author : subreddit -> string -> string
+(** [author subreddit post_id] is the author of a post with [post_id] in
+    [subreddit].*)
 
-val exits : t -> room_id -> exit_name list
-(** [exits a r] is a set-like list of all exit names from room [r] in
-    adventure [a]. Raises [UnknownRoom r] if [r] is not a room
-    identifier in [a]. *)
+val created_utc : subreddit -> string -> int
+(** [created_utc subreddit post_id] is the Unix epoch time in UTC of a
+    post with [post_id] in [subreddit].*)
 
-val next_room : t -> room_id -> exit_name -> room_id
-(** [next_room a r e] is the room to which [e] exits from room [r] in
-    adventure [a]. Raises [UnknownRoom r] if [r] is not a room
-    identifier in [a]. Raises [UnknownExit e] if [e] is not an exit from
-    room [r] in [a]. *)
+val id : subreddit -> string -> string
+(** [id subreddit post] is the id of a post of [post_id] in [subreddit].*)
 
-val next_rooms : t -> room_id -> room_id list
-(** [next_rooms a r] is a set-like list of all rooms to which there is
-    an exit from [r] in adventure [a]. Raises [UnknownRoom r] if [r] is
-    not a room identifier in [a].*)
+val num_comments : subreddit -> string -> int
+(** [num_comments subreddit post_id] is the number of comments to
+    [post_id] in [subreddit].*)
+
+val num_crossposts : subreddit -> string -> int
+(** [num_crossposts subreddit post_id] is the number of crossposts for
+    [post_id] in [subreddit].*)
+
+val selftext : subreddit -> string -> string
+(** [selftext subreddit post_id] is the text in the body of the post
+    with [post_id] in [subreddit].*)
+
+val spoiler : subreddit -> string -> bool
+(** [spoiler subreddit post_id] is true is the post [post_id] in
+    [subreddit] is tagged as a spoiler.*)
+
+val title : subreddit -> string -> string
+(** [title subreddit post_id] is the title of the post [post_id] in
+    [subreddit].*)
