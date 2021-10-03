@@ -1,3 +1,4 @@
 (library
  (name analyzer)
- (public_name Analyzer))
+ (public_name Analyzer)
+ (libraries yojson ANSITerminal))
