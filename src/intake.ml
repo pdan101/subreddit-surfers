@@ -53,3 +53,24 @@ let subreddit_type subreddit = subreddit.subreddit_type
 
 let post_ids subreddit =
   List.sort_uniq compare (List.map (fun x -> x.id) subreddit.posts)
+
+let find_post post_id posts = List.find (fun x -> x.id = post_id) posts
+
+let author subreddit post = (find_post post subreddit.posts).author
+
+let created_utc subreddit post =
+  (find_post post subreddit.posts).created_utc
+
+let id subreddit post = (find_post post subreddit.posts).id
+
+let num_comments subreddit post =
+  (find_post post subreddit.posts).num_comments
+
+let num_crossposts subreddit post =
+  (find_post post subreddit.posts).num_crossposts
+
+let selftext subreddit post = (find_post post subreddit.posts).selftext
+
+let spoiler subreddit post = (find_post post subreddit.posts).spoiler
+
+let title subreddit post = (find_post post subreddit.posts).title
