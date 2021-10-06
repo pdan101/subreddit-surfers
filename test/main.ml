@@ -1,22 +1,37 @@
 open OUnit2
 open Analyzer
 open Intake
+open WordProcessor
 
 let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
 let make_state_test : test = state_test
 
+(** let rec list_printer_helper list accumulator = match list with | []
+    -> accumulator ^ "]" | h :: t -> list_printer_helper t (accumulator
+    ^ " " ^ h ^ ";")
+
+    let rec list_printer list = match list with | [] -> "[]" | _ :: _ ->
+    list_printer_helper list "" *)
 let id (x : string) = x
 
-let rec list_printer_helper list accumulator =
-  match list with
-  | [] -> accumulator ^ "]"
-  | h :: t -> list_printer_helper t (accumulator ^ " " ^ h ^ ";")
+(** [pp_string s] pretty-prints string [s]. *)
+let pp_string s = "\"" ^ s ^ "\""
 
-let rec list_printer list =
-  match list with
-  | [] -> "[]"
-  | _ :: _ -> list_printer_helper list ""
+(** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
+    pretty-print each element of [lst]. *)
+let pp_list pp_elt lst =
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (h2 :: t as t') ->
+          if n = 100 then acc ^ "..." (* stop printing long list *)
+          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
+    in
+    loop 0 "" lst
+  in
+  "[" ^ pp_elts lst ^ "]"
 
 let cmp_word_list words1 words2 =
   if List.compare_lengths words1 words2 = 0 then
@@ -31,8 +46,8 @@ let parse_test
     (input_text : string)
     (expected_output : string list) : test =
   name >:: fun _ ->
-  assert_equal ~cmp:cmp_word_list expected_output (parse input_text)
-    ~printer:list_printer
+  assert_equal expected_output (parse input_text)
+    ~printer:(pp_list pp_string)
 
 let word_processor_tests =
   [
@@ -50,7 +65,7 @@ let word_processor_tests =
         "was";
         "born";
       ];
-    parse_test "Parsiong text on multiple lines"
+    parse_test "Parsing text on multiple lines"
       "They should really be more clear on the fact that the deploy \
        button means to production not to locally on your machine.\n\n\
       \    Send help"
@@ -77,6 +92,8 @@ let word_processor_tests =
         "on";
         "your";
         "machine";
+        "Send";
+        "help";
       ];
     parse_test "Parsing text with punctuation"
       "So like I missed my test and I’m about to get tested rn. How \
@@ -89,7 +106,7 @@ let word_processor_tests =
         "my";
         "test";
         "and";
-        "I'm";
+        "Im";
         "about";
         "to";
         "get";
