@@ -1,6 +1,7 @@
 open OUnit2
 open Analyzer
 open Intake
+open Word_processor
 
 let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
