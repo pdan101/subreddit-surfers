@@ -6,3 +6,4 @@ margin = 72
 parse-docstrings = true
 type-decl=sparse
 wrap-comments = true
+break-collection-expressions = wrap

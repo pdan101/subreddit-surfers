@@ -14,7 +14,8 @@ let make_state_test : test = state_test
 
     let rec list_printer list = match list with | [] -> "[]" | _ :: _ ->
     list_printer_helper list "" *)
-let id (x : string) = x
+
+(* let id (x : string) = x *)
 
 (** [pp_string s] pretty-prints string [s]. *)
 let pp_string s = "\"" ^ s ^ "\""
@@ -34,14 +35,10 @@ let pp_list pp_elt lst =
   in
   "[" ^ pp_elts lst ^ "]"
 
-let cmp_word_list words1 words2 =
-  if List.compare_lengths words1 words2 = 0 then
-    let sorted_words1 = List.sort compare words1 in
-    let sorted_words2 = List.sort compare words2 in
-    List.length words1 = List.length words2
-    && sorted_words1 = sorted_words2
-  else false
-
+(* let cmp_word_list words1 words2 = if List.compare_lengths words1
+   words2 = 0 then let sorted_words1 = List.sort compare words1 in let
+   sorted_words2 = List.sort compare words2 in List.length words1 =
+   List.length words2 && sorted_words1 = sorted_words2 else false *)
 let parse_test
     (name : string)
     (input_text : string)
@@ -56,14 +53,7 @@ let word_processor_tests =
     parse_test "Parsing text with no punctuation"
       "And just like that a copy pasta was born"
       [
-        "And";
-        "just";
-        "like";
-        "that";
-        "a";
-        "copy";
-        "pasta";
-        "was";
+        "And"; "just"; "like"; "that"; "a"; "copy"; "pasta"; "was";
         "born";
       ];
     parse_test "Parsing text on multiple lines"
@@ -71,55 +61,18 @@ let word_processor_tests =
        button means to production not to locally on your machine.\n\n\
       \    Send help"
       [
-        "They";
-        "should";
-        "really";
-        "be";
-        "more";
-        "clear";
-        "on";
-        "the";
-        "fact";
-        "that";
-        "the";
-        "deploy";
-        "button";
-        "means";
-        "to";
-        "production";
-        "not";
-        "to";
-        "locally";
-        "on";
-        "your";
-        "machine";
-        "Send";
-        "help";
+        "They"; "should"; "really"; "be"; "more"; "clear"; "on"; "the";
+        "fact"; "that"; "the"; "deploy"; "button"; "means"; "to";
+        "production"; "not"; "to"; "locally"; "on"; "your"; "machine";
+        "Send"; "help";
       ];
     parse_test "Parsing text with punctuation"
       "So like I missed my test and I’m about to get tested rn. How \
        long till I get canvas back?"
       [
-        "So";
-        "like";
-        "I";
-        "missed";
-        "my";
-        "test";
-        "and";
-        "Im";
-        "about";
-        "to";
-        "get";
-        "tested";
-        "rn";
-        "How";
-        "long";
-        "till";
-        "I";
-        "get";
-        "canvas";
-        "back";
+        "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "Im"; "about";
+        "to"; "get"; "tested"; "rn"; "How"; "long"; "till"; "I"; "get";
+        "canvas"; "back";
       ];
   ]
 
