@@ -3,7 +3,7 @@ open Cohttp
 open Cohttp_lwt_unix
 
 let body =
-  Client.get (Uri.of_string "https://www.reddit.com/")
+  Client.get (Uri.of_string "https://www.reddit.com/r/cornell/hot.json")
   >>= fun (resp, body) ->
   let code = resp |> Response.status |> Code.code_of_status in
   Printf.printf "Response code: %d\n" code;
