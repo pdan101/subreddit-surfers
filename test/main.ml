@@ -8,20 +8,21 @@ let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
 let make_state_test : test = state_test
 
-(** FROM A2: let rec list_printer_helper list accumulator = match list
-    with | [] -> accumulator ^ "]" | h :: t -> list_printer_helper t
-    (accumulator ^ " " ^ h ^ ";")
+(** let rec list_printer_helper list accumulator = match list with | []
+    -> accumulator ^ "]" | h :: t -> list_printer_helper t (accumulator
+    ^ " " ^ h ^ ";")
 
     let rec list_printer list = match list with | [] -> "[]" | _ :: _ ->
     list_printer_helper list "" *)
 
 (* let id (x : string) = x *)
+(*BISECT-IGNORE-BEGIN*)
 
 (** FROM A2: [pp_string s] pretty-prints string [s]. *)
 let pp_string s = "\"" ^ s ^ "\""
 
-(** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
-    pretty-print each element of [lst]. *)
+(** FROM A2: [pp_list pp_elt lst] pretty-prints list [lst], using
+    [pp_elt] to pretty-print each element of [lst]. *)
 let pp_list pp_elt lst =
   let pp_elts lst =
     let rec loop n acc = function
@@ -35,6 +36,7 @@ let pp_list pp_elt lst =
   in
   "[" ^ pp_elts lst ^ "]"
 
+(*BISECT-IGNORE-END*)
 (* let cmp_word_list words1 words2 = if List.compare_lengths words1
    words2 = 0 then let sorted_words1 = List.sort compare words1 in let
    sorted_words2 = List.sort compare words2 in List.length words1 =

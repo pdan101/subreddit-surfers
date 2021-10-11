@@ -1,4 +1,4 @@
 (library
  (name analyzer)
  (public_name Analyzer)
- (libraries yojson ANSITerminal pyml cohttp))
+ (libraries yojson ANSITerminal pyml cohttp lwt cohttp-lwt-unix))
