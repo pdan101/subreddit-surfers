@@ -1,0 +1,22 @@
+Instructions on how to run bisect to check code coverage
+
+Make sure you have 
+(executable
+ (name main)
+ (libraries ounit2)
+ (instrumentation
+  (backend bisect_ppx)))
+in the dune file in the test folder 
+
+run $ dune exec --instrument-with bisect_ppx test/main.exe
+from the 3110-final folder, and it'll make some weird file names but that's fine
+
+run $ bisect-ppx-report html
+which will general some files under a _coverage folder
+
+Go to the _coverage folder and open the index.html link in your browser
+to see the code coverage results
+
+When done,
+run $ rm bisect*.coverage
+to get rid of all the bisectNNNN.coverage files that were created
