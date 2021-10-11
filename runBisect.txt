@@ -2,7 +2,7 @@ Instructions on how to run bisect to check code coverage
 
 Make sure you have 
 (executable
- (name test_sorts)
+ (name main)
  (libraries ounit2)
  (instrumentation
   (backend bisect_ppx)))

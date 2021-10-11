@@ -8,16 +8,16 @@ let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
 let make_state_test : test = state_test
 
-(** let rec list_printer_helper list accumulator = match list with | []
-    -> accumulator ^ "]" | h :: t -> list_printer_helper t (accumulator
-    ^ " " ^ h ^ ";")
+(** FROM A2: let rec list_printer_helper list accumulator = match list
+    with | [] -> accumulator ^ "]" | h :: t -> list_printer_helper t
+    (accumulator ^ " " ^ h ^ ";")
 
     let rec list_printer list = match list with | [] -> "[]" | _ :: _ ->
     list_printer_helper list "" *)
 
 (* let id (x : string) = x *)
 
-(** [pp_string s] pretty-prints string [s]. *)
+(** FROM A2: [pp_string s] pretty-prints string [s]. *)
 let pp_string s = "\"" ^ s ^ "\""
 
 (** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
