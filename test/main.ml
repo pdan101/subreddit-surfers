@@ -56,6 +56,16 @@ let word_processor_tests =
         "And"; "just"; "like"; "that"; "a"; "copy"; "pasta"; "was";
         "born";
       ];
+    parse_test
+      "Parsing text with conjunctions but no sentence punctuation"
+      "I'm a sophomore and I didn't really apply to many clubs and I \
+       got rejected from all the ones I applied to this semester"
+      [
+        "I'm"; "a"; "sophomore"; "and"; "I"; "didn't"; "really";
+        "apply"; "to"; "many"; "clubs"; "and"; "I"; "got"; "rejected";
+        "from"; "all"; "the"; "ones"; "I"; "applied"; "to"; "this";
+        "semester";
+      ];
     parse_test "Parsing text on multiple lines"
       "They should really be more clear on the fact that the deploy \
        button means to production not to locally on your machine.\n\n\
@@ -66,13 +76,39 @@ let word_processor_tests =
         "production"; "not"; "to"; "locally"; "on"; "your"; "machine";
         "Send"; "help";
       ];
-    parse_test "Parsing text with punctuation"
+    parse_test
+      "Parsing text with punctuation, doesn't remove punctuation in \
+       the middle of the word"
       "So like I missed my test and I’m about to get tested rn. How \
        long till I get canvas back?"
       [
-        "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "Im"; "about";
-        "to"; "get"; "tested"; "rn"; "How"; "long"; "till"; "I"; "get";
-        "canvas"; "back";
+        "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "I'm";
+        "about"; "to"; "get"; "tested"; "rn"; "How"; "long"; "till";
+        "I"; "get"; "canvas"; "back";
+      ];
+    parse_test "Don't conjunction and punctuation"
+      "And he has spent a long time constantly targeting me in these \
+       implicit ways by either pretending I don’t contribute, quickly \
+       moving on without an acknowledgement, or emphasizing how I \
+       should have followed the point of his fave."
+      [
+        "And"; "he"; "has"; "spent"; "a"; "long"; "time"; "constantly";
+        "targeting"; "me"; "in"; "these"; "implicit"; "ways"; "by";
+        "either"; "pretending"; "I"; "don't"; "contribute"; "quickly";
+        "moving"; "on"; "without"; "an"; "acknowledgment"; "or";
+        "emphasizing"; "how"; "I"; "should"; "have"; "followed"; "the";
+        "point"; "of"; "his"; "phase";
+      ];
+    parse_test "Many conjunctions and types of punctuation"
+      "the professor hasn't released prelim grades, doesn't know how \
+       to teach the material, and didn't give us a syllabus! They're \
+       really slow to realize homework grades, it's ridiculous! "
+      [
+        "the"; "professor"; "haven't"; "released"; "prelim"; "grades";
+        "doesn't"; "know"; "how"; "to"; "teach"; "the"; "material";
+        "and"; "didn't"; "give"; "us"; "a"; "syllabus"; "They're";
+        "really"; "slow"; "to"; "realize"; "homework"; "grades"; "it's";
+        "ridiculous";
       ];
   ]
 
