@@ -3,6 +3,7 @@ open Analyzer
 open Intake
 open WordProcessor
 open Sentiment
+open RedditApi
 
 let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
@@ -84,11 +85,19 @@ let sentiment_test (name : string) expected_output : test =
 
 let sentiment_tests = [ sentiment_test "trying to run this" 1.0 ]
 
+let reddit_api_test (name : string) expected_output : test =
+  name >:: fun _ -> assert_equal expected_output run_api
+
+let reddit_api_tests = [ reddit_api_test "this is a test" () ]
+
 let intake_tests = []
 
 let suite =
   "test suite for Final"
   >::: List.flatten
-         [ intake_tests; word_processor_tests; sentiment_tests ]
+         [
+           intake_tests; word_processor_tests; sentiment_tests;
+           reddit_api_tests;
+         ]
 
 let _ = run_test_tt_main suite
