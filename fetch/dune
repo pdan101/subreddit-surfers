@@ -1,0 +1,3 @@
+(executable
+ (name redditApi)
+ (libraries Analyzer yojson ANSITerminal pyml cohttp lwt cohttp-lwt-unix))

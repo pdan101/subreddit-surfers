@@ -9,8 +9,8 @@ utop:
 test:
 	OCAMLRUNPARAM=b dune exec test/main.exe
 
-play:
-	OCAMLRUNPARAM=b dune exec bin/main.exe
+request:
+	OCAMLRUNPARAM=b dune exec fetch/redditApi.exe
 
 check:
 	@bash check.sh
