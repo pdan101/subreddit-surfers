@@ -61,4 +61,16 @@ let rec calc_m char_string =
   else if first_char = '-' || second_char = '-' then 0
   else calc_m (tail char_string)
 
+let get_last word num = String.sub word (String.length word - num) num
+
+let remove_last word num = String.sub word 0 (String.length word - num)
+
+let remove_plurals word =
+  let len = String.length word in
+  if len = 0 then word
+  else if len >= 4 && get_last word 4 = "sses" then remove_last word 2
+  else if len >= 3 && get_last word 3 = "ies" then remove_last word 2
+  else if len >= 2 && get_last word 1 = "s" then remove_last word 1
+  else word
+
 let stem (word : string) = raise (Failure "Unimplemented")
