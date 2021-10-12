@@ -3,9 +3,6 @@
     converts it into more usable types, which can be used in function
     applications. *)
 
-type author = string
-(** The type of author name. *)
-
 type post
 (** The abstract type of values representing a specific reddit post. *)
 

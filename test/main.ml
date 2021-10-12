@@ -131,13 +131,30 @@ let word_processor_tests =
       "hlped" 1 "hlped";
   ]
 
-let sentiment_test (name : string) expected_output : test =
+let sentiment_of_score score =
+  if score <= -0.05 then "Negative"
+  else if score >= 0.05 then "Positive"
+  else "Neutral"
+
+let sentiment_test
+    (name : string)
+    (text : string)
+    (expected_output : string) : test =
+  let _ = print_float (polarity_score text) in
   name >:: fun _ ->
   assert_equal expected_output
-    (connotation_str "this is a very funny sentence I love it")
-    ~printer:string_of_float
+    (sentiment_of_score (polarity_score text))
+    ~printer:String.escaped
 
-let sentiment_tests = [ sentiment_test "trying to run this" 0.839 ]
+let sentiment_tests =
+  [
+    sentiment_test "Positive sentence"
+      "This is a very happy sentence that thrills me." "Positive";
+    sentiment_test "Neutral sentence"
+      "Cornell University is located in New York." "Neutral";
+    sentiment_test "Negative sentence" "I hate all of the snow."
+      "Negative";
+  ]
 
 let intake_tests = []
 
