@@ -47,7 +47,7 @@ let rec create_units (word : string) =
   else ""
 
 (*TODO make this method better- should not be using try/catch*)
-let rec calc_m char_string =
+let rec calc_vc char_string =
   let first_char =
     try String.get char_string 0 with
     | _ -> '-'
@@ -57,9 +57,9 @@ let rec calc_m char_string =
     | _ -> '-'
   in
   if first_char = 'V' && second_char = 'C' then
-    1 + calc_m (tail char_string)
+    1 + calc_vc (tail char_string)
   else if first_char = '-' || second_char = '-' then 0
-  else calc_m (tail char_string)
+  else calc_vc (tail char_string)
 
 let get_last word num = String.sub word (String.length word - num) num
 
@@ -69,14 +69,20 @@ let remove_plurals word =
   let len = String.length word in
   if len >= 4 && get_last word 4 = "sses" then remove_last word 2
   else if len >= 3 && get_last word 3 = "ies" then remove_last word 2
+  else if len >= 2 && get_last word 2 = "ss" then remove_last word 2
   else if len >= 2 && get_last word 1 = "s" then remove_last word 1
   else word
 
 let contains_vowel word = word <> find_group word vowels
 
-let remove_past_participles word m =
+let rec contains_vowel word =
+  if String.length word = 0 then false
+  else if String.contains vowels (String.get word 0) then true
+  else contains_vowel (tail word)
+
+let remove_past_participles word num_vc =
   let len = String.length word in
-  if m > 0 && len >= 3 && get_last word 3 = "eed" then
+  if num_vc > 0 && len >= 3 && get_last word 3 = "eed" then
     remove_last word 1
   else if len >= 3 && get_last word 3 = "eed" then word
   else if

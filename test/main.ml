@@ -47,6 +47,40 @@ let parse_test
   assert_equal expected_output (parse input_text)
     ~printer:(pp_list pp_string)
 
+let create_units_test
+    (name : string)
+    (word : string)
+    (expected_output : string) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (create_units word)
+    ~printer:String.escaped
+
+let calc_vc_test
+    (name : string)
+    (char_string : string)
+    (expected_output : int) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (calc_vc char_string)
+    ~printer:string_of_int
+
+let remove_plurals_test
+    (name : string)
+    (word : string)
+    (expected_output : string) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (remove_plurals word)
+    ~printer:String.escaped
+
+let remove_past_participles_test
+    (name : string)
+    (word : string)
+    (num_vc : int)
+    (expected_output : string) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (remove_past_participles word num_vc)
+    ~printer:String.escaped
+
 let word_processor_tests =
   [
     parse_test "Empty string" "" [];
@@ -73,7 +107,28 @@ let word_processor_tests =
         "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "Im"; "about";
         "to"; "get"; "tested"; "rn"; "How"; "long"; "till"; "I"; "get";
         "canvas"; "back";
-      ];
+      ]; create_units_test "Consonant group" "hello" "CVCV";
+    create_units_test "Vowel group" "helloooooo" "CVCV";
+    create_units_test "Basic test" "helo" "CVCV";
+    create_units_test "Numerous groups" "hhhhhheeeeeellllloooooo" "CVCV";
+    create_units_test "Numerous groups with different characters"
+      "hkealolo" "CVCVCV"; calc_vc_test "no VC" "CV" 0;
+    calc_vc_test "Empty string" "" 0; calc_vc_test "Odd length" "CVC" 1;
+    calc_vc_test "Even pairs" "VCVCVC" 3;
+    remove_plurals_test "Ending with SSES" "possesses" "possess";
+    remove_plurals_test "Ending with IES" "libraries" "librari";
+    remove_plurals_test "Ending with SS" "loneliness" "loneline";
+    remove_plurals_test "Ending with S" "cars" "car";
+    remove_plurals_test "Not plural" "car" "car";
+    remove_past_participles_test "No VC with EED" "steed" 0 "steed";
+    remove_past_participles_test "Ending with EED" "agreed" 1 "agree";
+    remove_past_participles_test "Ending with ING" "wondering" 1
+      "wonder";
+    remove_past_participles_test "Ending with ING and no vowel in stem"
+      "wndring" 1 "wndring";
+    remove_past_participles_test "Ending with ED" "helped" 1 "help";
+    remove_past_participles_test "Ending with ED and no vowel in stem"
+      "hlped" 1 "hlped";
   ]
 
 let sentiment_test (name : string) expected_output : test =
@@ -82,7 +137,7 @@ let sentiment_test (name : string) expected_output : test =
     (connotation_str "this is a very funny sentence I love it")
     ~printer:string_of_float
 
-let sentiment_tests = [ sentiment_test "trying to run this" 1.0 ]
+let sentiment_tests = [ sentiment_test "trying to run this" 0.839 ]
 
 let intake_tests = []
 
