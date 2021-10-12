@@ -42,8 +42,23 @@ let rec create_units (word : string) =
   if String.length word >= 1 then
     let remove_vowels = find_group word vowels in
     let remove_consonants = find_group word consonants in
-    if remove_vowels <> word then 'V' :: create_units remove_vowels
-    else 'C' :: create_units remove_consonants
-  else []
+    if remove_vowels <> word then "V" ^ create_units remove_vowels
+    else "C" ^ create_units remove_consonants
+  else ""
+
+(*TODO make this method better- should not be using try/catch*)
+let rec calc_m char_string =
+  let first_char =
+    try String.get char_string 0 with
+    | _ -> '-'
+  in
+  let second_char =
+    try String.get char_string 1 with
+    | _ -> '-'
+  in
+  if first_char = 'V' && second_char = 'C' then
+    1 + calc_m (tail char_string)
+  else if first_char = '-' || second_char = '-' then 0
+  else calc_m (tail char_string)
 
 let stem (word : string) = raise (Failure "Unimplemented")
