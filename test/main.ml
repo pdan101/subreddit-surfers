@@ -84,14 +84,24 @@ let sentiment_test (name : string) expected_output : test =
     (connotation_str "this is a very funny sentence I love it")
     ~printer:string_of_float
 
-let sentiment_tests = [ sentiment_test "trying to run this" 1.0 ]
+let sentiment_tests = [ sentiment_test "trying to run this" 0.839 ]
 
 (* let reddit_api_test (name : string) input1 expected_output : test =
    name >:: fun _ -> assert_equal expected_output (RedditApi.terminal
    input1)
 
    let reddit_api_tests = [ reddit_api_test "this is a test" () () ] *)
-let intake_tests = []
+
+let cornell =
+  from_json ("data/cornell_real.json" |> Yojson.Basic.from_file)
+
+let author_test (name : string) input1 input2 expected_output : test =
+  name >:: fun _ ->
+  assert_equal expected_output (author input1 input2)
+    ~printer:String.escaped
+
+let intake_tests =
+  [ author_test "Finding first post author" cornell "mts7re" "pw11111" ]
 
 let suite =
   "test suite for Final"
