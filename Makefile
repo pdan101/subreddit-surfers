@@ -12,6 +12,9 @@ test:
 play:
 	OCAMLRUNPARAM=b dune exec bin/main.exe
 
+demo1:
+	OCAMLRUNPARAM=b dune exec demo1/demo1.exe
+
 check:
 	@bash check.sh
 
