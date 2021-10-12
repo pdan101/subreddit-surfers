@@ -4,76 +4,56 @@ type author = string
 
 type post = {
   author : author;
-  created_utc : int;
+  created_utc : float;
   id : string;
   num_comments : int;
   num_crossposts : int;
   selftext : string;
   spoiler : bool;
   title : string;
+  upvotes : int;
 }
 
-type subreddit = {
-  posts : post list;
-  subreddit_name : string;
-  subreddit_id : string;
-  subreddit_subscribers : int;
-  subreddit_type : string;
-}
+type subreddit = post list
 
 let post_of_json json =
+  let next = json |> member "data" in
   {
-    author = json |> member "author" |> to_string;
-    created_utc = json |> member "created_utc" |> to_int;
-    id = json |> member "id" |> to_string;
-    num_comments = json |> member "num_comments" |> to_int;
-    num_crossposts = json |> member "num_crossposts" |> to_int;
-    selftext = json |> member "selftext" |> to_string;
-    spoiler = json |> member "spoiler" |> to_bool;
-    title = json |> member "title" |> to_string;
+    author = next |> member "author" |> to_string;
+    created_utc = next |> member "created_utc" |> to_float;
+    id = next |> member "id" |> to_string;
+    num_comments = next |> member "num_comments" |> to_int;
+    num_crossposts = next |> member "num_crossposts" |> to_int;
+    selftext = next |> member "selftext" |> to_string;
+    spoiler = next |> member "spoiler" |> to_bool;
+    title = next |> member "title" |> to_string;
+    upvotes = next |> member "score" |> to_int;
   }
 
 let from_json json =
-  {
-    posts = json |> member "posts" |> to_list |> List.map post_of_json;
-    subreddit_name = json |> member "subreddit_name" |> to_string;
-    subreddit_id = json |> member "subreddit_id" |> to_string;
-    subreddit_subscribers =
-      json |> member "subreddit_subscribers" |> to_int;
-    subreddit_type = json |> member "subreddit_type" |> to_string;
-  }
-
-let subreddit_name subreddit = subreddit.subreddit_name
-
-let subreddit_id subreddit = subreddit.subreddit_id
-
-let subreddit_subscribers subreddit = subreddit.subreddit_subscribers
-
-let subreddit_type subreddit = subreddit.subreddit_type
+  json |> member "data" |> member "children" |> to_list
+  |> List.map post_of_json
 
 let post_ids subreddit =
-  List.sort_uniq compare (List.map (fun x -> x.id) subreddit.posts)
+  List.sort_uniq compare (List.map (fun x -> x.id) subreddit)
 
 let find_post post_id posts = List.find (fun x -> x.id = post_id) posts
 
-let author subreddit post_id =
-  (find_post post_id subreddit.posts).author
+let author subreddit post_id = (find_post post_id subreddit).author
 
 let created_utc subreddit post_id =
-  (find_post post_id subreddit.posts).created_utc
+  (find_post post_id subreddit).created_utc
 
-let id subreddit post_id = (find_post post_id subreddit.posts).id
+let id subreddit post_id = (find_post post_id subreddit).id
 
 let num_comments subreddit post_id =
-  (find_post post_id subreddit.posts).num_comments
+  (find_post post_id subreddit).num_comments
 
 let num_crossposts subreddit post_id =
-  (find_post post_id subreddit.posts).num_crossposts
+  (find_post post_id subreddit).num_crossposts
 
-let selftext subreddit post_id =
-  (find_post post_id subreddit.posts).selftext
+let selftext subreddit post_id = (find_post post_id subreddit).selftext
 
-let spoiler subreddit post_id =
-  (find_post post_id subreddit.posts).spoiler
+let spoiler subreddit post_id = (find_post post_id subreddit).spoiler
 
-let title subreddit post_id = (find_post post_id subreddit.posts).title
+let title subreddit post_id = (find_post post_id subreddit).title
