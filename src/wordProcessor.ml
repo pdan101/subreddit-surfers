@@ -67,10 +67,28 @@ let remove_last word num = String.sub word 0 (String.length word - num)
 
 let remove_plurals word =
   let len = String.length word in
-  if len = 0 then word
-  else if len >= 4 && get_last word 4 = "sses" then remove_last word 2
+  if len >= 4 && get_last word 4 = "sses" then remove_last word 2
   else if len >= 3 && get_last word 3 = "ies" then remove_last word 2
   else if len >= 2 && get_last word 1 = "s" then remove_last word 1
+  else word
+
+let contains_vowel word = word <> find_group word vowels
+
+let remove_past_participles word m =
+  let len = String.length word in
+  if m > 0 && len >= 3 && get_last word 3 = "eed" then
+    remove_last word 1
+  else if len >= 3 && get_last word 3 = "eed" then word
+  else if
+    len >= 2
+    && get_last word 2 = "ed"
+    && contains_vowel (remove_last word 2)
+  then remove_last word 2
+  else if
+    len >= 3
+    && get_last word 3 = "ing"
+    && contains_vowel (remove_last word 3)
+  then remove_last word 3
   else word
 
 let stem (word : string) = raise (Failure "Unimplemented")
