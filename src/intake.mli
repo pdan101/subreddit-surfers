@@ -16,6 +16,13 @@ val from_json : Yojson.Basic.t -> subreddit
 (** [from_json json] is the subreddit that [json] represents. Requires:
     [json] is a valid JSON subreddit representation. *)
 
+val recent_post : subreddit -> post
+(** [recent_post subreddit] is the most recent post in [subreddit].
+    Fails with "No posts in this subreddit" if there are no posts.*)
+
+val posts : subreddit -> post list
+(** [posts subreddit] is the list of posts in [subreddit].*)
+
 val post_ids : subreddit -> string list
 (** [post_ids subreddit] is a set-like list of the posts in subreddit
     [subreddit] sorted by their ids. Requires: [subreddit] is a valid
@@ -46,10 +53,8 @@ val num_crossposts : subreddit -> string -> int
     [post_id] in [subreddit]. Requires: [subreddit] is a valid
     subreddit, [post_id] exists in the posts of [subreddit].*)
 
-val selftext : subreddit -> string -> string
-(** [selftext subreddit post_id] is the text in the body of the post
-    with [post_id] in [subreddit]. Requires: [subreddit] is a valid
-    subreddit, [post_id] exists in the posts of [subreddit].*)
+val selftext : post -> string
+(** [selftext post] is the text in the body of the [post].*)
 
 val spoiler : subreddit -> string -> bool
 (** [spoiler subreddit post_id] is true is the post [post_id] in

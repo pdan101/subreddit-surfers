@@ -34,6 +34,13 @@ let from_json json =
   json |> member "data" |> member "children" |> to_list
   |> List.map post_of_json
 
+let posts subreddit : post list = subreddit
+
+let recent_post (subreddit : subreddit) : post =
+  match subreddit with
+  | [] -> failwith "No posts available"
+  | h :: _ -> h
+
 let post_ids subreddit =
   List.sort_uniq compare (List.map (fun x -> x.id) subreddit)
 
@@ -52,7 +59,7 @@ let num_comments subreddit post_id =
 let num_crossposts subreddit post_id =
   (find_post post_id subreddit).num_crossposts
 
-let selftext subreddit post_id = (find_post post_id subreddit).selftext
+let selftext post = post.selftext
 
 let spoiler subreddit post_id = (find_post post_id subreddit).spoiler
 
