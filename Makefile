@@ -16,7 +16,7 @@ demo1:
 	OCAMLRUNPARAM=b dune exec demo1/demo1.exe
 
 bisect: clean test
-	bisect-ppx-report html --theme-light
+	bisect-ppx-report html --theme=light
 
 check:
 	@bash check.sh
