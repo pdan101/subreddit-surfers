@@ -10,14 +10,31 @@ let rec sub subreddit_name =
       print_string "> ";
       sub (read_line ())
 
+let print_graph score =
+  let pos = String.make (23. *. score |> int_of_float) ' ' in
+  let arrow_up = pos ^ "^" in
+  let score_up =
+    String.sub pos 2 (String.length pos - 2) ^ string_of_float score
+  in
+  print_endline "       SENTIMENT       ";
+  print_endline "|----------|----------|";
+  print_endline "Neg.    Neutral      Pos.";
+  print_endline arrow_up;
+  print_endline score_up
+
 let run_analysis subreddit_name =
   let intake_sub = sub subreddit_name in
   let recent_post_text =
     intake_sub |> Intake.recent_post |> Intake.selftext
   in
+  let () =
+    print_endline
+      ("Pulling the text from the most recent hot post in r/"
+     ^ subreddit_name ^ ": \n")
+  in
   let () = print_endline recent_post_text in
-  let () = print_float (Sentiment.polarity_score recent_post_text) in
   let () = print_newline () in
+  let () = print_graph (Sentiment.polarity_score recent_post_text) in
   ()
 
 let terminal () =

@@ -12,7 +12,7 @@ test:
 play:
 	OCAMLRUNPARAM=b dune exec bin/main.exe
 
-demo1:
+demo_one:
 	OCAMLRUNPARAM=b dune exec demo1/demo1.exe
 
 bisect: clean test
