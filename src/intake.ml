@@ -1,9 +1,7 @@
 open Yojson.Basic.Util
 
-type author = string
-
 type post = {
-  author : author;
+  author : string;
   created_utc : float;
   id : string;
   num_comments : int;
@@ -34,33 +32,35 @@ let from_json json =
   json |> member "data" |> member "children" |> to_list
   |> List.map post_of_json
 
-let posts subreddit : post list = subreddit
-
 let recent_post (subreddit : subreddit) : post =
   match subreddit with
   | [] -> failwith "No posts available"
   | h :: _ -> h
 
-let post_ids subreddit =
-  List.sort_uniq compare (List.map (fun x -> x.id) subreddit)
+let posts subreddit : post list = subreddit
 
-let find_post post_id posts = List.find (fun x -> x.id = post_id) posts
+let author post = post.author
 
-let author subreddit post_id = (find_post post_id subreddit).author
+let created_utc post = post.created_utc
 
-let created_utc subreddit post_id =
-  (find_post post_id subreddit).created_utc
+let id post = post.id
 
-let id subreddit post_id = (find_post post_id subreddit).id
+let num_comments post = post.num_comments
 
-let num_comments subreddit post_id =
-  (find_post post_id subreddit).num_comments
-
-let num_crossposts subreddit post_id =
-  (find_post post_id subreddit).num_crossposts
+let num_crossposts post = post.num_crossposts
 
 let selftext post = post.selftext
 
-let spoiler subreddit post_id = (find_post post_id subreddit).spoiler
+let spoiler post = post.spoiler
 
-let title subreddit post_id = (find_post post_id subreddit).title
+let title post = post.title
+
+let upvotes post = post.upvotes
+
+
+
+
+
+
+
+

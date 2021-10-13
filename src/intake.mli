@@ -3,9 +3,6 @@
     converts it into more usable types, which can be used in function
     applications. *)
 
-type author = string
-(** The type of author name. *)
-
 type post
 (** The abstract type of values representing a specific reddit post. *)
 
@@ -23,45 +20,36 @@ val recent_post : subreddit -> post
 val posts : subreddit -> post list
 (** [posts subreddit] is the list of posts in [subreddit].*)
 
-val post_ids : subreddit -> string list
-(** [post_ids subreddit] is a set-like list of the posts in subreddit
-    [subreddit] sorted by their ids. Requires: [subreddit] is a valid
-    subreddit.*)
+val author : post -> string 
+(** [author post] is the author of [post].*)
 
-val author : subreddit -> string -> string
-(** [author subreddit post_id] is the author of a post with [post_id] in
-    [subreddit]. Requires: [subreddit] is a valid subreddit, [post_id]
-    exists in the posts of [subreddit].*)
+val created_utc : post -> float
+(** [created_utc post] is the creation time of [post].*)
 
-val created_utc : subreddit -> string -> float
-(** [created_utc subreddit post_id] is the Unix epoch time in UTC of a
-    post with [post_id] in [subreddit]. Requires: [subreddit] is a valid
-    subreddit, [post_id] exists in the posts of [subreddit].*)
+val id : post -> string 
+(** [id post] is the id of [post].*)
 
-val id : subreddit -> string -> string
-(** [id subreddit post] is the id of a post of [post_id] in [subreddit].
-    Requires: [subreddit] is a valid subreddit, [post] exists in the
-    posts of [subreddit].*)
+val num_comments : post -> int
+(** [num_comments post] is the number of comments of [post].*)
 
-val num_comments : subreddit -> string -> int
-(** [num_comments subreddit post_id] is the number of comments to
-    [post_id] in [subreddit]. Requires: [subreddit] is a valid
-    subreddit, [post_id] exists in the posts of [subreddit].*)
+val num_crossposts : post -> int
+(** [num_crossposts post] is the number of crossposts of [post].*)
 
-val num_crossposts : subreddit -> string -> int
-(** [num_crossposts subreddit post_id] is the number of crossposts for
-    [post_id] in [subreddit]. Requires: [subreddit] is a valid
-    subreddit, [post_id] exists in the posts of [subreddit].*)
+val selftext : post -> string 
+(** [selftext post] is the text of [post].*)
 
-val selftext : post -> string
-(** [selftext post] is the text in the body of the [post].*)
+val spoiler : post -> bool
+(** [spoiler post] indicates if [post] has a spoiler.*)
+    
+val upvotes : post -> int
+(** [author post] is the number of upvotes of [post].*)
 
-val spoiler : subreddit -> string -> bool
-(** [spoiler subreddit post_id] is true is the post [post_id] in
-    [subreddit] is tagged as a spoiler. Requires: [subreddit] is a valid
-    subreddit, [post_id] exists in the posts of [subreddit].*)
 
-val title : subreddit -> string -> string
-(** [title subreddit post_id] is the title of the post [post_id] in
-    [subreddit]. Requires: [subreddit] is a valid subreddit, [post_id]
-    exists in the posts of [subreddit].*)
+
+
+
+
+
+
+
+

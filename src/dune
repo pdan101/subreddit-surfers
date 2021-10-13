@@ -1,4 +1,6 @@
 (library
  (name analyzer)
  (public_name Analyzer)
- (libraries yojson ANSITerminal pyml))
+ (libraries yojson ANSITerminal pyml)
+ (instrumentation
+  (backend bisect_ppx)))
