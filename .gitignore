@@ -17,4 +17,5 @@ _build
 \#*\#
 .DS_Store
 
-
+# bisect
+_coverage

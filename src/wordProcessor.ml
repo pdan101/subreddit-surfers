@@ -73,8 +73,6 @@ let remove_plurals word =
   else if len >= 2 && get_last word 1 = "s" then remove_last word 1
   else word
 
-let contains_vowel word = word <> find_group word vowels
-
 let rec contains_vowel word =
   if String.length word = 0 then false
   else if String.contains vowels (String.get word 0) then true
