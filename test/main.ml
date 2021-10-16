@@ -169,10 +169,7 @@ let word_processor_tests =
        punctuation"
       parse_sentence "Hello there, my name is Usnavi Who are you"
       [ "Hello there, my name is Usnavi Who are you" ];
-        "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "Im"; "about";
-        "to"; "get"; "tested"; "rn"; "How"; "long"; "till"; "I"; "get";
-        "canvas"; "back";
-      ]; create_units_test "Consonant group" "hello" "CVCV";
+    create_units_test "Consonant group" "hello" "CVCV";
     create_units_test "Vowel group" "helloooooo" "CVCV";
     create_units_test "Basic test" "helo" "CVCV";
     create_units_test "Numerous groups" "hhhhhheeeeeellllloooooo" "CVCV";
@@ -210,7 +207,6 @@ let sentiment_test
   assert_equal expected_output
     (sentiment_of_score (polarity_score text))
     ~printer:String.escaped
-
 
 let sentiment_tests =
   [
