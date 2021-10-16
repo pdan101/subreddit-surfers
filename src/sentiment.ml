@@ -1,6 +1,6 @@
-(** taken from
+(** adapted from
     https://github.com/Duncan-McD/OCamlStocks/blob/5d2c3d62decf7ee3ae4265655f014b0f34961ada/src/parser.ml*)
-let connotation_str str =
+let polarity_score str =
   Py.initialize ();
   let vader = Py.import "vaderSentiment.vaderSentiment" in
   let sentAnalyzer =

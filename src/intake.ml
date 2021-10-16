@@ -1,79 +1,66 @@
 open Yojson.Basic.Util
 
-type author = string
-
 type post = {
-  author : author;
-  created_utc : int;
+  author : string;
+  created_utc : float;
   id : string;
   num_comments : int;
   num_crossposts : int;
   selftext : string;
   spoiler : bool;
   title : string;
+  upvotes : int;
 }
 
-type subreddit = {
-  posts : post list;
-  subreddit_name : string;
-  subreddit_id : string;
-  subreddit_subscribers : int;
-  subreddit_type : string;
-}
+type subreddit = post list
 
 let post_of_json json =
+  let next = json |> member "data" in
   {
-    author = json |> member "author" |> to_string;
-    created_utc = json |> member "created_utc" |> to_int;
-    id = json |> member "id" |> to_string;
-    num_comments = json |> member "num_comments" |> to_int;
-    num_crossposts = json |> member "num_crossposts" |> to_int;
-    selftext = json |> member "selftext" |> to_string;
-    spoiler = json |> member "spoiler" |> to_bool;
-    title = json |> member "title" |> to_string;
+    author = next |> member "author" |> to_string;
+    created_utc = next |> member "created_utc" |> to_float;
+    id = next |> member "id" |> to_string;
+    num_comments = next |> member "num_comments" |> to_int;
+    num_crossposts = next |> member "num_crossposts" |> to_int;
+    selftext = next |> member "selftext" |> to_string;
+    spoiler = next |> member "spoiler" |> to_bool;
+    title = next |> member "title" |> to_string;
+    upvotes = next |> member "score" |> to_int;
   }
 
 let from_json json =
-  {
-    posts = json |> member "posts" |> to_list |> List.map post_of_json;
-    subreddit_name = json |> member "subreddit_name" |> to_string;
-    subreddit_id = json |> member "subreddit_id" |> to_string;
-    subreddit_subscribers =
-      json |> member "subreddit_subscribers" |> to_int;
-    subreddit_type = json |> member "subreddit_type" |> to_string;
-  }
+  json |> member "data" |> member "children" |> to_list
+  |> List.map post_of_json
 
-let subreddit_name subreddit = subreddit.subreddit_name
+let recent_post (subreddit : subreddit) : post =
+  match subreddit with
+  | [] -> failwith "No posts available"
+  | h :: _ -> h
 
-let subreddit_id subreddit = subreddit.subreddit_id
+let posts subreddit : post list = subreddit
 
-let subreddit_subscribers subreddit = subreddit.subreddit_subscribers
+let author post = post.author
 
-let subreddit_type subreddit = subreddit.subreddit_type
+let created_utc post = post.created_utc
 
-let post_ids subreddit =
-  List.sort_uniq compare (List.map (fun x -> x.id) subreddit.posts)
+let id post = post.id
 
-let find_post post_id posts = List.find (fun x -> x.id = post_id) posts
+let num_comments post = post.num_comments
 
-let author subreddit post_id =
-  (find_post post_id subreddit.posts).author
+let num_crossposts post = post.num_crossposts
 
-let created_utc subreddit post_id =
-  (find_post post_id subreddit.posts).created_utc
+let selftext post = post.selftext
 
-let id subreddit post_id = (find_post post_id subreddit.posts).id
+let spoiler post = post.spoiler
 
-let num_comments subreddit post_id =
-  (find_post post_id subreddit.posts).num_comments
+let title post = post.title
 
-let num_crossposts subreddit post_id =
-  (find_post post_id subreddit.posts).num_crossposts
+let upvotes post = post.upvotes
 
-let selftext subreddit post_id =
-  (find_post post_id subreddit.posts).selftext
 
-let spoiler subreddit post_id =
-  (find_post post_id subreddit.posts).spoiler
 
-let title subreddit post_id = (find_post post_id subreddit.posts).title
+
+
+
+
+

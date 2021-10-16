@@ -31,6 +31,76 @@ let parse (text : string) =
   |> List.map (fun x -> String.trim x)
   |> List.map (fun x -> remove_punc x)
 
+let consonants = "bcdfghjklmnpqrstwxz"
+
+let vowels = "aeiouy"
+
+let tail word = String.sub word 1 (String.length word - 1)
+
+let rec find_group word type_char =
+  if
+    String.length word > 0
+    && String.contains type_char (String.get word 0)
+  then find_group (tail word) type_char
+  else word
+
+let rec create_units (word : string) =
+  if String.length word >= 1 then
+    let remove_vowels = find_group word vowels in
+    let remove_consonants = find_group word consonants in
+    if remove_vowels <> word then "V" ^ create_units remove_vowels
+    else "C" ^ create_units remove_consonants
+  else ""
+
+(*TODO make this method better- should not be using try/catch*)
+let rec calc_vc char_string =
+  let first_char =
+    try String.get char_string 0 with
+    | _ -> '-'
+  in
+  let second_char =
+    try String.get char_string 1 with
+    | _ -> '-'
+  in
+  if first_char = 'V' && second_char = 'C' then
+    1 + calc_vc (tail char_string)
+  else if first_char = '-' || second_char = '-' then 0
+  else calc_vc (tail char_string)
+
+let get_last word num = String.sub word (String.length word - num) num
+
+let remove_last word num = String.sub word 0 (String.length word - num)
+
+let remove_plurals word =
+  let len = String.length word in
+  if len >= 4 && get_last word 4 = "sses" then remove_last word 2
+  else if len >= 3 && get_last word 3 = "ies" then remove_last word 2
+  else if len >= 2 && get_last word 2 = "ss" then remove_last word 2
+  else if len >= 2 && get_last word 1 = "s" then remove_last word 1
+  else word
+
+let rec contains_vowel word =
+  if String.length word = 0 then false
+  else if String.contains vowels (String.get word 0) then true
+  else contains_vowel (tail word)
+
+let remove_past_participles word num_vc =
+  let len = String.length word in
+  if num_vc > 0 && len >= 3 && get_last word 3 = "eed" then
+    remove_last word 1
+  else if len >= 3 && get_last word 3 = "eed" then word
+  else if
+    len >= 2
+    && get_last word 2 = "ed"
+    && contains_vowel (remove_last word 2)
+  then remove_last word 2
+  else if
+    len >= 3
+    && get_last word 3 = "ing"
+    && contains_vowel (remove_last word 3)
+  then remove_last word 3
+  else word
+
 let stem (word : string) = raise (Failure "Unimplemented")
 
 exception Unsupported_sentence_format
