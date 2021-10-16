@@ -32,3 +32,24 @@ let parse (text : string) =
   |> List.map (fun x -> remove_punc x)
 
 let stem (word : string) = raise (Failure "Unimplemented")
+
+exception Unsupported_sentence_format
+
+let rec split_sentence_list (sep : Str.split_result list) : string list
+    =
+  match sep with
+  | [] -> []
+  | [ Text x ] -> [ x ]
+  | Text sentence :: Delim punc :: t ->
+      (String.trim sentence ^ punc) :: split_sentence_list t
+  | Delim x :: t -> raise Unsupported_sentence_format
+  | Text _ :: Text _ :: t -> raise Unsupported_sentence_format
+
+let parse_sentence (text : string) =
+  match
+    try
+      split_sentence_list (Str.full_split (Str.regexp "[.!?]") text)
+    with
+    | Unsupported_sentence_format -> [ text ]
+  with
+  | x -> x

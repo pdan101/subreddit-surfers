@@ -3,6 +3,7 @@ open Analyzer
 open Intake
 open WordProcessor
 open Sentiment
+open Str
 
 let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
@@ -41,23 +42,24 @@ let pp_list pp_elt lst =
    List.length words2 && sorted_words1 = sorted_words2 else false *)
 let parse_test
     (name : string)
+    (parser : string -> string list)
     (input_text : string)
     (expected_output : string list) : test =
   name >:: fun _ ->
-  assert_equal expected_output (parse input_text)
+  assert_equal expected_output (parser input_text)
     ~printer:(pp_list pp_string)
 
 let word_processor_tests =
   [
-    parse_test "Empty string" "" [];
-    parse_test "Parsing text with no punctuation"
+    parse_test "Empty string" parse "" [];
+    parse_test "Parsing text with no punctuation" parse
       "And just like that a copy pasta was born"
       [
         "And"; "just"; "like"; "that"; "a"; "copy"; "pasta"; "was";
         "born";
       ];
     parse_test
-      "Parsing text with conjunctions but no sentence punctuation"
+      "Parsing text with conjunctions but no sentence punctuation" parse
       "I'm a sophomore and I didn't really apply to many clubs and I \
        got rejected from all the ones I applied to this semester"
       [
@@ -66,7 +68,7 @@ let word_processor_tests =
         "from"; "all"; "the"; "ones"; "I"; "applied"; "to"; "this";
         "semester";
       ];
-    parse_test "Parsing text on multiple lines"
+    parse_test "Parsing text on multiple lines" parse
       "They should really be more clear on the fact that the deploy \
        button means to production not to locally on your machine.\n\n\
       \    Send help"
@@ -79,6 +81,7 @@ let word_processor_tests =
     parse_test
       "Parsing text with punctuation, doesn't remove punctuation in \
        the middle of the word"
+      parse
       "So like I missed my test and I'm about to get tested rn. How \
        long till I get canvas back?"
       [
@@ -86,7 +89,7 @@ let word_processor_tests =
         "about"; "to"; "get"; "tested"; "rn"; "How"; "long"; "till";
         "I"; "get"; "canvas"; "back";
       ];
-    parse_test "Don't conjunction and punctuation"
+    parse_test "Don't conjunction and punctuation" parse
       "And he has spent a long time constantly targeting me in these \
        implicit ways by either pretending I don't contribute, quickly \
        moving on without an acknowledgement, or emphasizing how I \
@@ -99,7 +102,7 @@ let word_processor_tests =
         "emphasizing"; "how"; "I"; "should"; "have"; "followed"; "the";
         "point"; "of"; "his"; "fave";
       ];
-    parse_test "Many conjunctions and types of punctuation"
+    parse_test "Many conjunctions and types of punctuation" parse
       "the professor hasn't released prelim grades, doesn't know how \
        to teach the material, and didn't give us a syllabus! They're \
        really slow to realize homework grades, it's ridiculous! "
@@ -111,7 +114,27 @@ let word_processor_tests =
         "ridiculous";
       ];
     (*Parse does not work with right apostrophe parse_test "Round right
-      apostrophe" "It’s" [ "It’s" ];*)
+      apostrophe" (parse) "It’s" [ "It’s" ];*)
+    parse_test "Parses text into sentences separated by periods"
+      parse_sentence "the professor is great. He gave everyone an A."
+      [ "the professor is great."; "He gave everyone an A." ];
+    parse_test
+      "Parses text into sentences separated by exclamation marks"
+      parse_sentence "Hello there! It's so great to see you!"
+      [ "Hello there!"; "It's so great to see you!" ];
+    parse_test "Parses text into sentences separated by question marks"
+      parse_sentence "Hello there? Is anybody home?"
+      [ "Hello there?"; "Is anybody home?" ];
+    parse_test
+      "Parses text into sentences with punctuation in middle of \
+       sentence"
+      parse_sentence "Hello there, my name is Usnavi. Who are you?"
+      [ "Hello there, my name is Usnavi."; "Who are you?" ];
+    parse_test
+      "Doesn't parse text with text containing no sentence delimiting \
+       punctuation"
+      parse_sentence "Hello there, my name is Usnavi Who are you"
+      [ "Hello there, my name is Usnavi Who are you" ];
   ]
 
 let sentiment_test (name : string) expected_output : test =

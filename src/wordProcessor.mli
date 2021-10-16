@@ -8,7 +8,13 @@ type vocabulary
 
 val parse : string -> string list
 (**[parse text] is the list of words contained in text excluding
-   trailing whitespace and punctuation*)
+   trailing whitespace and punctuation, but including the punctuation of
+   a conjunction. Requires text is in English*)
 
 val stem : string -> string
 (**[stem word] is the stemmed version of word*)
+
+val parse_sentence : string -> string list
+(**[parse text] is the list of words contained in text exlcuding
+   trailing whitespace and punctuation Requires: text is in English and
+   follows English grammar rules*)
