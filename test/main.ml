@@ -83,32 +83,6 @@ let remove_past_participles_test
     (remove_past_participles word num_vc)
     ~printer:String.escaped
 
-let possess : WordProcessor.stemmed_word =
-  {
-    original_word = "possesses";
-    units = "CVCVCVC";
-    num_vcs = 3;
-    stemmed = "possess";
-  }
-
-let pp_stemmed_word stemmed =
-  "Word: " ^ stemmed.original_word ^ " Units: " ^ stemmed.units
-  ^ " Num VCs: "
-  ^ string_of_int stemmed.num_vcs
-  ^ " Stemmed: " ^ stemmed.stemmed
-
-let stemmed_words_equal s1 s2 =
-  s1.original_word = s2.original_word
-  && s1.num_vcs = s2.num_vcs && s1.units = s2.units
-  && s1.stemmed = s2.stemmed
-
-let stemmer_test
-    (name : string)
-    (word : string)
-    (expected_output : WordProcessor.stemmed_word) : test =
-  name >:: fun _ ->
-  assert_equal expected_output (stemmer word) ~printer:pp_stemmed_word
-
 let word_processor_tests =
   [
     parse_test "Empty string" parse "" [];
@@ -217,7 +191,6 @@ let word_processor_tests =
     remove_past_participles_test "Ending with ED" "helped" 1 "help";
     remove_past_participles_test "Ending with ED and no vowel in stem"
       "hlped" 1 "hlped";
-    stemmer_test "Stemming possesses" "possesses" possess;
   ]
 
 let sentiment_of_score score =
