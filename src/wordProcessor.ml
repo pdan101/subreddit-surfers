@@ -1,11 +1,19 @@
-type word_data = {
-  word : string;
-  occurences : int;
+type stemmed_word = {
+  original_word : string;
+  units : string;
+  num_vcs : int;
   stemmed : string;
-  meaning : string;
 }
 
-type vocabulary = word_data list
+type vocabulary = stemmed_word list
+
+type text_block = {
+  original_text : string;
+  stemmed_text : string;
+  stop_words_removed : string;
+  parsed_words : string list;
+  parsed_sentences : string list;
+}
 
 let rec remove_punc s =
   if String.length s = 0 then s
@@ -101,7 +109,11 @@ let remove_past_participles word num_vc =
   then remove_last word 3
   else word
 
-let stem (word : string) = raise (Failure "Unimplemented")
+let stemmer (word : string) =
+  let units = create_units word in
+  let vcs = calc_vc units in
+  let stemmed = vcs |> remove_past_participles word |> remove_plurals in
+  { original_word = word; units; num_vcs = vcs; stemmed }
 
 exception Unsupported_sentence_format
 
@@ -123,3 +135,16 @@ let parse_sentence (text : string) =
     | Unsupported_sentence_format -> [ text ]
   with
   | x -> x
+
+let stem_list (words : string list) =
+  List.map (fun x -> (stemmer x).stemmed) words
+
+let make_sentence (delim : string) (sep_sentence : string list) =
+  List.fold_right (fun acc w -> acc ^ " " ^ w) sep_sentence "" ^ delim
+
+let process_sentence (sentence : string) =
+  let sentence_delimiter = sentence.[String.length sentence - 1] in
+  sentence |> parse |> stem_list
+  |> make_sentence (String.make 1 sentence_delimiter)
+
+let remove_stop_words = raise (Failure "Unimplemented")
