@@ -1,6 +1,11 @@
 (**This module contains all the word processing functions for text*)
 
-type word_data
+type stemmed_word = {
+  original_word : string;
+  units : string;
+  num_vcs : int;
+  stemmed : string;
+}
 (**the abstract type containing data about a word*)
 
 type vocabulary
@@ -26,7 +31,7 @@ val remove_past_participles : string -> int -> string
    there is at least one VC pair), ED (if this leaves at least one vowel
    in the stem), ING (if this leaves at leat one vowel in the stem)*)
 
-val stem : string -> string
+val stemmer : string -> stemmed_word
 (**[stem word] is the stemmed version of word*)
 
 val parse_sentence : string -> string list

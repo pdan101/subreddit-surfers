@@ -1,11 +1,11 @@
-type word_data = {
-  word : string;
-  occurences : int;
+type stemmed_word = {
+  original_word : string;
+  units : string;
+  num_vcs : int;
   stemmed : string;
-  meaning : string;
 }
 
-type vocabulary = word_data list
+type vocabulary = stemmed_word list
 
 let rec remove_punc s =
   if String.length s = 0 then s
@@ -101,7 +101,11 @@ let remove_past_participles word num_vc =
   then remove_last word 3
   else word
 
-let stem (word : string) = raise (Failure "Unimplemented")
+let stemmer (word : string) =
+  let units = create_units word in
+  let vcs = calc_vc units in
+  let stemmed = vcs |> remove_past_participles word |> remove_plurals in
+  { original_word = word; units; num_vcs = vcs; stemmed }
 
 exception Unsupported_sentence_format
 
