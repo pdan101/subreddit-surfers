@@ -7,6 +7,14 @@ type stemmed_word = {
 
 type vocabulary = stemmed_word list
 
+type text_block = {
+  original_text : string;
+  stemmed_text : string;
+  stop_words_removed : string;
+  parsed_words : string list;
+  parsed_sentences : string list;
+}
+
 let rec remove_punc s =
   if String.length s = 0 then s
   else
@@ -127,3 +135,16 @@ let parse_sentence (text : string) =
     | Unsupported_sentence_format -> [ text ]
   with
   | x -> x
+
+let stem_list (words : string list) =
+  List.map (fun x -> (stemmer x).stemmed) words
+
+let make_sentence (delim : string) (sep_sentence : string list) =
+  List.fold_right (fun acc w -> acc ^ " " ^ w) sep_sentence "" ^ delim
+
+let process_sentence (sentence : string) =
+  let sentence_delimiter = sentence.[String.length sentence - 1] in
+  sentence |> parse |> stem_list
+  |> make_sentence (String.make 1 sentence_delimiter)
+
+let remove_stop_words = raise (Failure "Unimplemented")
