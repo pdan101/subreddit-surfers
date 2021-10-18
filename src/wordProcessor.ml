@@ -1,3 +1,4 @@
+
 (*Making sure this gets copied*)
 type stemmed_word = {
   original_word : string;
@@ -5,6 +6,7 @@ type stemmed_word = {
   num_vcs : int;
   stemmed : string;
 }
+
 
 type vocabulary = stemmed_word list
 
@@ -115,6 +117,7 @@ let stemmer (word : string) =
   let _ = print_int vcs in
   let stemmed = vcs |> remove_past_participles word |> remove_plurals in
   { original_word = word; units; num_vcs = vcs; stemmed }
+
 
 exception Unsupported_sentence_format
 
