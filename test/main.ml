@@ -86,7 +86,7 @@ let remove_past_participles_test
     (remove_past_participles word num_vc)
     ~printer:String.escaped
 
-let possesses : WordProcessor.stemmed_word =
+let possesses : stemmed_word =
   {
     original_word = "possesses";
     units = "CVCVCVC";
@@ -94,7 +94,7 @@ let possesses : WordProcessor.stemmed_word =
     stemmed = "possess";
   }
 
-let agreed : WordProcessor.stemmed_word =
+let agreed : stemmed_word =
   {
     original_word = "agreed";
     units = "VCVC";
@@ -120,28 +120,23 @@ let stemmed_words_equal s1 s2 =
 let stemmer_test
     (name : string)
     (word : string)
-    (expected_output : WordProcessor.stemmed_word) : test =
+    (expected_output : stemmed_word) : test =
   name >:: fun _ ->
-  assert_equal expected_output
-    (WordProcessor.stemmer word)
-    ~printer:pp_stemmed_word
+  assert_equal expected_output (stemmer word) ~printer:pp_stemmed_word
 
 let process_sentence_test
     (name : string)
     (sentence : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output
-    (WordProcessor.process_sentence sentence)
-    ~printer:id
+  assert_equal expected_output (process_sentence sentence) ~printer:id
 
 let make_text_block_test
     (name : string)
     (text : string)
     (expected_output : text_block) : test =
   name >:: fun _ ->
-  assert_equal expected_output
-    (WordProcessor.make_text_block text)
+  assert_equal expected_output (make_text_block text)
     ~printer:pp_text_block
 
 let sophomore_club_test_block =
