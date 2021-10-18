@@ -86,7 +86,6 @@ let remove_past_participles_test
     (remove_past_participles word num_vc)
     ~printer:String.escaped
 
-
 let possesses : WordProcessor.stemmed_word =
   {
     original_word = "possesses";
@@ -166,7 +165,6 @@ let bad_professor_test_block =
        teach the material and didn't give u a syllabu! They're really \
        slow to realize homework grade it's ridiculou!";
   }
-
 
 let word_processor_tests =
   [
@@ -300,7 +298,6 @@ let word_processor_tests =
        released prelim grades, doesn't know how \ to teach the material,
        and didn't give us a syllabus! They're \ really slow to realize
        homework grades, it's ridiculous!" bad_professor_test_block; *)
-
   ]
 
 let sentiment_of_score score =

@@ -1,6 +1,11 @@
 (**This module contains all the word processing functions for text*)
 
-type word_data
+type stemmed_word = {
+  original_word : string;
+  units : string;
+  num_vcs : int;
+  stemmed : string;
+}
 (**the abstract type containing data about a word*)
 
 type vocabulary
