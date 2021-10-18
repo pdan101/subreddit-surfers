@@ -11,7 +11,7 @@ type text_block = {
   original_text : string;
   stemmed_text : string;
   stop_words_removed : string;
-  parsed_words : string list;
+  parsed_stemmed_words : string list;
   parsed_sentences : string list;
 }
 
@@ -39,7 +39,7 @@ let parse (text : string) =
   |> List.map (fun x -> String.trim x)
   |> List.map (fun x -> remove_punc x)
 
-let consonants = "bcdfghjklmnpqrstwxz"
+let consonants = "bcdfghjklmnpqrstwvxz"
 
 let vowels = "aeiouy"
 
@@ -53,10 +53,12 @@ let rec find_group word type_char =
   else word
 
 let rec create_units (word : string) =
-  if String.length word >= 1 then
-    let remove_vowels = find_group word vowels in
-    let remove_consonants = find_group word consonants in
-    if remove_vowels <> word then "V" ^ create_units remove_vowels
+  let lowercase_word = String.lowercase_ascii word in
+  if String.length lowercase_word >= 1 then
+    let remove_vowels = find_group lowercase_word vowels in
+    let remove_consonants = find_group lowercase_word consonants in
+    if remove_vowels <> lowercase_word then
+      "V" ^ create_units remove_vowels
     else "C" ^ create_units remove_consonants
   else ""
 
@@ -112,6 +114,7 @@ let remove_past_participles word num_vc =
 let stemmer (word : string) =
   let units = create_units word in
   let vcs = calc_vc units in
+  let _ = print_int vcs in
   let stemmed = vcs |> remove_past_participles word |> remove_plurals in
   { original_word = word; units; num_vcs = vcs; stemmed }
 
@@ -136,15 +139,21 @@ let parse_sentence (text : string) =
   with
   | x -> x
 
-let stem_list (words : string list) =
-  List.map (fun x -> (stemmer x).stemmed) words
+let stem_word_list (words : string list) =
+  List.map (fun x -> stemmer x) words
+
+let extract_stemmed (stemmed_words : stemmed_word list) =
+  List.map (fun x -> x.stemmed) stemmed_words
 
 let make_sentence (delim : string) (sep_sentence : string list) =
-  List.fold_right (fun acc w -> acc ^ " " ^ w) sep_sentence "" ^ delim
+  let sentence =
+    List.fold_right (fun acc w -> acc ^ " " ^ w) sep_sentence ""
+  in
+  String.sub sentence 0 (String.length sentence - 1) ^ delim
 
 let process_sentence (sentence : string) =
   let sentence_delimiter = sentence.[String.length sentence - 1] in
-  sentence |> parse |> stem_list
+  sentence |> parse |> stem_word_list |> extract_stemmed
   |> make_sentence (String.make 1 sentence_delimiter)
 
-let remove_stop_words = raise (Failure "Unimplemented")
+let remove_stop_words (words : string list) = [ "" ]

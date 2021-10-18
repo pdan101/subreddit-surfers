@@ -15,7 +15,7 @@ type text_block = {
   original_text : string;
   stemmed_text : string;
   stop_words_removed : string;
-  parsed_words : string list;
+  parsed_stemmed_words : string list;
   parsed_sentences : string list;
 }
 
