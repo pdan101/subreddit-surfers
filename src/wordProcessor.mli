@@ -6,6 +6,11 @@ type word_data
 type vocabulary
 (**the abstract type containing all the words seen so far*)
 
+
+type text_block = {
+  original_text : string;
+  stemmed_text : string;
+}
 val parse : string -> string list
 (**[parse text] is the list of words contained in text excluding
    trailing whitespace and punctuation, but including the punctuation of
@@ -33,3 +38,14 @@ val parse_sentence : string -> string list
 (**[parse text] is the list of words contained in text exlcuding
    trailing whitespace and punctuation Requires: text is in English and
    follows English grammar rules*)
+
+
+val process_sentence : string -> string
+(**[processed_sentence sentence] is the stemmed version of sentence*)
+
+val remove_stop_words : string list -> string list
+(**[remove_stop_words words] is words with stop words removed*)
+
+val make_text_block : string -> text_block
+(**[make_text_block text] is the text_block of text*)
+
