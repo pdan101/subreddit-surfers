@@ -1,10 +1,14 @@
+
 (*Making sure this gets copied*)
 type stemmed_word = {
   original_word : string;
   units : string;
   num_vcs : int;
+
   stemmed : string;
+  meaning : string;
 }
+
 
 type vocabulary = stemmed_word list
 
@@ -116,6 +120,7 @@ let stemmer (word : string) =
   let stemmed = vcs |> remove_past_participles word |> remove_plurals in
   { original_word = word; units; num_vcs = vcs; stemmed }
 
+
 exception Unsupported_sentence_format
 
 let rec split_sentence_list (sep : Str.split_result list) : string list
@@ -166,3 +171,4 @@ let stem_paragraph (paragraph : string) =
 
 let make_text_block (text : string) =
   { original_text = text; stemmed_text = stem_paragraph text }
+

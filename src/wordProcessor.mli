@@ -11,11 +11,11 @@ type stemmed_word = {
 type vocabulary
 (**the abstract type containing all the words seen so far*)
 
+
 type text_block = {
   original_text : string;
   stemmed_text : string;
 }
-
 val parse : string -> string list
 (**[parse text] is the list of words contained in text excluding
    trailing whitespace and punctuation, but including the punctuation of
@@ -36,13 +36,14 @@ val remove_past_participles : string -> int -> string
    there is at least one VC pair), ED (if this leaves at least one vowel
    in the stem), ING (if this leaves at leat one vowel in the stem)*)
 
-val stemmer : string -> stemmed_word
+val stem : string -> string
 (**[stem word] is the stemmed version of word*)
 
 val parse_sentence : string -> string list
 (**[parse text] is the list of words contained in text exlcuding
    trailing whitespace and punctuation Requires: text is in English and
    follows English grammar rules*)
+
 
 val process_sentence : string -> string
 (**[processed_sentence sentence] is the stemmed version of sentence*)
@@ -52,3 +53,4 @@ val remove_stop_words : string list -> string list
 
 val make_text_block : string -> text_block
 (**[make_text_block text] is the text_block of text*)
+
