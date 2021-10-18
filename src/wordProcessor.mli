@@ -14,9 +14,6 @@ type vocabulary
 type text_block = {
   original_text : string;
   stemmed_text : string;
-  stop_words_removed : string;
-  parsed_stemmed_words : string list;
-  parsed_sentences : string list;
 }
 
 val parse : string -> string list
@@ -52,3 +49,6 @@ val process_sentence : string -> string
 
 val remove_stop_words : string list -> string list
 (**[remove_stop_words words] is words with stop words removed*)
+
+val make_text_block : string -> text_block
+(**[make_text_block text] is the text_block of text*)

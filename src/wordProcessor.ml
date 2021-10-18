@@ -10,9 +10,6 @@ type vocabulary = stemmed_word list
 type text_block = {
   original_text : string;
   stemmed_text : string;
-  stop_words_removed : string;
-  parsed_stemmed_words : string list;
-  parsed_sentences : string list;
 }
 
 let rec remove_punc s =
@@ -46,19 +43,19 @@ let vowels = "aeiouy"
 let tail word = String.sub word 1 (String.length word - 1)
 
 let rec find_group word type_char =
+  let apos_removed = Str.global_replace (Str.regexp "[']") "" word in
+  let lowercase_word = String.lowercase_ascii apos_removed in
   if
-    String.length word > 0
-    && String.contains type_char (String.get word 0)
-  then find_group (tail word) type_char
+    String.length lowercase_word > 0
+    && String.contains type_char (String.get lowercase_word 0)
+  then find_group (tail lowercase_word) type_char
   else word
 
 let rec create_units (word : string) =
-  let lowercase_word = String.lowercase_ascii word in
-  if String.length lowercase_word >= 1 then
-    let remove_vowels = find_group lowercase_word vowels in
-    let remove_consonants = find_group lowercase_word consonants in
-    if remove_vowels <> lowercase_word then
-      "V" ^ create_units remove_vowels
+  if String.length word >= 1 then
+    let remove_vowels = find_group word vowels in
+    let remove_consonants = find_group word consonants in
+    if remove_vowels <> word then "V" ^ create_units remove_vowels
     else "C" ^ create_units remove_consonants
   else ""
 
@@ -153,7 +150,18 @@ let make_sentence (delim : string) (sep_sentence : string list) =
 
 let process_sentence (sentence : string) =
   let sentence_delimiter = sentence.[String.length sentence - 1] in
-  sentence |> parse |> stem_word_list |> extract_stemmed
+  sentence |> String.trim |> parse |> stem_word_list |> extract_stemmed
   |> make_sentence (String.make 1 sentence_delimiter)
 
 let remove_stop_words (words : string list) = [ "" ]
+
+let make_paragraph (sentences : string list) =
+  List.fold_right (fun acc w -> acc ^ " " ^ w) sentences ""
+
+let stem_paragraph (paragraph : string) =
+  paragraph |> parse_sentence
+  |> List.map process_sentence
+  |> make_paragraph
+
+let make_text_block (text : string) =
+  { original_text = text; stemmed_text = stem_paragraph text }

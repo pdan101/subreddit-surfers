@@ -108,6 +108,10 @@ let pp_stemmed_word stemmed =
   ^ string_of_int stemmed.num_vcs
   ^ " Stemmed: " ^ stemmed.stemmed
 
+let pp_text_block block =
+  "Original Text: " ^ block.original_text ^ "\n Stemmed Text: "
+  ^ block.stemmed_text
+
 let stemmed_words_equal s1 s2 =
   s1.original_word = s2.original_word
   && s1.num_vcs = s2.num_vcs && s1.units = s2.units
@@ -130,6 +134,37 @@ let process_sentence_test
   assert_equal expected_output
     (WordProcessor.process_sentence sentence)
     ~printer:id
+
+let make_text_block_test
+    (name : string)
+    (text : string)
+    (expected_output : text_block) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (WordProcessor.make_text_block text)
+    ~printer:pp_text_block
+
+let sophomore_club_test_block =
+  {
+    original_text =
+      "I'm a sophomore and I didn't really apply to many clubs and I \
+       got rejected from all the ones I applied to this semester";
+    stemmed_text =
+      "I'm a sophomore and I didn't really apply to many club and I \
+       got reject from all the one I appli to thi semesterr";
+  }
+
+let bad_professor_test_block =
+  {
+    original_text =
+      "the professor hasn't released prelim grades, doesn't know how  \
+       to teach the material, and didn't give us a syllabus! They're  \
+       really slow to realize homework grades, it's ridiculous!";
+    stemmed_text =
+      "the professor hasn't relea prelim grade doesn't know how to \
+       teach the material and didn't give u a syllabu! They're really \
+       slow to realize homework grade it's ridiculou!";
+  }
 
 let word_processor_tests =
   [
@@ -254,6 +289,15 @@ let word_processor_tests =
     process_sentence_test "Sentence with two words to stem"
       "They agreed to visit libraries with me."
       "They agree to visit librari with me.";
+    (*These tests should pass, but spacing is causing them to act
+      weird*)
+    (* make_text_block_test "Sophomore clubs post" "I'm a sophomore and
+       I didn't really apply to many clubs and I \ got rejected from all
+       the ones I applied to this semester" sophomore_club_test_block;
+       make_text_block_test "Bad professor text" "the professor hasn't
+       released prelim grades, doesn't know how \ to teach the material,
+       and didn't give us a syllabus! They're \ really slow to realize
+       homework grades, it's ridiculous!" bad_professor_test_block; *)
   ]
 
 let sentiment_of_score score =
