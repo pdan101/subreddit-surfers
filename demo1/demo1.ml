@@ -44,6 +44,7 @@ let terminal () =
   print_string "> ";
   match read_line () with
   | exception End_of_file -> ()
-  | subreddit_name -> run_analysis subreddit_name
+  | subreddit_name ->
+      run_analysis (subreddit_name |> String.lowercase_ascii)
 
 let () = terminal ()
