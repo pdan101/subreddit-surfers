@@ -1,4 +1,5 @@
 open Analyzer
+open WordProcessor
 
 let rec sub subreddit_name =
   try
@@ -26,6 +27,7 @@ let run_analysis subreddit_name =
   let intake_sub = sub subreddit_name in
   let recent_post_text =
     intake_sub |> Intake.recent_post |> Intake.selftext
+    (*ADD ANOTHER PIPELINE FOR PROCESSED TEXT*)
   in
   let () =
     print_endline
