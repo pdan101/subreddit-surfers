@@ -4,9 +4,7 @@ type stemmed_word = {
   original_word : string;
   units : string;
   num_vcs : int;
-
   stemmed : string;
-  meaning : string;
 }
 
 
@@ -171,4 +169,3 @@ let stem_paragraph (paragraph : string) =
 
 let make_text_block (text : string) =
   { original_text = text; stemmed_text = stem_paragraph text }
-
