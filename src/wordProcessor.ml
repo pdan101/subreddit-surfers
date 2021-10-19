@@ -39,20 +39,17 @@ let vowels = "aeiouy"
 let tail word = String.sub word 1 (String.length word - 1)
 
 let rec find_group word type_char =
+  let lowercase_word = String.lowercase_ascii word in
   if
     String.length word > 0
-    && String.contains type_char (String.get word 0)
-  then find_group (tail word) type_char
+    && String.contains type_char (String.get lowercase_word 0)
+  then find_group (tail lowercase_word) type_char
   else word
 
 let rec create_units (word : string) =
-  let weird_chars_removed =
-    Str.global_replace (Str.regexp "[]'[-`!-@{-~]-") "" word
-  in
-  let lowercase_word = String.lowercase_ascii weird_chars_removed in
   if String.length word >= 1 then
-    let remove_vowels = find_group lowercase_word vowels in
-    let remove_consonants = find_group lowercase_word consonants in
+    let remove_vowels = find_group word vowels in
+    let remove_consonants = find_group word consonants in
     if remove_vowels <> word then "V" ^ create_units remove_vowels
     else "C" ^ create_units remove_consonants
   else ""
