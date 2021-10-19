@@ -265,90 +265,133 @@ let multi_line_two =
 
 let word_processor_tests =
   [
-    (* parse_test "Empty string" parse "" []; parse_test "Parsing text
-       with no punctuation" parse "And just like that a copy pasta was
-       born" [ "And"; "just"; "like"; "that"; "a"; "copy"; "pasta";
-       "was"; "born"; ]; parse_test "Parsing text with conjunctions but
-       no sentence punctuation" parse "I'm a sophomore and I didn't
-       really apply to many clubs and I\n\ \ got rejected from all the
-       ones I applied to this semester" [ "I'm"; "a"; "sophomore";
-       "and"; "I"; "didn't"; "really"; "apply"; "to"; "many"; "clubs";
-       "and"; "I"; "got"; "rejected"; "from"; "all"; "the"; "ones"; "I";
-       "applied"; "to"; "this"; "semester"; ]; parse_test "Parsing text
-       on multiple lines" parse "They should really be more clear on the
-       fact that the deploy\n\ \ button means to production not to
-       locally on your \ machine. Send\n\ \ help" [ "They"; "should";
-       "really"; "be"; "more"; "clear"; "on"; "the"; "fact"; "that";
-       "the"; "deploy"; "button"; "means"; "to"; "production"; "not";
-       "to"; "locally"; "on"; "your"; "machine"; "Send"; "help"; ];
-       parse_test "Parsing text with punctuation, doesn't remove
-       punctuation in \ the middle of the word" parse "So like I missed
-       my test and I'm about to get tested rn. How \ long till I get
-       canvas back?" [ "So"; "like"; "I"; "missed"; "my"; "test"; "and";
-       "I'm"; "about"; "to"; "get"; "tested"; "rn"; "How"; "long";
-       "till"; "I"; "get"; "canvas"; "back"; ]; parse_test "Don't
-       conjunction and punctuation" parse "And he has spent a long time
-       constantly targeting me in these \ implicit ways by either\n\ \
-       pretending I don't contribute, quickly moving on \ without an\n\
-       \ acknowledgement, or emphasizing how I should have \ followed
-       the point of\n\ \ his fave." [ "And"; "he"; "has"; "spent"; "a";
-       "long"; "time"; "constantly"; "targeting"; "me"; "in"; "these";
-       "implicit"; "ways"; "by"; "either"; "pretending"; "I"; "don't";
-       "contribute"; "quickly"; "moving"; "on"; "without"; "an";
-       "acknowledgement"; "or"; "emphasizing"; "how"; "I"; "should";
-       "have"; "followed"; "the"; "point"; "of"; "his"; "fave"; ];
-       parse_test "Manyconjunctions and types of punctuation" parse "the
-       professor hasn't released prelim grades, doesn't know how to\n\ \
-       teach the material, and didn't give us a syllabus! \ They're
-       really\n\ \ slow to realize homework grades, it's ridiculous! " [
-       "the"; "professor"; "hasn't"; "released"; "prelim"; "grades";
-       "doesn't"; "know"; "how"; "to"; "teach"; "the"; "material";
-       "and"; "didn't"; "give"; "us"; "a"; "syllabus"; "They're";
-       "really"; "slow"; "to"; "realize"; "homework"; "grades"; "it's";
-       "ridiculous"; ]; (*Parse does not work with right apostrophe
-       parse_test "Round right apostrophe" (parse) "It’s" [ "It’s" ];*)
-       parse_test "Parses text into sentences separated by periods"
-       parse_sentence "the professor is great. He gave everyone an A." [
-       "the professor is great."; "He gave everyone an A." ]; parse_test
-       "Parses text into sentences separated by exclamation marks"
-       parse_sentence "Hello there! It's so great to see you!" [ "Hello
-       there!"; "It's so great to see you!" ]; parse_test "Parses text
-       into sentences separated by question marks" parse_sentence "Hello
-       there? Is anybody home?" [ "Hello there?"; "Is anybody home?" ];
-       parse_test "Parses text into sentences with punctuation in middle
-       of \ sentence" parse_sentence "Hello there, my name is Usnavi.
-       Who are you?" [ "Hello there, my name is Usnavi."; "Who are you?"
-       ]; parse_test "Doesn't parse text with text containing no
-       sentence delimiting \ punctuation" parse_sentence "Hello there,
-       my name is Usnavi Who are you" [ "Hello there, my name is Usnavi
-       Who are you" ]; create_units_test "Consonant group" "hello"
-       "CVCV"; create_units_test "Vowel group" "helloooooo" "CVCV";
-       create_units_test "Basic test" "helo" "CVCV"; create_units_test
-       "Numerous groups" "hhhhhheeeeeellllloooooo" "CVCV";
-       create_units_test "Numerous groups with different characters"
-       "hkealolo" "CVCVCV"; create_units_test "Does create_units work
-       with possessive" "possessive" "CVCVCVCV"; calc_vc_test "no VC"
-       "CV" 0; calc_vc_test "Empty string" "" 0; calc_vc_test "Odd
-       length" "CVC" 1; calc_vc_test "Even pairs" "VCVCVC" 3;
-       remove_plurals_test "Ending with SSES" "possesses" "possess";
-       remove_plurals_test "Ending with IES" "libraries" "librari";
-       remove_plurals_test "Ending with SS" "loneliness" "loneline";
-       remove_plurals_test "Ending with S" "cars" "car";
-       remove_plurals_test "Not plural" "car" "car";
-       remove_past_participles_test "No VC with EED" "steed" 0 "steed";
-       remove_past_participles_test "Ending with EED" "agreed" 1
-       "agree"; remove_past_participles_test "Ending with ING"
-       "wondering" 1 "wonder"; remove_past_participles_test "Ending with
-       ING and no vowel in stem" "wndring" 1 "wndring";
-       remove_past_participles_test "Ending with ED" "helped" 1 "help";
-       remove_past_participles_test "Ending with ED and no vowel in
-       stem" "hlped" 1 "hlped"; stemmer_test "Stemming possesses"
-       "possesses" possesses; stemmer_test "Stemming agreed -> agree"
-       "agreed" agreed; create_units_test "Creating unit for he CV" "He"
-       "CV"; process_sentence_test "Sentence with one word to stem" "He
-       possesses the gem." "He possess the gem."; process_sentence_test
-       "Sentence with two words to stem" "They agreed to visit libraries
-       with me." "They agree to visit librari with me."; *)
+    parse_test "Empty string" parse "" [];
+    parse_test "Parsing text\n       with no punctuation" parse
+      "And just like that a copy pasta was\n       born"
+      [
+        "And"; "just"; "like"; "that"; "a"; "copy"; "pasta"; "was";
+        "born";
+      ];
+    parse_test
+      "Parsing text with conjunctions but\n\
+      \       no sentence punctuation" parse
+      "I'm a sophomore and I didn't\n\
+      \       really apply to many clubs and I\n\
+      \  got rejected from all the\n\
+      \       ones I applied to this semester"
+      [
+        "I'm"; "a"; "sophomore"; "and"; "I"; "didn't"; "really";
+        "apply"; "to"; "many"; "clubs"; "and"; "I"; "got"; "rejected";
+        "from"; "all"; "the"; "ones"; "I"; "applied"; "to"; "this";
+        "semester";
+      ];
+    parse_test "Parsing text\n       on multiple lines" parse
+      "They should really be more clear on the\n\
+      \       fact that the deploy\n\
+      \  button means to production not to\n\
+      \       locally on your  machine. Send\n\
+      \  help"
+      [
+        "They"; "should"; "really"; "be"; "more"; "clear"; "on"; "the";
+        "fact"; "that"; "the"; "deploy"; "button"; "means"; "to";
+        "production"; "not"; "to"; "locally"; "on"; "your"; "machine";
+        "Send"; "help";
+      ];
+    parse_test
+      "Parsing text with punctuation, doesn't remove\n\
+      \       punctuation in  the middle of the word" parse
+      "So like I missed\n\
+      \       my test and I'm about to get tested rn. How  long till I \
+       get\n\
+      \       canvas back?"
+      [
+        "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "I'm";
+        "about"; "to"; "get"; "tested"; "rn"; "How"; "long"; "till";
+        "I"; "get"; "canvas"; "back";
+      ];
+    parse_test "Don't\n       conjunction and punctuation" parse
+      "And he has spent a long time\n\
+      \       constantly targeting me in these  implicit ways by either\n\
+      \ pretending I don't contribute, quickly moving on  without an\n\
+      \ acknowledgement, or emphasizing how I should have  followed\n\
+      \       the point of\n\
+      \  his fave."
+      [
+        "And"; "he"; "has"; "spent"; "a"; "long"; "time"; "constantly";
+        "targeting"; "me"; "in"; "these"; "implicit"; "ways"; "by";
+        "either"; "pretending"; "I"; "don't"; "contribute"; "quickly";
+        "moving"; "on"; "without"; "an"; "acknowledgement"; "or";
+        "emphasizing"; "how"; "I"; "should"; "have"; "followed"; "the";
+        "point"; "of"; "his"; "fave";
+      ];
+    parse_test "Manyconjunctions and types of punctuation" parse
+      "the\n\
+      \       professor hasn't released prelim grades, doesn't know \
+       how to\n\
+      \ teach the material, and didn't give us a syllabus!  They're\n\
+      \       really\n\
+      \  slow to realize homework grades, it's ridiculous! "
+      [
+        "the"; "professor"; "hasn't"; "released"; "prelim"; "grades";
+        "doesn't"; "know"; "how"; "to"; "teach"; "the"; "material";
+        "and"; "didn't"; "give"; "us"; "a"; "syllabus"; "They're";
+        "really"; "slow"; "to"; "realize"; "homework"; "grades"; "it's";
+        "ridiculous";
+      ];
+    (*Parse does not work with right apostrophe parse_test "Round right
+      apostrophe" (parse) "It’s" [ "It’s" ];*)
+    parse_test "Parses text into sentences separated by periods"
+      parse_sentence "the professor is great. He gave everyone an A."
+      [ "the professor is great."; "He gave everyone an A." ];
+    parse_test
+      "Parses text into sentences separated by exclamation marks"
+      parse_sentence "Hello there! It's so great to see you!"
+      [ "Hello there!"; "It's so great to see you!" ];
+    parse_test "Parses text into sentences separated by question marks"
+      parse_sentence "Hello there? Is anybody home?"
+      [ "Hello there?"; "Is anybody home?" ];
+    parse_test
+      "Parses text into sentences with punctuation in middle of  \
+       sentence"
+      parse_sentence "Hello there, my name is Usnavi. Who are you?"
+      [ "Hello there, my name is Usnavi."; "Who are you?" ];
+    parse_test
+      "Doesn't parse text with text containing no sentence delimiting  \
+       punctuation"
+      parse_sentence "Hello there, my name is Usnavi Who are you"
+      [ "Hello there, my name is Usnavi Who are you" ];
+    create_units_test "Consonant group" "hello" "CVCV";
+    create_units_test "Vowel group" "helloooooo" "CVCV";
+    create_units_test "Basic test" "helo" "CVCV";
+    create_units_test "Numerous groups" "hhhhhheeeeeellllloooooo" "CVCV";
+    create_units_test "Numerous groups with different characters"
+      "hkealolo" "CVCVCV";
+    create_units_test "Does create_units work with possessive"
+      "possessive" "CVCVCVCV"; calc_vc_test "no VC" "CV" 0;
+    calc_vc_test "Empty string" "" 0; calc_vc_test "Odd length" "CVC" 1;
+    calc_vc_test "Even pairs" "VCVCVC" 3;
+    remove_plurals_test "Ending with SSES" "possesses" "possess";
+    remove_plurals_test "Ending with IES" "libraries" "librari";
+    remove_plurals_test "Ending with SS" "loneliness" "loneline";
+    remove_plurals_test "Ending with S" "cars" "car";
+    remove_plurals_test "Not plural" "car" "car";
+    remove_past_participles_test "No VC with EED" "steed" 0 "steed";
+    remove_past_participles_test "Ending with EED" "agreed" 1 "agree";
+    remove_past_participles_test "Ending with ING" "wondering" 1
+      "wonder";
+    remove_past_participles_test "Ending with ING and no vowel in stem"
+      "wndring" 1 "wndring";
+    remove_past_participles_test "Ending with ED" "helped" 1 "help";
+    remove_past_participles_test "Ending with ED and no vowel in stem"
+      "hlped" 1 "hlped";
+    stemmer_test "Stemming possesses" "possesses" possesses;
+    stemmer_test "Stemming agreed -> agree" "agreed" agreed;
+    create_units_test "Creating unit for he CV" "He" "CV";
+    process_sentence_test "Sentence with one word to stem"
+      "He possesses the gem." "He possess the gem.";
+    process_sentence_test "Sentence with two words to stem"
+      "They agreed to visit libraries with me."
+      "They agree to visit librari with me.";
     (*These tests should pass, but spacing is causing them to act
       weird*)
     (* make_text_block_test "Sophomore clubs post" "I'm a sophomore and
@@ -357,8 +400,8 @@ let word_processor_tests =
        make_text_block_test "Bad professor text" "the professor hasn't
        released prelim grades, doesn't know how \ to teach the material,
        and didn't give us a syllabus! They're \ really slow to realize
-       homework grades, it's ridiculous!" bad_professor_test_block; *)
-    (* make_text_block_test "URL"
+       homework grades, it's ridiculous!" bad_professor_test_block;
+       make_text_block_test "URL"
        "[FAFSA](https://studentaid.gov/h/apply-for-aid/fafsa)"
        url_text_block; make_text_block_test "Date" "2021-2022 school
        year: Use the 2021-2022 FAFSA, which opened \ October 1, 2020.
@@ -366,11 +409,10 @@ let word_processor_tests =
        make_text_block_test "Asterisk" "* Gather all necessary
        documents, including bank statements, \ tax information (W-2s,
        tax returns), any records of untaxed \ income, etc."
-       asterisk_text_block; *)
-    (* make_text_block_test "Multi line text block" "2022-2023 school
-       year: 2022-2023 FAFSA will became available \ October 1, 2021.
-       Requires 2020 tax information.\n\n\ \ **First time? Here's a
-       step-by-step guide.**\n\ \ \n\ \ * Create an [FSA
+       asterisk_text_block; make_text_block_test "Multi line text block"
+       "2022-2023 school year: 2022-2023 FAFSA will became available \
+       October 1, 2021. Requires 2020 tax information.\n\n\ \ **First
+       time? Here's a step-by-step guide.**\n\ \ \n\ \ * Create an [FSA
        account](https://www.fsaid.ed.gov) (also \ known as the FSA ID).
        This is your legal electronic signature \ to sign the FAFSA. It's
        linked to your Social Security number. \ If you are a dependent
@@ -378,11 +420,11 @@ let word_processor_tests =
        assuming they have an SSN. If your parent \ already has their own
        FSA account, they must use that. If your \ parent does not have
        an SSN, they must print and sign the \ signature page manually,
-       then mail it in." multi_line_text_block; *)
-    (* make_text_block_test "Multi line text block with new lines
-       removed" "2022-2023 school year: 2022-2023 FAFSA will became
-       available \ October 1, 2021. Requires 2020 tax information.
-       **First time? \ Here's a step-by-step guide.** * Create an [FSA \
+       then mail it in." multi_line_text_block; make_text_block_test
+       "Multi line text block with new lines removed" "2022-2023 school
+       year: 2022-2023 FAFSA will became available \ October 1, 2021.
+       Requires 2020 tax information. **First time? \ Here's a
+       step-by-step guide.** * Create an [FSA \
        account](https://www.fsaid.ed.gov) (also known as the FSA ID). \
        This is your legal electronic signature to sign the FAFSA. It's \
        linked to your Social Security number. If you are a dependent \
@@ -390,12 +432,12 @@ let word_processor_tests =
        assuming they have an SSN. If your parent already has their own \
        FSA account, they must use that. If your parent does not have \
        an SSN, they must print and sign the signature page manually, \
-       then mail it in." multi_line_text_block_one_line; *)
-    (* make_text_block_test "Multi text line 1" "2022-2023 school year:
+       then mail it in." multi_line_text_block_one_line;
+       make_text_block_test "Multi text line 1" "2022-2023 school year:
        2022-2023 FAFSA will became available \ October 1, 2021. Requires
-       2020 tax information." multi_line_one; *)
-    make_text_block_test "2nd line multi"
-      "**First time? Here's a step-by-step guide.**" multi_line_two;
+       2020 tax information." multi_line_one; make_text_block_test "2nd
+       line multi" "**First time? Here's a step-by-step guide.**"
+       multi_line_two; *)
   ]
 
 let sentiment_of_score score =
