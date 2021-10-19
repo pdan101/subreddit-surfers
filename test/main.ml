@@ -280,10 +280,9 @@ let word_processor_tests =
       \  got rejected from all the\n\
       \       ones I applied to this semester"
       [
-        "I'm"; "a"; "sophomore"; "and"; "I"; "didn't"; "really";
-        "apply"; "to"; "many"; "clubs"; "and"; "I"; "got"; "rejected";
-        "from"; "all"; "the"; "ones"; "I"; "applied"; "to"; "this";
-        "semester";
+        "Im"; "a"; "sophomore"; "and"; "I"; "didnt"; "really"; "apply";
+        "to"; "many"; "clubs"; "and"; "I"; "got"; "rejected"; "from";
+        "all"; "the"; "ones"; "I"; "applied"; "to"; "this"; "semester";
       ];
     parse_test "Parsing text\n       on multiple lines" parse
       "They should really be more clear on the\n\
@@ -305,9 +304,9 @@ let word_processor_tests =
        get\n\
       \       canvas back?"
       [
-        "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "I'm";
-        "about"; "to"; "get"; "tested"; "rn"; "How"; "long"; "till";
-        "I"; "get"; "canvas"; "back";
+        "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "Im"; "about";
+        "to"; "get"; "tested"; "rn"; "How"; "long"; "till"; "I"; "get";
+        "canvas"; "back";
       ];
     parse_test "Don't\n       conjunction and punctuation" parse
       "And he has spent a long time\n\
@@ -319,7 +318,7 @@ let word_processor_tests =
       [
         "And"; "he"; "has"; "spent"; "a"; "long"; "time"; "constantly";
         "targeting"; "me"; "in"; "these"; "implicit"; "ways"; "by";
-        "either"; "pretending"; "I"; "don't"; "contribute"; "quickly";
+        "either"; "pretending"; "I"; "dont"; "contribute"; "quickly";
         "moving"; "on"; "without"; "an"; "acknowledgement"; "or";
         "emphasizing"; "how"; "I"; "should"; "have"; "followed"; "the";
         "point"; "of"; "his"; "fave";
@@ -332,10 +331,10 @@ let word_processor_tests =
       \       really\n\
       \  slow to realize homework grades, it's ridiculous! "
       [
-        "the"; "professor"; "hasn't"; "released"; "prelim"; "grades";
-        "doesn't"; "know"; "how"; "to"; "teach"; "the"; "material";
-        "and"; "didn't"; "give"; "us"; "a"; "syllabus"; "They're";
-        "really"; "slow"; "to"; "realize"; "homework"; "grades"; "it's";
+        "the"; "professor"; "hasnt"; "released"; "prelim"; "grades";
+        "doesnt"; "know"; "how"; "to"; "teach"; "the"; "material";
+        "and"; "didnt"; "give"; "us"; "a"; "syllabus"; "Theyre";
+        "really"; "slow"; "to"; "realize"; "homework"; "grades"; "its";
         "ridiculous";
       ];
     (*Parse does not work with right apostrophe parse_test "Round right
@@ -386,6 +385,7 @@ let word_processor_tests =
       "hlped" 1 "hlped";
     stemmer_test "Stemming possesses" "possesses" possesses;
     stemmer_test "Stemming agreed -> agree" "agreed" agreed;
+    create_units_test "Just seeing what" "H" "C";
     create_units_test "Creating unit for he CV" "He" "CV";
     process_sentence_test "Sentence with one word to stem"
       "He possesses the gem." "He possess the gem.";
