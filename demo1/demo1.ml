@@ -29,12 +29,19 @@ let run_analysis subreddit_name =
     intake_sub |> Intake.recent_post |> Intake.selftext
     (*ADD ANOTHER PIPELINE FOR PROCESSED TEXT*)
   in
+  let processed_post_text =
+    recent_post_text |> make_text_block |> stemmed_text_block
+  in
   let () =
     print_endline
       ("Pulling the text from the most recent hot post in r/"
      ^ subreddit_name ^ ": \n")
   in
   let () = print_endline recent_post_text in
+  let () = print_newline () in
+  let () =
+    print_endline ("Processed Post Text: \n" ^ processed_post_text)
+  in
   let () = print_newline () in
   let () = print_graph (Sentiment.polarity_score recent_post_text) in
   ()

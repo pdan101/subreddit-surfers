@@ -52,3 +52,6 @@ val remove_stop_words : string list -> string list
 
 val make_text_block : string -> text_block
 (**[make_text_block text] is the text_block of text*)
+
+val stemmed_text_block : text_block -> string
+(**[stemmed_text_block] is the stemmed text of text_block*)
