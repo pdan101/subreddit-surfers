@@ -158,33 +158,139 @@ let bad_professor_test_block =
     stemmed_text =
       "the professor hasn't relea prelim grade doesn't know how to \
        teach the material and didn't give u a syllabu! They're really \
-       slow to realize homework grade it's ridiculou!";
+       slow to realize homework grade it' ridiculou!";
+  }
+
+let url_text_block =
+  {
+    original_text =
+      "[FAFSA](https://studentaid.gov/h/apply-for-aid/fafsa";
+    stemmed_text = "FAFSAhttpsstudentaid. govhapplyforaidfafsa)";
+  }
+
+let date_text_block =
+  {
+    original_text =
+      "2021-2022 school year: Use the 2021-2022 FAFSA, which opened \
+       October 1, 2020. Requires 2019 tax information.";
+    stemmed_text =
+      "school year Use the  FAFSA which open October  . Require  tax \
+       information.";
+  }
+
+let asterisk_text_block =
+  {
+    original_text =
+      "* Gather all necessary documents, including bank statements, \
+       tax information (W-2s, tax returns), any records of untaxed \
+       income, etc.";
+    stemmed_text =
+      "Gather all necessary document includ bank statement tax \
+       information W tax return any record of untax income etc.";
+  }
+
+let multi_line_text_block =
+  {
+    original_text =
+      "2022-2023 school year: 2022-2023 FAFSA will became available \
+       October 1, 2021. Requires 2020 tax information.\n\n\
+      \  **First time? Here's a step-by-step guide.**\n\
+      \  \n\
+      \  * Create an [FSA account](https://www.fsaid.ed.gov) (also \
+       known as the FSA ID). This is your legal electronic signature \
+       to sign the FAFSA. It's linked to your Social Security number. \
+       If you are a dependent student, one of your parents will need \
+       to make one as well, assuming they have an SSN. If your parent \
+       already has their own FSA account, they must use that. If your \
+       parent does not have an SSN, they must print and sign the \
+       signature page manually, then mail it in.";
+    stemmed_text =
+      "2022-2023 school year: 2022-2023 FAFSA will became available \
+       October 1, 2021. Requires 2020 tax information.\n\n\
+      \  **First time? Here's a step-by-step guide.**\n\
+      \  \n\
+      \  * Create an [FSA account](https://www.fsaid.ed.gov) (also \
+       known as the FSA ID). This is your legal electronic signature \
+       to sign the FAFSA. It's linked to your Social Security number. \
+       If you are a dependent student, one of your parents will need \
+       to make one as well, assuming they have an SSN. If your parent \
+       already has their own FSA account, they must use that. If your \
+       parent does not have an SSN, they must print and sign the \
+       signature page manually, then mail it in.";
+  }
+
+let multi_line_text_block_one_line =
+  {
+    original_text =
+      "2022-2023 school year: 2022-2023 FAFSA will became available \
+       October 1, 2021. Requires 2020 tax information. **First time? \
+       Here's a step-by-step guide.** * Create an [FSA \
+       account](https://www.fsaid.ed.gov) (also known as the FSA ID). \
+       This is your legal electronic signature to sign the FAFSA. It's \
+       linked to your Social Security number. If you are a dependent \
+       student, one of your parents will need to make one as well, \
+       assuming they have an SSN. If your parent already has their own \
+       FSA account, they must use that. If your parent does not have \
+       an SSN, they must print and sign the signature page manually, \
+       then mail it in.";
+    stemmed_text =
+      "2022-2023 school year: 2022-2023 FAFSA will became available \
+       October 1, 2021. Requires 2020 tax information. **First time? \
+       Here's a step-by-step guide.** * Create an [FSA \
+       account](https://www.fsaid.ed.gov) (also known as the FSA ID). \
+       This is your legal electronic signature to sign the FAFSA. It's \
+       linked to your Social Security number. If you are a dependent \
+       student, one of your parents will need to make one as well, \
+       assuming they have an SSN. If your parent already has their own \
+       FSA account, they must use that. If your parent does not have \
+       an SSN, they must print and sign the signature page manually, \
+       then mail it in.";
+  }
+
+let multi_line_one =
+  {
+    original_text =
+      "2022-2023 school year: 2022-2023 FAFSA will became available \
+       October 1, 2021. Requires 2020 tax information.";
+    stemmed_text =
+      "2022-2023 school year: 2022-2023 FAFSA will became available \
+       October 1, 2021. Requires 2020 tax information.";
+  }
+
+let multi_line_two =
+  {
+    original_text = "**First time? Here's a step-by-step guide.**";
+    stemmed_text = "**First time? Here's a step-by-step guide.**";
   }
 
 let word_processor_tests =
   [
     parse_test "Empty string" parse "" [];
-    parse_test "Parsing text with no punctuation" parse
-      "And just like that a copy pasta was born"
+    parse_test "Parsing text\n       with no punctuation" parse
+      "And just like that a copy pasta was\n       born"
       [
         "And"; "just"; "like"; "that"; "a"; "copy"; "pasta"; "was";
         "born";
       ];
     parse_test
-      "Parsing text with conjunctions but no sentence punctuation" parse
-      "I'm a sophomore and I didn't really apply to many clubs and I\n\
-      \       got rejected from all the ones I applied to this semester"
+      "Parsing text with conjunctions but\n\
+      \       no sentence punctuation" parse
+      "I'm a sophomore and I didn't\n\
+      \       really apply to many clubs and I\n\
+      \  got rejected from all the\n\
+      \       ones I applied to this semester"
       [
         "I'm"; "a"; "sophomore"; "and"; "I"; "didn't"; "really";
         "apply"; "to"; "many"; "clubs"; "and"; "I"; "got"; "rejected";
         "from"; "all"; "the"; "ones"; "I"; "applied"; "to"; "this";
         "semester";
       ];
-    parse_test "Parsing text on multiple lines" parse
-      "They should really be more clear on the fact that the deploy\n\
-      \             button means to production not to locally on your \
-       machine. Send\n\
-      \       help"
+    parse_test "Parsing text\n       on multiple lines" parse
+      "They should really be more clear on the\n\
+      \       fact that the deploy\n\
+      \  button means to production not to\n\
+      \       locally on your  machine. Send\n\
+      \  help"
       [
         "They"; "should"; "really"; "be"; "more"; "clear"; "on"; "the";
         "fact"; "that"; "the"; "deploy"; "button"; "means"; "to";
@@ -192,24 +298,24 @@ let word_processor_tests =
         "Send"; "help";
       ];
     parse_test
-      "Parsing text with punctuation, doesn't remove punctuation in \
-       the middle of the word"
-      parse
-      "So like I missed my test and I'm about to get tested rn. How  \
-       long till I get canvas back?"
+      "Parsing text with punctuation, doesn't remove\n\
+      \       punctuation in  the middle of the word" parse
+      "So like I missed\n\
+      \       my test and I'm about to get tested rn. How  long till I \
+       get\n\
+      \       canvas back?"
       [
         "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "I'm";
         "about"; "to"; "get"; "tested"; "rn"; "How"; "long"; "till";
         "I"; "get"; "canvas"; "back";
       ];
-    parse_test "Don't conjunction and punctuation" parse
-      "And he has spent a long time constantly targeting me in these  \
-       implicit ways by either\n\
-      \       pretending I don't contribute, quickly  moving on \
-       without an\n\
-      \       acknowledgement, or emphasizing how I  should have \
-       followed the point of\n\
-      \       his fave."
+    parse_test "Don't\n       conjunction and punctuation" parse
+      "And he has spent a long time\n\
+      \       constantly targeting me in these  implicit ways by either\n\
+      \ pretending I don't contribute, quickly moving on  without an\n\
+      \ acknowledgement, or emphasizing how I should have  followed\n\
+      \       the point of\n\
+      \  his fave."
       [
         "And"; "he"; "has"; "spent"; "a"; "long"; "time"; "constantly";
         "targeting"; "me"; "in"; "these"; "implicit"; "ways"; "by";
@@ -219,10 +325,12 @@ let word_processor_tests =
         "point"; "of"; "his"; "fave";
       ];
     parse_test "Manyconjunctions and types of punctuation" parse
-      "the professor hasn't released prelim grades, doesn't know how  to\n\
-      \       teach the material, and didn't give us a syllabus! \
-       They're  really\n\
-      \       slow to realize homework grades, it's ridiculous! "
+      "the\n\
+      \       professor hasn't released prelim grades, doesn't know \
+       how to\n\
+      \ teach the material, and didn't give us a syllabus!  They're\n\
+      \       really\n\
+      \  slow to realize homework grades, it's ridiculous! "
       [
         "the"; "professor"; "hasn't"; "released"; "prelim"; "grades";
         "doesn't"; "know"; "how"; "to"; "teach"; "the"; "material";
@@ -243,12 +351,12 @@ let word_processor_tests =
       parse_sentence "Hello there? Is anybody home?"
       [ "Hello there?"; "Is anybody home?" ];
     parse_test
-      "Parses text into sentences with punctuation in middle of \
+      "Parses text into sentences with punctuation in middle of  \
        sentence"
       parse_sentence "Hello there, my name is Usnavi. Who are you?"
       [ "Hello there, my name is Usnavi."; "Who are you?" ];
     parse_test
-      "Doesn't parse text with text containing no sentence delimiting \
+      "Doesn't parse text with text containing no sentence delimiting  \
        punctuation"
       parse_sentence "Hello there, my name is Usnavi Who are you"
       [ "Hello there, my name is Usnavi Who are you" ];
@@ -292,7 +400,44 @@ let word_processor_tests =
        make_text_block_test "Bad professor text" "the professor hasn't
        released prelim grades, doesn't know how \ to teach the material,
        and didn't give us a syllabus! They're \ really slow to realize
-       homework grades, it's ridiculous!" bad_professor_test_block; *)
+       homework grades, it's ridiculous!" bad_professor_test_block;
+       make_text_block_test "URL"
+       "[FAFSA](https://studentaid.gov/h/apply-for-aid/fafsa)"
+       url_text_block; make_text_block_test "Date" "2021-2022 school
+       year: Use the 2021-2022 FAFSA, which opened \ October 1, 2020.
+       Requires 2019 tax information." date_text_block;
+       make_text_block_test "Asterisk" "* Gather all necessary
+       documents, including bank statements, \ tax information (W-2s,
+       tax returns), any records of untaxed \ income, etc."
+       asterisk_text_block; make_text_block_test "Multi line text block"
+       "2022-2023 school year: 2022-2023 FAFSA will became available \
+       October 1, 2021. Requires 2020 tax information.\n\n\ \ **First
+       time? Here's a step-by-step guide.**\n\ \ \n\ \ * Create an [FSA
+       account](https://www.fsaid.ed.gov) (also \ known as the FSA ID).
+       This is your legal electronic signature \ to sign the FAFSA. It's
+       linked to your Social Security number. \ If you are a dependent
+       student, one of your parents will need \ to make one as well,
+       assuming they have an SSN. If your parent \ already has their own
+       FSA account, they must use that. If your \ parent does not have
+       an SSN, they must print and sign the \ signature page manually,
+       then mail it in." multi_line_text_block; make_text_block_test
+       "Multi line text block with new lines removed" "2022-2023 school
+       year: 2022-2023 FAFSA will became available \ October 1, 2021.
+       Requires 2020 tax information. **First time? \ Here's a
+       step-by-step guide.** * Create an [FSA \
+       account](https://www.fsaid.ed.gov) (also known as the FSA ID). \
+       This is your legal electronic signature to sign the FAFSA. It's \
+       linked to your Social Security number. If you are a dependent \
+       student, one of your parents will need to make one as well, \
+       assuming they have an SSN. If your parent already has their own \
+       FSA account, they must use that. If your parent does not have \
+       an SSN, they must print and sign the signature page manually, \
+       then mail it in." multi_line_text_block_one_line;
+       make_text_block_test "Multi text line 1" "2022-2023 school year:
+       2022-2023 FAFSA will became available \ October 1, 2021. Requires
+       2020 tax information." multi_line_one; make_text_block_test "2nd
+       line multi" "**First time? Here's a step-by-step guide.**"
+       multi_line_two; *)
   ]
 
 let sentiment_of_score score =

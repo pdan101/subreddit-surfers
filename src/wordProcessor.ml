@@ -1,4 +1,3 @@
-
 (*Making sure this gets copied*)
 type stemmed_word = {
   original_word : string;
@@ -6,7 +5,6 @@ type stemmed_word = {
   num_vcs : int;
   stemmed : string;
 }
-
 
 type vocabulary = stemmed_word list
 
@@ -19,16 +17,11 @@ let rec remove_punc s =
   if String.length s = 0 then s
   else
     let current_char = s.[0] in
-    let current_char_code = current_char |> Char.code in
     let is_char =
       (current_char |> Char.uppercase_ascii |> Char.code)
       - ('a' |> Char.uppercase_ascii |> Char.code)
     in
-    if
-      (is_char >= 0 && is_char <= 25)
-      || current_char_code = ('\'' |> Char.code)
-      || current_char_code = ("’".[0] |> Char.code)
-    then
+    if is_char >= 0 && is_char <= 25 then
       String.make 1 current_char
       ^ (String.sub s 1 (String.length s - 1) |> remove_punc)
     else String.sub s 1 (String.length s - 1) |> remove_punc
@@ -46,18 +39,20 @@ let vowels = "aeiouy"
 let tail word = String.sub word 1 (String.length word - 1)
 
 let rec find_group word type_char =
-  let apos_removed = Str.global_replace (Str.regexp "[']") "" word in
-  let lowercase_word = String.lowercase_ascii apos_removed in
   if
-    String.length lowercase_word > 0
-    && String.contains type_char (String.get lowercase_word 0)
-  then find_group (tail lowercase_word) type_char
+    String.length word > 0
+    && String.contains type_char (String.get word 0)
+  then find_group (tail word) type_char
   else word
 
 let rec create_units (word : string) =
+  let weird_chars_removed =
+    Str.global_replace (Str.regexp "[]'[-`!-@{-~]-") "" word
+  in
+  let lowercase_word = String.lowercase_ascii weird_chars_removed in
   if String.length word >= 1 then
-    let remove_vowels = find_group word vowels in
-    let remove_consonants = find_group word consonants in
+    let remove_vowels = find_group lowercase_word vowels in
+    let remove_consonants = find_group lowercase_word consonants in
     if remove_vowels <> word then "V" ^ create_units remove_vowels
     else "C" ^ create_units remove_consonants
   else ""
@@ -114,10 +109,8 @@ let remove_past_participles word num_vc =
 let stemmer (word : string) =
   let units = create_units word in
   let vcs = calc_vc units in
-  let _ = print_int vcs in
   let stemmed = vcs |> remove_past_participles word |> remove_plurals in
   { original_word = word; units; num_vcs = vcs; stemmed }
-
 
 exception Unsupported_sentence_format
 
@@ -169,3 +162,5 @@ let stem_paragraph (paragraph : string) =
 
 let make_text_block (text : string) =
   { original_text = text; stemmed_text = stem_paragraph text }
+
+let stemmed_text_block block = block.stemmed_text
