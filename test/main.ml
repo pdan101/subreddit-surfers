@@ -399,8 +399,11 @@ let word_processor_tests =
       "Add e back after it has been removed" "troubl" 1 "trouble";
     finalize_plurals_past_participles_test
       "Add e back after it has been removed from" "siz" 1 "size";
-    finalize_plurals_past_participles_test "A" "fil" 1 "file";
-    stemmer_test "Stemming possesses" "possesses" possesses;
+    finalize_plurals_past_participles_test "Add e if stem is CVC" "fil"
+      1 "file";
+    finalize_plurals_past_participles_test
+      "Do not add e is stem is CVC but length greater than 3" "fail" 1
+      "fail"; stemmer_test "Stemming possesses" "possesses" possesses;
     stemmer_test "Stemming agreed -> agree" "agreed" agreed;
     create_units_test "Just seeing what" "H" "C";
     create_units_test "Creating unit for he CV" "He" "CV";

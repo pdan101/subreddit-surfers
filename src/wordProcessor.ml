@@ -123,13 +123,24 @@ let double_consonant word =
 
 let finalize_plurals_past_participles word num_vc =
   let len = String.length word in
-  if len >= 3 && end_cvc word && num_vc = 1 then word ^ "e"
+  if len = 3 && end_cvc word && num_vc = 1 then word ^ "e"
   else if len >= 2 then
     let last_two = get_last word 2 in
     if last_two = "at" || last_two = "bl" || last_two = "iz" then
       word ^ "e"
     else if double_consonant word then remove_last word 1
     else word
+  else word
+
+let fix_y word = if contains_vowel word then word ^ "i" else word
+
+let remove_e word num_vc =
+  if num_vc > 1 then remove_last word 1
+  else if num_vc = 1 && end_cvc word = false then remove_last word 1
+  else word
+
+let check_double_consonant word num_vc =
+  if num_vc > 1 && double_consonant word then remove_last word 1
   else word
 
 let stemmer (word : string) =
