@@ -210,15 +210,15 @@ let json_to_assoc_list data =
 
 let hashtbl_step2_3 = Hashtbl.create 20
 
-let rec add_pairs_to_table (lst : (string * string) list) =
+let rec add_pairs_to_table table (lst : (string * string) list) =
   match lst with
   | [] -> ()
   | (x, y) :: tail_lst ->
-      Hashtbl.add hashtbl_step2_3 x y;
-      add_pairs_to_table tail_lst
+      Hashtbl.add table x y;
+      add_pairs_to_table table tail_lst
 
 let assoc_list_to_hashtbl (data : (string * string) list) =
-  add_pairs_to_table data
+  add_pairs_to_table hashtbl_step2_3 data
 
 let build_table =
   step2data |> json_to_assoc_list |> assoc_list_to_hashtbl
@@ -234,7 +234,7 @@ let rec find_suffix_binding word =
         find_suffix_binding (String.sub word 1 (String.length word - 1))
 
 let replace_suffix word =
-  if calc_vc word > 0 then
+  if calc_vc (word |> create_units) > 0 then
     let replacement = find_suffix_binding word in
     let new_string =
       String.sub word 0 (String.length word - snd replacement)
