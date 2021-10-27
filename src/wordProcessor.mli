@@ -67,3 +67,5 @@ val finalize_plurals_past_participles : string -> int -> string
 
 val end_cvc : string -> bool
 (***)
+
+val create_simplified_units : string -> string -> string

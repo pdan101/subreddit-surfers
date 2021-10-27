@@ -147,7 +147,7 @@ let check_double_consonant word num_vc =
   else word
 
 let stemmer (word : string) =
-  let units = create_units word in
+  let units = create_simplified_units (create_units word) "" in
   let vcs = calc_vc units in
   let stemmed = vcs |> remove_past_participles word |> remove_plurals in
   { original_word = word; units; num_vcs = vcs; stemmed }

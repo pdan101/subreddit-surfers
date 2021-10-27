@@ -57,7 +57,8 @@ let create_units_test
     (word : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output (create_units word)
+  assert_equal expected_output
+    (create_simplified_units (create_units word) "")
     ~printer:String.escaped
 
 let calc_vc_test
