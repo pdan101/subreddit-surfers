@@ -208,13 +208,13 @@ let json_to_assoc_list data =
   data |> Yojson.Basic.Util.to_assoc
   |> List.map (fun (x, y) -> (x, y |> Yojson.Basic.Util.to_string))
 
-let hashtbl_step2 = Hashtbl.create 20
+let hashtbl_step2_3 = Hashtbl.create 20
 
 let rec add_pairs_to_table (lst : (string * string) list) =
   match lst with
   | [] -> ()
   | (x, y) :: tail_lst ->
-      Hashtbl.add hashtbl_step2 x y;
+      Hashtbl.add hashtbl_step2_3 x y;
       add_pairs_to_table tail_lst
 
 let assoc_list_to_hashtbl (data : (string * string) list) =
@@ -222,3 +222,22 @@ let assoc_list_to_hashtbl (data : (string * string) list) =
 
 let build_table =
   step2data |> json_to_assoc_list |> assoc_list_to_hashtbl
+
+let rec find_suffix_binding word =
+  if String.length word < 4 then ("", 0)
+  else
+    match
+      Hashtbl.find_opt hashtbl_step2_3 (word |> String.uppercase_ascii)
+    with
+    | Some x -> (x |> String.lowercase_ascii, String.length word)
+    | None ->
+        find_suffix_binding (String.sub word 1 (String.length word - 1))
+
+let replace_suffix word =
+  if calc_vc word > 0 then
+    let replacement = find_suffix_binding word in
+    let new_string =
+      String.sub word 0 (String.length word - snd replacement)
+    in
+    new_string ^ fst replacement
+  else word
