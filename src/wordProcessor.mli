@@ -55,3 +55,5 @@ val make_text_block : string -> text_block
 
 val stemmed_text_block : text_block -> string
 (**[stemmed_text_block] is the stemmed text of text_block*)
+
+val finalize_plurals_past_participles : string -> int -> string

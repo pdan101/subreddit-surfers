@@ -86,6 +86,16 @@ let remove_past_participles_test
     (remove_past_participles word num_vc)
     ~printer:String.escaped
 
+let finalize_plurals_past_participles_test
+    (name : string)
+    (word : string)
+    (num_vc : int)
+    (expected_output : string) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (finalize_plurals_past_participles word num_vc)
+    ~printer:String.escaped
+
 let possesses : stemmed_word =
   {
     original_word = "possesses";
@@ -383,6 +393,13 @@ let word_processor_tests =
     remove_past_participles_test "Ending with ED" "helped" 1 "help";
     remove_past_participles_test "Ending with ED and no vowel in stem"
       "hlped" 1 "hlped";
+    finalize_plurals_past_participles_test
+      "Add e back after it has been removed" "conflat" 1 "conflate";
+    finalize_plurals_past_participles_test
+      "Add e back after it has been removed" "troubl" 1 "trouble";
+    finalize_plurals_past_participles_test
+      "Add e back after it has been removed from" "siz" 1 "size";
+    finalize_plurals_past_participles_test "A" "fil" 1 "file";
     stemmer_test "Stemming possesses" "possesses" possesses;
     stemmer_test "Stemming agreed -> agree" "agreed" agreed;
     create_units_test "Just seeing what" "H" "C";
