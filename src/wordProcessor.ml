@@ -103,6 +103,30 @@ let remove_past_participles word num_vc =
   then remove_last word 3
   else word
 
+let end_cvc word =
+  let units = create_units word in
+  if String.length units >= 3 then
+    let last_three = get_last units 3 in
+    let last_letter = get_last word 1 in
+    if last_three = "CVC" && last_letter <> "w" || last_letter <> "x" || last_letter <> "y" then true
+    else false
+  else false
+
+let double_consonant word =
+  let last_two = get_last word 2 in
+  let second_to_last = remove_last last_two 1 in
+  let last = get_last word 1 in second_to_last = last
+
+let finalize_plurals_past_participles word num_vcs =
+  let len = String.length word in
+  if len >= 3 && end_cvc word && num_vcs = 1 then word ^ "e" 
+  else if len >= 2 then
+    let last_two = get_last word 2 in
+    if last_two = "at" || last_two = "bl" || last_two = "iz" then word ^ "e"
+    else if double_consonant word then remove_last word 1
+    else word
+  else word
+
 let stemmer (word : string) =
   let units = create_units word in
   let vcs = calc_vc units in
