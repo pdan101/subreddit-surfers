@@ -201,3 +201,24 @@ let make_text_block (text : string) =
   { original_text = text; stemmed_text = stem_paragraph text }
 
 let stemmed_text_block block = block.stemmed_text
+
+let step2data = Yojson.Basic.from_file "src/step2.json"
+
+let json_to_assoc_list data =
+  data |> Yojson.Basic.Util.to_assoc
+  |> List.map (fun (x, y) -> (x, y |> Yojson.Basic.Util.to_string))
+
+let hashtbl_step2 = Hashtbl.create 20
+
+let rec add_pairs_to_table (lst : (string * string) list) =
+  match lst with
+  | [] -> ()
+  | (x, y) :: tail_lst ->
+      Hashtbl.add hashtbl_step2 x y;
+      add_pairs_to_table tail_lst
+
+let assoc_list_to_hashtbl (data : (string * string) list) =
+  add_pairs_to_table data
+
+let build_table =
+  step2data |> json_to_assoc_list |> assoc_list_to_hashtbl

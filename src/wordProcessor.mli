@@ -67,3 +67,8 @@ val finalize_plurals_past_participles : string -> int -> string
 
 val end_cvc : string -> bool
 (***)
+
+val hashtbl_step2 : (string, string) Hashtbl.t
+(**[hashtbl_step2] is the abstract hashtable that contains key value
+   pairs corresponding to the suffix mappings necessary for the second
+   step in our porter stemmer implementation.*)
