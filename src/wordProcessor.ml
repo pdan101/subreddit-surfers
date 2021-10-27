@@ -38,21 +38,28 @@ let vowels = "aeiouy"
 
 let tail word = String.sub word 1 (String.length word - 1)
 
-let rec find_group word type_char =
-  let lowercase_word = String.lowercase_ascii word in
-  if
-    String.length word > 0
-    && String.contains type_char (String.get lowercase_word 0)
-  then find_group (tail lowercase_word) type_char
-  else word
+let is_vowel character =
+  let lowercase_char = Char.lowercase_ascii character in
+  String.contains vowels lowercase_char
+
+let get_last word num = String.sub word (String.length word - num) num
+
+let remove_last word num = String.sub word 0 (String.length word - num)
 
 let rec create_units (word : string) =
-  if String.length word >= 1 then
-    let remove_vowels = find_group word vowels in
-    let remove_consonants = find_group word consonants in
-    if remove_vowels <> word then "V" ^ create_units remove_vowels
-    else "C" ^ create_units remove_consonants
+  let length = String.length word in
+  if length > 0 then
+    if is_vowel (String.get word 0) then "V" ^ create_units (tail word)
+    else "C" ^ create_units (tail word)
   else ""
+
+let rec create_simplified_units raw_units acc =
+  if String.length raw_units > 0 then
+    let first_character = Char.escaped (String.get raw_units 0) in
+    if String.length acc > 0 && get_last acc 1 = first_character then
+      create_simplified_units (tail raw_units) acc
+    else create_simplified_units (tail raw_units) (acc ^ first_character)
+  else acc
 
 (*TODO make this method better- should not be using try/catch*)
 let rec calc_vc char_string =
@@ -68,10 +75,6 @@ let rec calc_vc char_string =
     1 + calc_vc (tail char_string)
   else if first_char = '-' || second_char = '-' then 0
   else calc_vc (tail char_string)
-
-let get_last word num = String.sub word (String.length word - num) num
-
-let remove_last word num = String.sub word 0 (String.length word - num)
 
 let remove_plurals word =
   let len = String.length word in
@@ -109,8 +112,8 @@ let end_cvc word =
     let last_three = get_last units 3 in
     let last_letter = get_last word 1 in
     if
-      (last_three = "CVC" && last_letter <> "w")
-      || last_letter <> "x" || last_letter <> "y"
+      last_three = "CVC" && last_letter <> "w" && last_letter <> "x"
+      && last_letter <> "y"
     then true
     else false
   else false
@@ -123,7 +126,7 @@ let double_consonant word =
 
 let finalize_plurals_past_participles word num_vc =
   let len = String.length word in
-  if len = 3 && end_cvc word && num_vc = 1 then word ^ "e"
+  if end_cvc word && num_vc = 1 then word ^ "e"
   else if len >= 2 then
     let last_two = get_last word 2 in
     if last_two = "at" || last_two = "bl" || last_two = "iz" then
@@ -144,7 +147,7 @@ let check_double_consonant word num_vc =
   else word
 
 let stemmer (word : string) =
-  let units = create_units word in
+  let units = create_simplified_units (create_units word) "" in
   let vcs = calc_vc units in
   let stemmed = vcs |> remove_past_participles word |> remove_plurals in
   { original_word = word; units; num_vcs = vcs; stemmed }
