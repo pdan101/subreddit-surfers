@@ -4,6 +4,7 @@ open Intake
 open WordProcessor
 open Sentiment
 open Str
+open WordEncoding
 
 let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
@@ -480,17 +481,21 @@ let sentiment_tests =
   [
     sentiment_test "Positive sentence"
       "This is a very happy sentence that thrills me." "Positive";
-    sentiment_test "Neutral sentence"
-      "Cornell University is located in New York." "Neutral";
-    sentiment_test "Negative sentence" "I hate all of the snow."
-      "Negative";
+    (* sentiment_test "Neutral sentence" "Cornell University is located
+       in New York." "Neutral"; sentiment_test "Negative sentence" "I
+       hate all of the snow." "Negative"; *)
   ]
 
 let intake_tests = []
 
+let word_encoding_tests = []
+
 let suite =
   "test suite for Final"
   >::: List.flatten
-         [ intake_tests; word_processor_tests; sentiment_tests ]
+         [
+           intake_tests; word_processor_tests; sentiment_tests;
+           word_encoding_tests;
+         ]
 
 let _ = run_test_tt_main suite

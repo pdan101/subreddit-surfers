@@ -20,13 +20,13 @@ val recent_post : subreddit -> post
 val posts : subreddit -> post list
 (** [posts subreddit] is the list of posts in [subreddit].*)
 
-val author : post -> string 
+val author : post -> string
 (** [author post] is the author of [post].*)
 
 val created_utc : post -> float
 (** [created_utc post] is the creation time of [post].*)
 
-val id : post -> string 
+val id : post -> string
 (** [id post] is the id of [post].*)
 
 val num_comments : post -> int
@@ -35,21 +35,14 @@ val num_comments : post -> int
 val num_crossposts : post -> int
 (** [num_crossposts post] is the number of crossposts of [post].*)
 
-val selftext : post -> string 
+val selftext : post -> string
 (** [selftext post] is the text of [post].*)
 
 val spoiler : post -> bool
 (** [spoiler post] indicates if [post] has a spoiler.*)
-    
+
 val upvotes : post -> int
 (** [author post] is the number of upvotes of [post].*)
 
-
-
-
-
-
-
-
-
-
+val subreddit_name : post -> string
+(**[subreddit post] is the name of the subreddit that [post] belongs to.*)

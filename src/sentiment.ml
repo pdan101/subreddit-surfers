@@ -1,6 +1,18 @@
 (** adapted from
     https://github.com/Duncan-McD/OCamlStocks/blob/5d2c3d62decf7ee3ae4265655f014b0f34961ada/src/parser.ml*)
+
+open WordEncoding
+
+let test_file = open_out "test2.json"
+
 let polarity_score str =
+  let _ = output_string test_file "{\n" in
+  let _ =
+    (*Fine tuning output of write_words_to_json*)
+    write_words_to_json test_file
+      [ "Hello"; "Did"; "This"; "format"; "correctly" ]
+  in
+  let _ = output_string test_file "}" in
   Py.initialize ();
   let vader = Py.import "vaderSentiment.vaderSentiment" in
   let sentAnalyzer =

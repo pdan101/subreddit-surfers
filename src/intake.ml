@@ -3,6 +3,7 @@ open Yojson.Basic.Util
 type post = {
   author : string;
   created_utc : float;
+  subreddit : string;
   id : string;
   num_comments : int;
   num_crossposts : int;
@@ -19,6 +20,7 @@ let post_of_json json =
   {
     author = next |> member "author" |> to_string;
     created_utc = next |> member "created_utc" |> to_float;
+    subreddit = next |> member "subreddit" |> to_string;
     id = next |> member "id" |> to_string;
     num_comments = next |> member "num_comments" |> to_int;
     num_crossposts = next |> member "num_crossposts" |> to_int;
@@ -57,10 +59,4 @@ let title post = post.title
 
 let upvotes post = post.upvotes
 
-
-
-
-
-
-
-
+let subreddit_name post = post.subreddit
