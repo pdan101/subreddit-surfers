@@ -65,6 +65,19 @@ val finalize_plurals_past_participles : string -> int -> string
    only be used if remove_plurals or remove_past_participles has altered
    the word*)
 
+val end_cvc : string -> bool
+(***)
+
+val hashtbl_step2_3 : (string, string) Hashtbl.t
+(**[hashtbl_step2_3] is the abstract hashtable that contains key value
+   pairs corresponding to the suffix mappings necessary for the second
+   and third steps in our porter stemmer implementation.*)
+
+val replace_suffix : string -> string
+(**[replace_suffix word] is the adjusted [word] after checking and
+   replacing known suffixes in step 2 of our porter stemmer. Returns
+   [word] if no suffixes are found.*)
+
 val create_simplified_units : string -> string -> string
 (**[create_simplified_units] has all vowels and consonants grouped
    together and represented with either V or C*)
@@ -73,11 +86,11 @@ val fix_y : string -> string
 (**[fix_y] adds and "i" to a stemmed word if it contains a vowel. This
    is Step 1c in the porter stemmer paper*)
 
-val remove_e : string -> string
+val remove_e : string -> int -> string
 (**[remove_e] adds "e" to the end of a stemmed word if the number of
    VC's is greater than 1 or the number of VC's is 1 and does not end
    with CVC. This is Step 5a in the porter stemmer paper*)
 
-val check_double_consonant : string -> string
+val check_double_consonant : string -> int -> string
 (**[check_double_consonant] removes double consonants from the end of
    stemmed words if the number VC's is greater than 1*)
