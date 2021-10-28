@@ -57,7 +57,8 @@ let create_units_test
     (word : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output (create_units word)
+  assert_equal expected_output
+    (create_simplified_units (create_units word) "")
     ~printer:String.escaped
 
 let calc_vc_test
@@ -84,6 +85,16 @@ let remove_past_participles_test
   name >:: fun _ ->
   assert_equal expected_output
     (remove_past_participles word num_vc)
+    ~printer:String.escaped
+
+let finalize_plurals_past_participles_test
+    (name : string)
+    (word : string)
+    (num_vc : int)
+    (expected_output : string) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (finalize_plurals_past_participles word num_vc)
     ~printer:String.escaped
 
 let possesses : stemmed_word =
@@ -383,7 +394,17 @@ let word_processor_tests =
     remove_past_participles_test "Ending with ED" "helped" 1 "help";
     remove_past_participles_test "Ending with ED and no vowel in stem"
       "hlped" 1 "hlped";
-    stemmer_test "Stemming possesses" "possesses" possesses;
+    finalize_plurals_past_participles_test
+      "Add e back after it has been removed" "conflat" 1 "conflate";
+    finalize_plurals_past_participles_test
+      "Add e back after it has been removed" "troubl" 1 "trouble";
+    finalize_plurals_past_participles_test
+      "Add e back after it has been removed from" "siz" 1 "size";
+    finalize_plurals_past_participles_test "Add e if stem is CVC" "fil"
+      1 "file";
+    finalize_plurals_past_participles_test
+      "Do not add e is stem is CVC but length greater than 3" "fail" 1
+      "fail"; stemmer_test "Stemming possesses" "possesses" possesses;
     stemmer_test "Stemming agreed -> agree" "agreed" agreed;
     create_units_test "Just seeing what" "H" "C";
     create_units_test "Creating unit for he CV" "He" "CV";
