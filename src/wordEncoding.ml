@@ -15,12 +15,20 @@ let subreddit_json_to_stemmed_words subreddit_json : string list =
   let unstemmed = subreddit_json_to_words subreddit_json in
   unstemmed |> stem_word_list |> extract_stemmed
 
-let write_words_to_json (file : out_channel) (words : string list) :
+let rec write_words_to_json (file : out_channel) (words : string list) :
     unit =
-  List.iter
-    (fun x ->
-      output_string file ("\t" ^ "\"" ^ x ^ "\"" ^ ":" ^ "\"" ^ "\",\n"))
-    words
+  match words with
+  | [] -> output_string file "}"
+  | [ h ] ->
+      output_string file ("\"" ^ h ^ "\":\"\"\n");
+      write_words_to_json file []
+  | h :: t ->
+      if pos_out file < 1 then (
+        output_string file "{\n";
+        write_words_to_json file (h :: t))
+      else (
+        output_string file ("\"" ^ h ^ "\":\"\",\n");
+        write_words_to_json file t)
 
 (* let subreddit_json_to_word_json subreddit_json : unit = let subreddit
    = from_json subreddit_json in let filename = subreddit |> recent_post

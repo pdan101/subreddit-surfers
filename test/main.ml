@@ -488,7 +488,22 @@ let sentiment_tests =
 
 let intake_tests = []
 
-let word_encoding_tests = []
+let write_words_to_json_test
+    (name : string)
+    (words : string list)
+    (filename : string)
+    (expected_output : unit) : test =
+  let file = open_out ("data/subredditVocabJsons/" ^ filename) in
+  name >:: fun _ ->
+  assert_equal expected_output (write_words_to_json file words)
+
+let word_encoding_tests =
+  [
+    write_words_to_json_test
+      "Takes a list of words and writes to a json file"
+      [ "Hello"; "Did"; "This"; "format"; "correctly" ]
+      "test3.json" (print_int 1);
+  ]
 
 let suite =
   "test suite for Final"
