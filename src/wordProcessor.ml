@@ -205,13 +205,17 @@ let make_text_block (text : string) =
 
 let stemmed_text_block block = block.stemmed_text
 
-let step2data = Yojson.Basic.from_file "src/step2.json"
+let step2_3data = Yojson.Basic.from_file "src/step2_3.json"
+
+let step4data = Yojson.Basic.from_file "src/step4.json"
 
 let json_to_assoc_list data =
   data |> Yojson.Basic.Util.to_assoc
   |> List.map (fun (x, y) -> (x, y |> Yojson.Basic.Util.to_string))
 
-let hashtbl_step2_3 = Hashtbl.create 20
+let hashtbl_step2_3 = Hashtbl.create 27
+
+let hashtbl_step4 = Hashtbl.create 19
 
 let rec add_pairs_to_table table (lst : (string * string) list) =
   match lst with
@@ -220,27 +224,39 @@ let rec add_pairs_to_table table (lst : (string * string) list) =
       Hashtbl.add table x y;
       add_pairs_to_table table tail_lst
 
-let assoc_list_to_hashtbl (data : (string * string) list) =
-  add_pairs_to_table hashtbl_step2_3 data
+let assoc_list_to_hashtbl tbl (data : (string * string) list) =
+  add_pairs_to_table tbl data
 
-let build_table =
-  step2data |> json_to_assoc_list |> assoc_list_to_hashtbl
+let build_tables =
+  step2_3data |> json_to_assoc_list
+  |> assoc_list_to_hashtbl hashtbl_step2_3;
+  step4data |> json_to_assoc_list |> assoc_list_to_hashtbl hashtbl_step4
 
-let rec find_suffix_binding word =
-  if String.length word < 4 then ("", 0)
+let rec find_suffix_binding tbl word =
+  if String.length word < 2 then ("", 0)
   else
-    match
-      Hashtbl.find_opt hashtbl_step2_3 (word |> String.uppercase_ascii)
-    with
+    match Hashtbl.find_opt tbl (word |> String.uppercase_ascii) with
     | Some x -> (x |> String.lowercase_ascii, String.length word)
     | None ->
-        find_suffix_binding (String.sub word 1 (String.length word - 1))
+        find_suffix_binding tbl
+          (String.sub word 1 (String.length word - 1))
 
 let replace_suffix word =
-  if calc_vc (word |> create_units) > 0 then
-    let replacement = find_suffix_binding word in
-    let new_string =
-      String.sub word 0 (String.length word - snd replacement)
+  let complete23 =
+    if calc_vc (word |> create_units) > 0 then
+      let replacement = find_suffix_binding hashtbl_step2_3 word in
+      let new_string =
+        String.sub word 0 (String.length word - snd replacement)
+      in
+      new_string ^ fst replacement
+    else word
+  in
+  let () = print_endline complete23 in
+  if calc_vc (complete23 |> create_units) > 1 then
+    let replacement2 = find_suffix_binding hashtbl_step4 complete23 in
+    let new_string2 =
+      String.sub complete23 0
+        (String.length complete23 - snd replacement2)
     in
-    new_string ^ fst replacement
+    new_string2 ^ fst replacement2
   else word
