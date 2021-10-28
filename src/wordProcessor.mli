@@ -68,20 +68,10 @@ val finalize_plurals_past_participles : string -> int -> string
 val end_cvc : string -> bool
 (***)
 
-val hashtbl_step2_3 : (string, string) Hashtbl.t
-(**[hashtbl_step2_3] is the abstract hashtable that contains key value
-   pairs corresponding to the suffix mappings necessary for the second
-   and third steps in our porter stemmer implementation.*)
-
-val hashtbl_step4 : (string, string) Hashtbl.t
-(**[hashtbl_step2_3] is the abstract hashtable that contains key value
-   pairs corresponding to the suffix mappings necessary for the fourth
-   step in our porter stemmer implementation.*)
-
 val replace_suffix : string -> string
 (**[replace_suffix word] is the adjusted [word] after checking and
-   replacing known suffixes in step 2 of our porter stemmer. Returns
-   [word] if no suffixes are found.*)
+   replacing known suffixes in step 2, 3, and 4 of our porter stemmer.
+   Returns [word] if no suffixes are found.*)
 
 val create_simplified_units : string -> string -> string
 (**[create_simplified_units] has all vowels and consonants grouped
