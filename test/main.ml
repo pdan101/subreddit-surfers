@@ -523,6 +523,8 @@ let word_processor_tests =
     (*These last tests are in the case that there is no suffix change.*)
     replace_suffix_test "NO CHANGE" "hello" "hello";
     replace_suffix_test "NO CHANGE" "hi" "hi";
+    replace_suffix_test "Choose step 4 but not step 3" "rational"
+      "ration";
   ]
 
 let sentiment_of_score score =
