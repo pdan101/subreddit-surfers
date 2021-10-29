@@ -61,13 +61,10 @@ let create_units_test
     (create_simplified_units (create_units word) "")
     ~printer:String.escaped
 
-let calc_vc_test
-    (name : string)
-    (char_string : string)
-    (expected_output : int) : test =
+let calc_vc_test (name : string) (word : string) (expected_output : int)
+    : test =
   name >:: fun _ ->
-  assert_equal expected_output (calc_vc char_string)
-    ~printer:string_of_int
+  assert_equal expected_output (calc_vc word) ~printer:string_of_int
 
 let remove_plurals_test
     (name : string)
@@ -80,21 +77,19 @@ let remove_plurals_test
 let remove_past_participles_test
     (name : string)
     (word : string)
-    (num_vc : int)
     (expected_output : string) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (remove_past_participles word num_vc)
+    (remove_past_participles word)
     ~printer:String.escaped
 
 let finalize_plurals_past_participles_test
     (name : string)
     (word : string)
-    (num_vc : int)
     (expected_output : string) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (finalize_plurals_past_participles word num_vc)
+    (finalize_plurals_past_participles word)
     ~printer:String.escaped
 
 let possesses : stemmed_word =
@@ -110,7 +105,7 @@ let agreed : stemmed_word =
     original_word = "agreed";
     units = "VCVC";
     num_vcs = 2;
-    stemmed = "agree";
+    stemmed = "agre";
   }
 
 let pp_stemmed_word stemmed =
@@ -282,6 +277,20 @@ let replace_suffix_test
   assert_equal expected_output (replace_suffix word)
     ~printer:String.escaped
 
+let fix_y_test
+    (name : string)
+    (word : string)
+    (expected_output : string) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (fix_y word) ~printer:String.escaped
+
+let remove_e_test
+    (name : string)
+    (word : string)
+    (expected_output : string) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (remove_e word) ~printer:String.escaped
+
 let word_processor_tests =
   [
     parse_test "Empty string" parse "" [];
@@ -385,33 +394,30 @@ let word_processor_tests =
     create_units_test "Numerous groups with different characters"
       "hkealolo" "CVCVCV";
     create_units_test "Does create_units work with possessive"
-      "possessive" "CVCVCVCV"; calc_vc_test "no VC" "CV" 0;
-    calc_vc_test "Empty string" "" 0; calc_vc_test "Odd length" "CVC" 1;
-    calc_vc_test "Even pairs" "VCVCVC" 3;
+      "possessive" "CVCVCVCV";
     remove_plurals_test "Ending with SSES" "possesses" "possess";
     remove_plurals_test "Ending with IES" "libraries" "librari";
     remove_plurals_test "Ending with SS" "loneliness" "loneliness";
     remove_plurals_test "Ending with S" "cars" "car";
     remove_plurals_test "Not plural" "car" "car";
-    remove_past_participles_test "No VC with EED" "steed" 0 "steed";
-    remove_past_participles_test "Ending with EED" "agreed" 1 "agree";
-    remove_past_participles_test "Ending with ING" "wondering" 1
-      "wonder";
+    remove_past_participles_test "No VC with EED" "steed" "steed";
+    remove_past_participles_test "Ending with EED" "agreed" "agree";
+    remove_past_participles_test "Ending with ING" "wondering" "wonder";
     remove_past_participles_test "Ending with ING and no vowel in stem"
-      "wndring" 1 "wndring";
-    remove_past_participles_test "Ending with ED" "helped" 1 "help";
+      "wndring" "wndring";
+    remove_past_participles_test "Ending with ED" "helped" "help";
     remove_past_participles_test "Ending with ED and no vowel in stem"
-      "hlped" 1 "hlped";
+      "hlped" "hlped";
     finalize_plurals_past_participles_test
-      "Add e back after it has been removed" "conflat" 1 "conflate";
+      "Add e back after it has been removed" "conflat" "conflate";
     finalize_plurals_past_participles_test
-      "Add e back after it has been removed" "troubl" 1 "trouble";
+      "Add e back after it has been removed" "troubl" "trouble";
     finalize_plurals_past_participles_test
-      "Add e back after it has been removed from" "siz" 1 "size";
+      "Add e back after it has been removed from" "siz" "size";
     finalize_plurals_past_participles_test "Add e if stem is CVC" "fil"
-      1 "file";
+      "file";
     finalize_plurals_past_participles_test
-      "Do not add e is stem is CVC but length greater than 3" "fail" 1
+      "Do not add e is stem is CVC but length greater than 3" "fail"
       "fail"; stemmer_test "Stemming possesses" "possesses" possesses;
     stemmer_test "Stemming agreed -> agree" "agreed" agreed;
     create_units_test "Just seeing what" "H" "C";
@@ -523,6 +529,17 @@ let word_processor_tests =
     (*These last tests are in the case that there is no suffix change.*)
     replace_suffix_test "NO CHANGE" "hello" "hello";
     replace_suffix_test "NO CHANGE" "hi" "hi";
+    fix_y_test "Replaces i with y if there is a vowel in the stem"
+      "party" "parti";
+    fix_y_test "Does not change word that does not end in y" "python"
+      "python";
+    fix_y_test "Does not change word without vowel" "sky" "sky";
+    remove_e_test "Removes e if number of VC's > 1" "debate" "debat";
+    remove_e_test "Does not remove e if number of VC's <= 1" "late"
+      "late";
+    remove_e_test
+      "Removes e if number of VC's = 1 and the stem ends CVC" "cease"
+      "ceas";
   ]
 
 let sentiment_of_score score =
