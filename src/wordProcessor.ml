@@ -137,7 +137,10 @@ let finalize_plurals_past_participles word num_vc =
     else word
   else word
 
-let fix_y word = if contains_vowel word then word ^ "i" else word
+let fix_y word =
+  if contains_vowel word && get_last word 1 = "y" then
+    remove_last word 1 ^ "i"
+  else word
 
 let remove_e word num_vc =
   if num_vc > 1 then remove_last word 1
@@ -148,10 +151,42 @@ let check_double_consonant word num_vc =
   if num_vc > 1 && double_consonant word then remove_last word 1
   else word
 
+let replace_suffix word =
+  let complete23, len23 =
+    if calc_vc (word |> create_units) > 0 then
+      let replacement = find_suffix_binding hashtbl_step2_3 word in
+      let new_string =
+        String.sub word 0 (String.length word - snd replacement)
+      in
+      (new_string ^ fst replacement, snd replacement)
+    else (word, 0)
+  in
+  let complete4, len4 =
+    if calc_vc (word |> create_units) > 1 then
+      let replacement2 = find_suffix_binding hashtbl_step4 word in
+      let new_string2 =
+        String.sub word 0 (String.length word - snd replacement2)
+      in
+      (new_string2 ^ fst replacement2, snd replacement2)
+    else (word, 0)
+  in
+  if len23 > len4 then complete23 else complete4
+
 let stemmer (word : string) =
   let units = create_simplified_units (create_units word) "" in
   let vcs = calc_vc units in
-  let stemmed = vcs |> remove_past_participles word |> remove_plurals in
+
+  let step_1a = remove_plurals word in
+  let step_1b = remove_past_participles step_1a vcs in
+  let final_step1ab =
+    if word <> step_1b then
+      finalize_plurals_past_participles step_1b vcs
+    else step_1b
+  in
+  let step_1c = fix_y final_step1ab in
+  let step_234 = replace_suffix step_1c in
+  let step_5a = remove_e step_234 vcs in
+  let stemmed = check_double_consonant step_5a vcs in
   { original_word = word; units; num_vcs = vcs; stemmed }
 
 exception Unsupported_sentence_format
@@ -206,24 +241,3 @@ let make_text_block (text : string) =
   { original_text = text; stemmed_text = stem_paragraph text }
 
 let stemmed_text_block block = block.stemmed_text
-
-let replace_suffix word =
-  let complete23, len23 =
-    if calc_vc (word |> create_units) > 0 then
-      let replacement = find_suffix_binding hashtbl_step2_3 word in
-      let new_string =
-        String.sub word 0 (String.length word - snd replacement)
-      in
-      (new_string ^ fst replacement, snd replacement)
-    else (word, 0)
-  in
-  let complete4, len4 =
-    if calc_vc (word |> create_units) > 1 then
-      let replacement2 = find_suffix_binding hashtbl_step4 word in
-      let new_string2 =
-        String.sub word 0 (String.length word - snd replacement2)
-      in
-      (new_string2 ^ fst replacement2, snd replacement2)
-    else (word, 0)
-  in
-  if len23 > len4 then complete23 else complete4
