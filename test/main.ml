@@ -5,6 +5,7 @@ open WordProcessor
 open Sentiment
 open Str
 open WordEncoding
+open Yojson.Basic
 
 let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
@@ -497,12 +498,29 @@ let write_words_to_json_test
   name >:: fun _ ->
   assert_equal expected_output (write_words_to_json file words)
 
+let convert_path_to_json (file_path : string) = file_path |> from_file
+
+let cornell_json = convert_path_to_json "data/college.json"
+
+let subreddit_json_to_word_json_test
+    (name : string)
+    (expected_output : unit)
+    (processor : Yojson.Basic.t -> string list)
+    (subreddit : Yojson.Basic.t) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (subreddit_json_to_word_json processor subreddit)
+
 let word_encoding_tests =
   [
     write_words_to_json_test
       "Takes a list of words and writes to a json file"
       [ "Hello"; "Did"; "This"; "format"; "correctly" ]
       "test3.json" (print_int 1);
+    subreddit_json_to_word_json_test
+      "Converts words in cornell\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_words cornell_json;
   ]
 
 let suite =

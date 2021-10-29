@@ -1,6 +1,6 @@
 open WordProcessor
 open Intake
-open Yojson
+open Yojson.Basic
 
 let subreddit_json_to_words subreddit_json : string list =
   let subreddit = from_json subreddit_json in
@@ -30,6 +30,11 @@ let rec write_words_to_json (file : out_channel) (words : string list) :
         output_string file ("\"" ^ h ^ "\":\"\",\n");
         write_words_to_json file t)
 
-(* let subreddit_json_to_word_json subreddit_json : unit = let subreddit
-   = from_json subreddit_json in let filename = subreddit |> recent_post
-   |> subreddit_name in *)
+let subreddit_json_to_word_json processor_function subreddit_json : unit
+    =
+  let subreddit = from_json subreddit_json in
+  let words = processor_function subreddit_json in
+  let filename = subreddit |> recent_post |> subreddit_name in
+  let filepath = "data/subredditVocabJsons/" ^ filename ^ ".json" in
+  let file = open_out filepath in
+  write_words_to_json file words
