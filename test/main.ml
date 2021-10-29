@@ -390,7 +390,7 @@ let word_processor_tests =
     calc_vc_test "Even pairs" "VCVCVC" 3;
     remove_plurals_test "Ending with SSES" "possesses" "possess";
     remove_plurals_test "Ending with IES" "libraries" "librari";
-    remove_plurals_test "Ending with SS" "loneliness" "loneline";
+    remove_plurals_test "Ending with SS" "loneliness" "loneliness";
     remove_plurals_test "Ending with S" "cars" "car";
     remove_plurals_test "Not plural" "car" "car";
     remove_past_participles_test "No VC with EED" "steed" 0 "steed";

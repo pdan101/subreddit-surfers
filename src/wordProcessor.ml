@@ -108,6 +108,20 @@ let remove_past_participles word num_vc =
   then remove_last word 3
   else word
 
+let apply_finalize word =
+  let len = String.length word in
+  if
+    len >= 2
+    && get_last word 2 = "ed"
+    && contains_vowel (remove_last word 2)
+  then true
+  else if
+    len >= 3
+    && get_last word 3 = "ing"
+    && contains_vowel (remove_last word 3)
+  then true
+  else false
+
 let end_cvc word =
   let units = create_units word in
   if String.length units >= 3 then
@@ -178,9 +192,10 @@ let stemmer (word : string) =
 
   let step_1a = remove_plurals word in
   let step_1b = remove_past_participles step_1a vcs in
+
+  let apply_final = apply_finalize step_1a in
   let final_step1ab =
-    if word <> step_1b then
-      finalize_plurals_past_participles step_1b vcs
+    if apply_final then finalize_plurals_past_participles step_1b vcs
     else step_1b
   in
   let step_1c = fix_y final_step1ab in
