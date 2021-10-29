@@ -482,9 +482,10 @@ let sentiment_tests =
   [
     sentiment_test "Positive sentence"
       "This is a very happy sentence that thrills me." "Positive";
-    (* sentiment_test "Neutral sentence" "Cornell University is located
-       in New York." "Neutral"; sentiment_test "Negative sentence" "I
-       hate all of the snow." "Negative"; *)
+    sentiment_test "Neutral sentence"
+      "Cornell University is located\n       in New York." "Neutral";
+    sentiment_test "Negative sentence" "I\n       hate all of the snow."
+      "Negative";
   ]
 
 let intake_tests = []
