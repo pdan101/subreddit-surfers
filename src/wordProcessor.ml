@@ -82,7 +82,7 @@ let remove_plurals word =
   let len = String.length word in
   if len >= 4 && get_last word 4 = "sses" then remove_last word 2
   else if len >= 3 && get_last word 3 = "ies" then remove_last word 2
-  else if len >= 2 && get_last word 2 = "ss" then remove_last word 2
+  else if len >= 2 && get_last word 2 = "ss" then word
   else if len >= 2 && get_last word 1 = "s" then remove_last word 1
   else word
 
