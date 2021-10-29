@@ -1,9 +1,9 @@
 {
-	"words": {
-		"Hello":"",
-		"Did":"",
-		"This":"",
-		"format":"",
-		"correctly":""
-	}
+	"words": [
+		"Hello",
+		"Did",
+		"This",
+		"format",
+		"correctly"
+	]
 }

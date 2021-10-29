@@ -21,3 +21,8 @@ val subreddit_json_to_word_json :
    writes all the words of every post in the subreddit to a json file.
    The way each of these words is processed is based on
    [processor_function]*)
+
+val create_encoded_matrix : Basic.t -> string -> int array array
+(**[create_encoded_matrix word_json post] is a 2d matrix representing
+   [post]. Each row in the matrix is a binary vector representing [word]
+   according to it's index in [word_json] *)

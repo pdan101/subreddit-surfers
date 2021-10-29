@@ -511,16 +511,46 @@ let subreddit_json_to_word_json_test
   assert_equal expected_output
     (subreddit_json_to_word_json processor subreddit)
 
+let pp_print_matrix acc matrix : string =
+  Array.fold_right
+    (fun row acc ->
+      Array.fold_right (fun elt acc -> acc ^ string_of_int elt) row ""
+      ^ "\n")
+    matrix ""
+
+let create_encoded_matrix_test
+    (name : string)
+    (word_json : t)
+    (post : string)
+    (expected_output : int array array) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (create_encoded_matrix word_json post)
+    ~printer:(pp_print_matrix "")
+
+let test3_json =
+  convert_path_to_json "data/subredditVocabJsons/test3.json"
+
+let test3_matrix = Array.make_matrix 2 5 0
+
+let _ = test3_matrix.(0).(0) <- 1
+
+let _ = test3_matrix.(1).(3) <- 1
+
 let word_encoding_tests =
   [
     write_words_to_json_test
-      "Takes a list of words and writes to a json file"
+      "Takes a list of words and writes to a\n       json file"
       [ "Hello"; "Did"; "This"; "format"; "correctly" ]
       "test3.json" (print_int 1);
     subreddit_json_to_word_json_test
       "Converts words in cornell\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
       subreddit_json_to_words cornell_json;
+    create_encoded_matrix_test
+      "Json contains: Hello, Did, this, format, correctly. Test post \
+       is hello format"
+      test3_json "Hello format" test3_matrix;
   ]
 
 let suite =
