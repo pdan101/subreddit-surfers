@@ -66,3 +66,15 @@ let create_encoded_matrix (word_json : Yojson.Basic.t) (post : string) :
       matrix.(index).(word_index) <- 1)
     post_array;
   matrix
+
+let word_frequency_post (text : string) : (string * int) list =
+  let rec frequency_list
+      (words : string list)
+      (acc : (string * int) list) : (string * int) list =
+    match words with
+    | [] -> acc
+    | h :: t ->
+        let frequency = List.find_all (fun x -> h = x) t in
+        frequency_list t ((h, List.length frequency) :: acc)
+  in
+  List.sort_uniq compare (frequency_list (parse text) [])
