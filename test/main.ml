@@ -3,6 +3,7 @@ open Analyzer
 open Intake
 open WordProcessor
 open Sentiment
+open Stemmer
 open Str
 open WordEncoding
 open Yojson.Basic
