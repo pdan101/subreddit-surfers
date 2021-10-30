@@ -192,7 +192,7 @@ let check_double_consonant word =
 let replace_suffix word =
   let complete23, len23 =
     if calc_vc word > 0 then
-      let replacement = find_suffix_binding hashtbl_step2_3 word in
+      let replacement = find_suffix_binding hashtbl_step2_3 word "" 0 in
       let new_string =
         String.sub word 0 (String.length word - snd replacement)
       in
@@ -201,7 +201,7 @@ let replace_suffix word =
   in
   let complete4, len4 =
     if calc_vc word > 1 then
-      let replacement2 = find_suffix_binding hashtbl_step4 word in
+      let replacement2 = find_suffix_binding hashtbl_step4 word "" 1 in
       let new_string2 =
         String.sub word 0 (String.length word - snd replacement2)
       in
