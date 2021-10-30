@@ -9,4 +9,7 @@ val hashtbl_step4 : (string, string) Hashtbl.t
    step in our porter stemmer implementation.*)
 
 val find_suffix_binding :
-  (string, string) Hashtbl.t -> string -> string * int
+  (string, string) Hashtbl.t -> string -> string -> int -> string * int
+(**[find_suffix_binding tbl word remainder m] finds the new suffix to
+   replace the current word's suffix with based on the hash table of
+   mappings and minimum m value passed in. *)

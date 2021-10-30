@@ -540,6 +540,8 @@ let word_processor_tests =
     remove_e_test
       "Removes e if number of VC's = 1 and the stem ends CVC" "cease"
       "ceas";
+    replace_suffix_test "Choose step 4 but not step 3" "rational"
+      "ration";
   ]
 
 let sentiment_of_score score =
