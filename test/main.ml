@@ -11,9 +11,9 @@ let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
 let make_state_test : test = state_test
 
-(** FROM A2: let rec list_printer_helper list accumulator = match list
-    with | [] -> accumulator ^ "]" | h :: t -> list_printer_helper t
-    (accumulator ^ " " ^ h ^ ";")
+(** let rec list_printer_helper list accumulator = match list with | []
+    -> accumulator ^ "]" | h :: t -> list_printer_helper t (accumulator
+    ^ " " ^ h ^ ";")
 
     let rec list_printer list = match list with | [] -> "[]" | _ :: _ ->
     list_printer_helper list "" *)
@@ -23,8 +23,8 @@ let make_state_test : test = state_test
 (** FROM A2: [pp_string s] pretty-prints string [s]. *)
 let pp_string s = "\"" ^ s ^ "\""
 
-(** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
-    pretty-print each element of [lst]. *)
+(** FROM A2: [pp_list pp_elt lst] pretty-prints list [lst], using
+    [pp_elt] to pretty-print each element of [lst]. *)
 let pp_list pp_elt lst =
   let pp_elts lst =
     let rec loop n acc = function
@@ -291,6 +291,61 @@ let word_processor_tests =
     process_sentence_test "Sentence with two words to stem"
       "They agreed to visit libraries with me."
       "They agree to visit librari with me.";
+    (*The following test cases cover the replacements in our second and
+      third step, and they cover all possible mappings in the step2_3
+      json file.*)
+    replace_suffix_test "ational -> ate" "relational" "relate";
+    replace_suffix_test "tional -> tion" "conditional" "condition";
+    replace_suffix_test "enci -> ence" "valenci" "valence";
+    replace_suffix_test "anci -> ance" "hesitanci" "hesitance";
+    replace_suffix_test "izer -> ize" "digitizer" "digitize";
+    replace_suffix_test "abli -> able" "conformabli" "conformable";
+    replace_suffix_test "alli -> al" "radicalli" "radical";
+    replace_suffix_test "entli -> ent" "differentli" "different";
+    replace_suffix_test "eli -> e" "vileli" "vile";
+    replace_suffix_test "ousli -> ous" "analogousli" "analogous";
+    replace_suffix_test "ization -> ize" "vietnamization" "vietnamize";
+    replace_suffix_test "ation -> ate" "predication" "predicate";
+    replace_suffix_test "ator -> ate" "operator" "operate";
+    replace_suffix_test "alism -> al" "feudalism" "feudal";
+    replace_suffix_test "iveness -> ive" "decisiveness" "decisive";
+    replace_suffix_test "fulness -> ful" "hopefulness" "hopeful";
+    replace_suffix_test "ousness -> ous" "callousness" "callous";
+    replace_suffix_test "aliti -> al" "formaliti" "formal";
+    replace_suffix_test "iviti -> ive" "sensitiviti" "sensitive";
+    replace_suffix_test "biliti -> ble" "sensibiliti" "sensible";
+    replace_suffix_test "alism -> al" "feudalism" "feudal";
+    replace_suffix_test "icate -> ic" "triplicate" "triplic";
+    replace_suffix_test "ative -> empty" "formative" "form";
+    replace_suffix_test "alize -> al" "formalize" "formal";
+    replace_suffix_test "iciti -> ic" "electriciti" "electric";
+    replace_suffix_test "ical -> ic" "electrical" "electric";
+    replace_suffix_test "ful -> empty" "hopeful" "hope";
+    replace_suffix_test "ness -> empty" "goodness" "good";
+    (*The following test cases cover the replacements in our fourth
+      step, and they cover all the possible mappings in the step4 json
+      file.*) replace_suffix_test "al -> empty" "revival" "reviv";
+    replace_suffix_test "ance -> empty" "allowance" "allow";
+    replace_suffix_test "ence -> empty" "inference" "infer";
+    replace_suffix_test "er -> empty" "airliner" "airlin";
+    replace_suffix_test "ic -> empty" "gyroscopic" "gyroscop";
+    replace_suffix_test "able -> empty" "adjustable" "adjust";
+    replace_suffix_test "ible -> empty" "defensible" "defens";
+    replace_suffix_test "ant -> empty" "irritant" "irrit";
+    replace_suffix_test "ement -> empty" "replacement" "replac";
+    replace_suffix_test "ment -> empty" "adjustment" "adjust";
+    replace_suffix_test "ent -> empty" "dependent" "depend";
+    replace_suffix_test "ion -> empty" "adoption" "adopt";
+    replace_suffix_test "ou -> empty" "homologou" "homolog";
+    replace_suffix_test "ism -> empty" "communism" "commun";
+    replace_suffix_test "ate -> empty" "activate" "activ";
+    replace_suffix_test "iti -> empty" "angulariti" "angular";
+    replace_suffix_test "ous -> empty" "homologous" "homolog";
+    replace_suffix_test "ive -> empty" "effective" "effect";
+    replace_suffix_test "ize -> empty" "bowdlerize" "bowdler";
+    (*These last tests are in the case that there is no suffix change.*)
+    replace_suffix_test "NO CHANGE" "hello" "hello";
+    replace_suffix_test "NO CHANGE" "hi" "hi";
   ]
 
 let sentiment_of_score score =
