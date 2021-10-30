@@ -1,0 +1,3 @@
+(executable
+ (name demo2)
+ (libraries Analyzer ANSITerminal))
