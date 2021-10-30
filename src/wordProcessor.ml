@@ -34,9 +34,9 @@ let parse (text : string) =
   |> List.map (fun x -> String.trim x)
   |> List.map (fun x -> remove_punc x)
 
-let consonants = "bcdfghjklmnpqrstwvxz"
+let consonants = "bcdfghjklmnpqrstwvxzy"
 
-let vowels = "aeiouy"
+let vowels = "aeiou"
 
 let tail word = String.sub word 1 (String.length word - 1)
 
@@ -63,20 +63,22 @@ let rec create_simplified_units raw_units acc =
     else create_simplified_units (tail raw_units) (acc ^ first_character)
   else acc
 
-(*TODO make this method better- should not be using try/catch*)
-let rec calc_vc char_string =
-  let first_char =
-    try String.get char_string 0 with
-    | _ -> '-'
-  in
-  let second_char =
-    try String.get char_string 1 with
-    | _ -> '-'
-  in
-  if first_char = 'V' && second_char = 'C' then
-    1 + calc_vc (tail char_string)
-  else if first_char = '-' || second_char = '-' then 0
-  else calc_vc (tail char_string)
+let rec remove_before_v char_string =
+  if String.length char_string > 0 then
+    if String.get char_string 0 = 'V' then char_string
+    else remove_before_v (tail char_string)
+  else ""
+
+let rec calc_vc word =
+  if String.length word > 0 then
+    let char_string =
+      create_simplified_units
+        (create_units (String.lowercase_ascii word))
+        ""
+    in
+    let get_vc = remove_before_v char_string in
+    if get_vc = "CV" then 0 else String.length get_vc / 2
+  else 0
 
 let remove_plurals word =
   let len = String.length word in
@@ -91,10 +93,13 @@ let rec contains_vowel word =
   else if String.contains vowels (String.get word 0) then true
   else contains_vowel (tail word)
 
-let remove_past_participles word num_vc =
+let remove_past_participles word =
   let len = String.length word in
-  if num_vc > 0 && len >= 3 && get_last word 3 = "eed" then
-    remove_last word 1
+  if
+    len >= 3
+    && calc_vc (remove_last word 1) > 0
+    && get_last word 3 = "eed"
+  then remove_last word 1
   else if len >= 3 && get_last word 3 = "eed" then word
   else if
     len >= 2
@@ -110,7 +115,8 @@ let remove_past_participles word num_vc =
 
 let apply_finalize word =
   let len = String.length word in
-  if
+  if len >= 3 && get_last word 3 = "eed" then false
+  else if
     len >= 2
     && get_last word 2 = "ed"
     && contains_vowel (remove_last word 2)
@@ -140,9 +146,9 @@ let double_consonant word =
   let last = get_last word 1 in
   second_to_last = last
 
-let finalize_plurals_past_participles word num_vc =
+let finalize_plurals_past_participles word =
   let len = String.length word in
-  if end_cvc word && num_vc = 1 then word ^ "e"
+  if len > 0 && end_cvc word && calc_vc word = 1 then word ^ "e"
   else if len >= 2 then
     let last_two = get_last word 2 in
     if last_two = "at" || last_two = "bl" || last_two = "iz" then
@@ -156,19 +162,37 @@ let fix_y word =
     remove_last word 1 ^ "i"
   else word
 
-let remove_e word num_vc =
-  if num_vc > 1 then remove_last word 1
-  else if num_vc = 1 && end_cvc word = false then remove_last word 1
+let remove_e word =
+  let length = String.length word in
+  if
+    length > 0
+    && calc_vc (remove_last word 1) > 1
+    && get_last word 1 = "e"
+  then remove_last word 1
+  else if
+    length > 0
+    && calc_vc (remove_last word 1) = 1
+    && end_cvc (remove_last word 1) = false
+    && get_last word 1 = "e"
+  then remove_last word 1
   else word
 
-let check_double_consonant word num_vc =
-  if num_vc > 1 && double_consonant word then remove_last word 1
+let check_double_consonant word =
+  let length = String.length word in
+  if
+    length > 0
+    && calc_vc (remove_last word 1) > 1
+    && double_consonant word
+    && get_last word 1 <> "l"
+    && get_last word 1 <> "s"
+    && get_last word 1 <> "z"
+  then remove_last word 1
   else word
 
 let replace_suffix word =
   let complete23, len23 =
-    if calc_vc (word |> create_units) > 0 then
-      let replacement = find_suffix_binding hashtbl_step2_3 word "" 0 in
+    if calc_vc word > 0 then
+      let replacement = find_suffix_binding hashtbl_step2_3 word in
       let new_string =
         String.sub word 0 (String.length word - snd replacement)
       in
@@ -176,8 +200,8 @@ let replace_suffix word =
     else (word, 0)
   in
   let complete4, len4 =
-    if calc_vc (word |> create_units) > 1 then
-      let replacement2 = find_suffix_binding hashtbl_step4 word "" 1 in
+    if calc_vc word > 1 then
+      let replacement2 = find_suffix_binding hashtbl_step4 word in
       let new_string2 =
         String.sub word 0 (String.length word - snd replacement2)
       in
@@ -188,20 +212,20 @@ let replace_suffix word =
 
 let stemmer (word : string) =
   let units = create_simplified_units (create_units word) "" in
-  let vcs = calc_vc units in
+  let vcs = calc_vc word in
 
   let step_1a = remove_plurals word in
-  let step_1b = remove_past_participles step_1a vcs in
+  let step_1b = remove_past_participles step_1a in
 
   let apply_final = apply_finalize step_1a in
   let final_step1ab =
-    if apply_final then finalize_plurals_past_participles step_1b vcs
+    if apply_final then finalize_plurals_past_participles step_1b
     else step_1b
   in
   let step_1c = fix_y final_step1ab in
   let step_234 = replace_suffix step_1c in
-  let step_5a = remove_e step_234 vcs in
-  let stemmed = check_double_consonant step_5a vcs in
+  let step_5a = remove_e step_234 in
+  let stemmed = check_double_consonant step_5a in
   { original_word = word; units; num_vcs = vcs; stemmed }
 
 exception Unsupported_sentence_format
