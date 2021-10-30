@@ -31,7 +31,7 @@ let rec find_suffix_binding tbl word remainder m =
   if String.length word < 2 then ("", 0)
   else
     match Hashtbl.find_opt tbl (word |> String.uppercase_ascii) with
-    | Some x when remainder |> create_units |> calc_vc > m ->
+    | Some x when remainder |> calc_vc > m ->
         (x |> String.lowercase_ascii, String.length word)
     | _ ->
         find_suffix_binding tbl
