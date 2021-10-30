@@ -63,16 +63,10 @@ let rec create_simplified_units raw_units acc =
     else create_simplified_units (tail raw_units) (acc ^ first_character)
   else acc
 
-let rec remove_before_c char_string =
+let rec remove_before_v char_string =
   if String.length char_string > 0 then
-    if String.get char_string 0 = 'C' then char_string
-    else remove_before_c (tail char_string)
-  else ""
-
-let rec remove_after_last_v char_string =
-  if String.length char_string > 0 then
-    if get_last char_string 1 = "V" then char_string
-    else remove_after_last_v (remove_last char_string 1)
+    if String.get char_string 0 = 'V' then char_string
+    else remove_before_v (tail char_string)
   else ""
 
 let rec calc_vc word =
@@ -82,10 +76,8 @@ let rec calc_vc word =
         (create_units (String.lowercase_ascii word))
         ""
     in
-    let get_vc =
-      char_string |> remove_before_c |> remove_after_last_v
-    in
-    String.length get_vc / 2
+    let get_vc = remove_before_v char_string in
+    if get_vc = "CV" then 0 else String.length get_vc / 2
   else 0
 
 let remove_plurals word =
@@ -105,7 +97,7 @@ let remove_past_participles word =
   let len = String.length word in
   if
     len >= 3
-    && calc_vc (remove_last word 3) > 0
+    && calc_vc (remove_last word 1) > 0
     && get_last word 3 = "eed"
   then remove_last word 1
   else if len >= 3 && get_last word 3 = "eed" then word
@@ -123,7 +115,8 @@ let remove_past_participles word =
 
 let apply_finalize word =
   let len = String.length word in
-  if
+  if len >= 3 && get_last word 3 = "eed" then false
+  else if
     len >= 2
     && get_last word 2 = "ed"
     && contains_vowel (remove_last word 2)
