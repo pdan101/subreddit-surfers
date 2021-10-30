@@ -29,6 +29,14 @@ val parse_sentence : string -> string list
    trailing whitespace and punctuation Requires: text is in English and
    follows English grammar rules*)
 
+val stem_word_list : string list -> stemmed_word list
+(**[stem_word_list words] is the list of stemmed_words contained in
+   words. Requires: text is in English*)
+
+val extract_stemmed : stemmed_word list -> string list
+(**[extract_stemmed stemmed_words] is the list of the stemmed version of
+   words contained in stemmed_words*)
+
 val process_sentence : string -> string
 (**[processed_sentence sentence] is the stemmed version of sentence*)
 
