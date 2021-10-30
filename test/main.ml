@@ -99,6 +99,14 @@ let finalize_plurals_past_participles_test
     (finalize_plurals_past_participles word num_vc)
     ~printer:String.escaped
 
+let replace_suffix_test
+    (name : string)
+    (word : string)
+    (expected_output : string) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (replace_suffix word)
+    ~printer:String.escaped
+
 let possesses : stemmed_word =
   {
     original_word = "possesses";
