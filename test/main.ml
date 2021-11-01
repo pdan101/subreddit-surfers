@@ -635,12 +635,26 @@ let create_find_frequencies_test
     (find_frequencies word_json matrix)
     ~printer:pp_print_association_list
 
+let test4_matrix = Array.make_matrix 2 5 0
+
+let _ = test4_matrix.(0).(0) <- 1
+
+let _ = test4_matrix.(1).(0) <- 1
+
+let _ = test4_matrix.(1).(3) <- 1
+
 let statistics_tests =
   [
-    create_find_frequencies_test "empty posts" test3_json test3_matrix
+    create_find_frequencies_test "different words" test3_json
+      test3_matrix
       [
-        ("Hello", 1); ("Did", 0); ("This", 0); ("format", 1);
-        ("correctly", 0);
+        ("format", 1); ("Hello", 1); ("correctly", 0); ("This", 0);
+        ("Did", 0);
+      ];
+    create_find_frequencies_test "repeated word" test3_json test4_matrix
+      [
+        ("Hello", 2); ("format", 1); ("correctly", 0); ("This", 0);
+        ("Did", 0);
       ];
   ]
 

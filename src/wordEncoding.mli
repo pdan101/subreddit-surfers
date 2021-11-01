@@ -28,3 +28,6 @@ val create_encoded_matrix : Basic.t -> string -> int array array
    according to it's index in [word_json] *)
 
 val find_frequencies : Basic.t -> int array array -> (string * int) list
+(**[find_frequencies word_json encoding] is an association list. Each
+   item is a key (the vocab word) and a value (how many posts it appears
+   in)*)
