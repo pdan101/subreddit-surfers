@@ -34,6 +34,13 @@ let rec get_command () =
       print_endline "Did not recognize command. Please try again.\n";
       get_command ()
 
+(* let rec string_of_array arr pos = if pos < Array.length arr then
+   string_of_int arr.(pos) ^ " " ^ string_of_array arr (pos + 1) else ""
+
+   let rec string_matrix (mat : int array array) : string = match mat
+   with | [||] -> "" | [| one |] -> string_of_array one 0 | _ ->
+   string_of_array mat.(0) 0 ^ "\n" ^ string_matrix (Array.sub mat 1
+   (Array.length mat - 1)) *)
 let print_frequencies post =
   print_endline
     ("Finding the most frequent words in the most recent post in r/"
@@ -50,18 +57,29 @@ let print_stemmer post =
   print_endline ("Original text: " ^ original_text ^ "\n");
   print_endline ("Stemmed text: " ^ stemmed_text)
 
-let print_encoder post =
+let print_encoder subreddit post =
+  let encoded_matrix =
+    WordEncoding.create_encoded_matrix subreddit
+      (*(post |> Intake.selftext)*)
+      "business"
+  in
   print_endline
     ("Encoding the most recent post from r/"
     ^ (post |> Intake.subreddit_name)
-    ^ " based on all seen vocabulary in the subreddit")
+    ^ " based on all seen vocabulary in the subreddit\n");
+  encoded_matrix |> Array.iter (fun x -> Array.iter print_int x; print_newline ());
+  print_newline ()
 
 let run subreddit_name =
   let subreddit = sub subreddit_name in
   match get_command () with
   | Frequencies -> print_frequencies (subreddit |> Intake.recent_post)
   | Stemmer -> print_stemmer (subreddit |> Intake.recent_post)
-  | Encoder -> print_encoder (subreddit |> Intake.recent_post)
+  | Encoder ->
+      print_encoder
+        ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+        |> Yojson.Basic.from_file)
+        (subreddit |> Intake.recent_post)
   | NA -> exit 0
 
 let terminal () =
