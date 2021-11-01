@@ -37,7 +37,9 @@ let subreddit_json_to_word_json processor_function subreddit_json : unit
   let subreddit = from_json subreddit_json in
   let words = processor_function subreddit_json in
 
-  let filename = subreddit |> recent_post |> subreddit_name in
+  let filename =
+    subreddit |> recent_post |> subreddit_name |> String.lowercase_ascii
+  in
   let filepath = "data/subredditVocabJsons/" ^ filename ^ ".json" in
   let file = open_out filepath in
   write_words_to_json file words
