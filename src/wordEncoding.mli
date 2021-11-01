@@ -26,3 +26,5 @@ val create_encoded_matrix : Basic.t -> string -> int array array
 (**[create_encoded_matrix word_json post] is a 2d matrix representing
    [post]. Each row in the matrix is a binary vector representing [word]
    according to it's index in [word_json] *)
+
+val find_frequencies : Basic.t -> int array array -> (string * int) list

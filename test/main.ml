@@ -618,9 +618,26 @@ let word_encoding_tests =
       test3_json "Hello format" test3_matrix;
   ]
 
+let create_find_frequencies_test
+    (name : string)
+    (word_json : t)
+    (matrix : int array array)
+    (expected_output : (string * int) list) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (find_frequencies word_json matrix)
+
+let statistics_tests =
+  [
+    create_find_frequencies_test "empty posts" test3_json test3_matrix
+      [ ("test", 0) ];
+  ]
+
 let suite =
   "test suite for Final"
   >::: List.flatten
-         [ intake_tests; word_processor_tests; word_encoding_tests ]
+         [
+           intake_tests; word_processor_tests; word_encoding_tests;
+           statistics_tests;
+         ]
 
 let _ = run_test_tt_main suite
