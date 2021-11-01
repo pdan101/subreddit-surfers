@@ -36,6 +36,7 @@ let subreddit_json_to_word_json processor_function subreddit_json : unit
     =
   let subreddit = from_json subreddit_json in
   let words = processor_function subreddit_json in
+
   let filename = subreddit |> recent_post |> subreddit_name in
   let filepath = "data/subredditVocabJsons/" ^ filename ^ ".json" in
   let file = open_out filepath in
@@ -45,9 +46,12 @@ let word_json_to_array (word_json : Yojson.Basic.t) : string array =
   word_json |> member "words" |> to_list |> List.map to_string
   |> Array.of_list
 
+exception Element_Not_Found
+
 let rec find_index (current_index : int) (x : 'a) (arr : 'a array) : int
     =
-  if x = arr.(current_index) then current_index
+  if current_index > Array.length arr then raise Element_Not_Found
+  else if x = arr.(current_index) then current_index
   else find_index (current_index + 1) x arr
 
 let encode_post
@@ -59,9 +63,16 @@ let encode_post
   let encoded_post = Array.make 1 0 in
   Array.iteri
     (fun index x ->
-      let word_index = find_index 0 x vocab_array in
-      let old_value = encoded_post.(word_index) in
-      encoded_post.(word_index) <- 1 + old_value)
+      let word_index =
+        match find_index 0 x vocab_array with
+        | exception Element_Not_Found -> Array.length vocab_array
+        | x -> x
+      in
+      if word_index = Array.length vocab_array then
+        encoded_post.(0) <- encoded_post.(0)
+      else
+        let old_value = encoded_post.(word_index) in
+        encoded_post.(word_index) <- 1 + old_value)
     post_array;
   encoded_post
 
