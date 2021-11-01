@@ -80,6 +80,9 @@ let insert key value map =
     (key, value + old_value) :: map
   else (key, value) :: map
 
+let compare_keys (key1, val1) (key2, val2) =
+  if val1 = val2 then 0 else if val1 > val2 then -1 else 1
+
 let find_frequencies
     (word_json : Yojson.Basic.t)
     (matrix : int array array) =
@@ -92,10 +95,8 @@ let find_frequencies
 
   for row = 0 to Array.length matrix - 1 do
     for col = 0 to Array.length matrix.(0) - 1 do
-      for word = 0 to Array.length vocab_array - 1 do
-        frequency_map :=
-          insert vocab_array.(word) matrix.(row).(col) !frequency_map
-      done
+      frequency_map :=
+        insert vocab_array.(col) matrix.(row).(col) !frequency_map
     done
   done;
-  !frequency_map
+  List.sort compare_keys !frequency_map

@@ -638,7 +638,10 @@ let create_find_frequencies_test
 let statistics_tests =
   [
     create_find_frequencies_test "empty posts" test3_json test3_matrix
-      [ ("test", 0) ];
+      [
+        ("Hello", 1); ("Did", 0); ("This", 0); ("format", 1);
+        ("correctly", 0);
+      ];
   ]
 
 let suite =
