@@ -57,20 +57,21 @@ let print_stemmer post =
   print_endline ("Original text: " ^ original_text ^ "\n");
   print_endline ("Stemmed text: " ^ stemmed_text)
 
-let print_encoder subreddit post =
+let print_encoder subreddit_name =
   let encoded_matrix =
-    (* WordEncoding.encode_post subreddit parse "business" *)
-    (*(post |> Intake.selftext)*)
-    [| [||] |]
+    WordEncoding.encode_subreddit
+      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+      |> Yojson.Basic.from_file)
+      WordProcessor.stem_text
+      ("data/" ^ subreddit_name ^ ".json" |> Yojson.Basic.from_file)
   in
-
   print_endline
-    ("Encoding the most recent post from r/"
-    ^ (post |> Intake.subreddit_name)
-    ^ " based on all seen vocabulary in the subreddit\n");
-  encoded_matrix
+    ("Encoding r/" ^ subreddit_name
+   ^ " based on all seen vocabulary in the subreddit\n");
+  encoded_matrix |> Array.of_list
   |> Array.iter (fun x ->
          Array.iter print_int x;
+         print_newline ();
          print_newline ());
   print_newline ()
 
@@ -79,11 +80,7 @@ let run subreddit_name =
   match get_command () with
   | Frequencies -> print_frequencies (subreddit |> Intake.recent_post)
   | Stemmer -> print_stemmer (subreddit |> Intake.recent_post)
-  | Encoder ->
-      print_encoder
-        ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
-        |> Yojson.Basic.from_file)
-        (subreddit |> Intake.recent_post)
+  | Encoder -> print_encoder subreddit_name
   | NA -> exit 0
 
 let terminal () =

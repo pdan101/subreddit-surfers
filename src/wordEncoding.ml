@@ -46,6 +46,7 @@ let subreddit_json_to_word_json processor_function subreddit_json : unit
 
 let word_json_to_array (word_json : Yojson.Basic.t) : string array =
   word_json |> member "words" |> to_list |> List.map to_string
+  |> List.map String.lowercase_ascii
   |> Array.of_list
 
 exception Element_Not_Found
@@ -62,13 +63,14 @@ let encode_post
     (post : string) : int array =
   let vocab_array = word_json_to_array vocab_json in
   let post_array = Array.of_list (processor_function post) in
-  let encoded_post = ref (Array.make 1 0) in
+  let encoded_post = ref (Array.make (Array.length vocab_array) 0) in
   Array.iteri
     (fun index x ->
+      let x2 = String.lowercase_ascii x in
       let word_index =
-        match find_index 0 x vocab_array with
+        match find_index 0 x2 vocab_array with
         | exception Element_Not_Found -> Array.length vocab_array
-        | x -> x
+        | x2 -> x2
       in
       if word_index = Array.length vocab_array then
         !encoded_post.(0) <- !encoded_post.(0)
@@ -84,7 +86,10 @@ let encode_subreddit
     (subreddit_json : Yojson.Basic.t) : int array list =
   let subreddit = from_json subreddit_json in
   let posts = Intake.posts subreddit in
-  let post_texts = List.map Intake.selftext posts in
+  let post_texts =
+    List.map Intake.selftext posts
+    |> List.filter (fun x -> String.length x > 0)
+  in
   List.fold_left
     (fun acc elt ->
       encode_post vocab_json processor_function elt :: acc)
