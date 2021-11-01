@@ -62,7 +62,7 @@ let encode_post
     (post : string) : int array =
   let vocab_array = word_json_to_array vocab_json in
   let post_array = Array.of_list (processor_function post) in
-  let encoded_post = Array.make 1 0 in
+  let encoded_post = ref (Array.make 1 0) in
   Array.iteri
     (fun index x ->
       let word_index =
@@ -71,12 +71,12 @@ let encode_post
         | x -> x
       in
       if word_index = Array.length vocab_array then
-        encoded_post.(0) <- encoded_post.(0)
+        !encoded_post.(0) <- !encoded_post.(0)
       else
-        let old_value = encoded_post.(word_index) in
-        encoded_post.(word_index) <- 1 + old_value)
+        let old_value = !encoded_post.(word_index) in
+        !encoded_post.(word_index) <- 1 + old_value)
     post_array;
-  encoded_post
+  !encoded_post
 
 let encode_subreddit
     (vocab_json : Yojson.Basic.t)
