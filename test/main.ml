@@ -594,7 +594,9 @@ let write_words_to_json_test
 
 let convert_path_to_json (file_path : string) = file_path |> from_file
 
-let cornell_json = convert_path_to_json "data/college.json"
+let cornell_json = convert_path_to_json "data/cornell.json"
+
+let college_json = convert_path_to_json "data/college.json"
 
 let subreddit_json_to_word_json_test
     (name : string)
@@ -640,7 +642,11 @@ let word_encoding_tests =
     subreddit_json_to_word_json_test
       "Converts words in cornell\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_words cornell_json;
+      subreddit_json_to_words college_json;
+    subreddit_json_to_word_json_test
+      "Converts words in cornell\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_stemmed_words cornell_json;  
     (* create_encoded_matrix_test
       "Json contains: Hello, Did, this, format, correctly. Test post \
        is hello format"
