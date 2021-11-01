@@ -50,7 +50,7 @@ exception Element_Not_Found
 
 let rec find_index (current_index : int) (x : 'a) (arr : 'a array) : int
     =
-  if current_index > Array.length arr then raise Element_Not_Found
+  if current_index >= Array.length arr then raise Element_Not_Found
   else if x = arr.(current_index) then current_index
   else find_index (current_index + 1) x arr
 
