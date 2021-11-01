@@ -302,7 +302,6 @@ let remove_e_test
   name >:: fun _ ->
   assert_equal expected_output (remove_e word) ~printer:String.escaped
 
-
 let word_processor_tests =
   [
     parse_test "Empty string" parse "" [];
@@ -436,9 +435,6 @@ let word_processor_tests =
     create_units_test "Creating unit for he CV" "He" "CV";
     process_sentence_test "Sentence with one word to stem"
       "He possesses the gem." "He possess the gem.";
-    (**process_sentence_test "Sentence with two words to stem"
-      "They agreed to visit libraries with me."
-      "They agree to visit librari with me.";*)
     (*These tests should pass, but spacing is causing them to act
       weird*)
     (* make_text_block_test "Sophomore clubs post" "I'm a sophomore and
@@ -541,6 +537,8 @@ let word_processor_tests =
     (*These last tests are in the case that there is no suffix change.*)
     replace_suffix_test "NO CHANGE" "hello" "hello";
     replace_suffix_test "NO CHANGE" "hi" "hi";
+    replace_suffix_test "Choose step 4 but not step 3" "rational"
+      "ration";
     fix_y_test "Replaces i with y if there is a vowel in the stem"
       "party" "parti";
     fix_y_test "Does not change word that does not end in y" "python"
@@ -552,33 +550,6 @@ let word_processor_tests =
     remove_e_test
       "Removes e if number of VC's = 1 and the stem ends CVC" "cease"
       "ceas";
-    replace_suffix_test "Choose step 4 but not step 3" "rational"
-      "ration";
-  ]
-
-let sentiment_of_score score =
-  if score <= -0.05 then "Negative"
-  else if score >= 0.05 then "Positive"
-  else "Neutral"
-
-let sentiment_test
-    (name : string)
-    (text : string)
-    (expected_output : string) : test =
-  let _ = print_float (polarity_score text) in
-  name >:: fun _ ->
-  assert_equal expected_output
-    (sentiment_of_score (polarity_score text))
-    ~printer:String.escaped
-
-let sentiment_tests =
-  [
-    sentiment_test "Positive sentence"
-      "This is a very happy sentence that thrills me." "Positive";
-    sentiment_test "Neutral sentence"
-      "Cornell University is located\n       in New York." "Neutral";
-    sentiment_test "Negative sentence" "I\n       hate all of the snow."
-      "Negative";
   ]
 
 let intake_tests = []
@@ -650,9 +621,6 @@ let word_encoding_tests =
 let suite =
   "test suite for Final"
   >::: List.flatten
-         [
-           intake_tests; word_processor_tests; sentiment_tests;
-           word_encoding_tests;
-         ]
+         [ intake_tests; word_processor_tests; word_encoding_tests ]
 
 let _ = run_test_tt_main suite

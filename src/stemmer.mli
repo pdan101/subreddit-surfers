@@ -43,3 +43,5 @@ val check_double_consonant : string -> string
    stemmed words if the number VC's is greater than 1*)
 
 val apply_finalize : string -> bool
+(**[apply_finalize] determines if [finalize_plurals_past_participles]
+   should be called based on the result of [remove_past_participles]*)
