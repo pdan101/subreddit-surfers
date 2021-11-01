@@ -9,6 +9,11 @@ type post
 type subreddit
 (** The abstract type of values representing a specific subreddit.*)
 
+val post_of_json : Yojson.Basic.t -> post
+(** [post_of_json json] is the posts form the subreddit that [json]
+    represents. Requires: [json] is a valid JSON subreddit
+    representation. *)
+
 val from_json : Yojson.Basic.t -> subreddit
 (** [from_json json] is the subreddit that [json] represents. Requires:
     [json] is a valid JSON subreddit representation. *)
@@ -37,6 +42,9 @@ val num_crossposts : post -> int
 
 val selftext : post -> string
 (** [selftext post] is the text of [post].*)
+
+val title : post -> string
+(** [title post] is the title of the [post]*)
 
 val spoiler : post -> bool
 (** [spoiler post] indicates if [post] has a spoiler.*)

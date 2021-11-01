@@ -45,7 +45,7 @@ let author post = post.author
 
 let created_utc post = post.created_utc
 
-let id post = post.id
+let id (post : post) = post.id
 
 let num_comments post = post.num_comments
 

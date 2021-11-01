@@ -581,8 +581,6 @@ let sentiment_tests =
       "Negative";
   ]
 
-let intake_tests = []
-
 let write_words_to_json_test
     (name : string)
     (words : string list)
@@ -646,12 +644,183 @@ let word_encoding_tests =
        is hello format"
       test3_json "Hello format" test3_matrix;
   ]
+  let input = (Yojson.Basic.from_file "cornell.json") |> post_of_json
+  let author_test
+  (name: string)
+  (input:post)
+  (expected_output: string)= 
+  name >:: (fun _ -> assert_equal expected_output( input|> author ))
+
+let author_tests=
+[
+  author_test "author" input "pw11111";
+  author_test "author" input "babybitchboi";
+  author_test "author" input "AgreeableAstronomer";
+  author_test "author" input "enzymes__substrates";
+  author_test "author" input "EDMenthusiast23124";  
+]
+let created_utc_test
+  (name: string)
+  (input: post)
+  (expected_output: float)=
+  name>:: (fun _ -> assert_equal expected_output(created_utc input))
+let created_utc_tests=
+  [
+    created_utc_test "created_utc" input 1618803237.0;
+    created_utc_test "created_utc" input 1631550683.0;
+    created_utc_test "created_utc" input 1633928054.0;
+    created_utc_test "created_utc" input 1633964241.0;
+    created_utc_test "created_utc" input 1633898729.0;
+  ]
+  let id_test
+  (name: string)
+  (input: post)
+  (expected_output: string)=
+  name>:: (fun _ -> assert_equal expected_output (Intake.id input))
+
+  let id_tests=
+  [
+    id_test "id" input "mts7re";
+    id_test "id" input "pniz40";
+    id_test "id" input "q5oizf";
+    id_test "id" input "q5xo03";
+    id_test "id" input "q5gddx";
+  ]
+
+  let num_comments_test
+  (name: string)
+  (input: post)
+  (expected_output: int)=
+  name>:: (fun _ -> assert_equal expected_output(input |> num_comments))
+
+  let num_comments_tests=
+  [
+    num_comments_test "num_comments" input 806;
+    num_comments_test "num_comments" input 17;
+    num_comments_test "num_comments" input 12;
+    num_comments_test "num_comments" input 1;
+    num_comments_test "num_comments" input 27; 
+  ]
+
+  let num_crossposts_test
+  (name: string)
+  (input: post)
+  (expected_output: int)=
+  name>:: (fun _ -> assert_equal expected_output(input |> num_crossposts))
+
+  let num_crossposts_tests=
+  [
+    num_crossposts_test "num_crossposts" input 0;
+    num_crossposts_test "num_crossposts" input 0;
+    num_crossposts_test "num_crossposts" input 0; 
+    num_crossposts_test "num_crossposts" input 0;
+    num_crossposts_test "num_crossposts" input 0;
+
+  ]
+
+  let self_text_test
+  (name: string)
+  (input: post)
+  (expected_output: string)=
+  name>:: (fun _ -> assert_equal expected_output(input |> selftext))
+  let self_text_tests=
+  [
+    self_text_test "self_text" input 
+      "Please place all admissions related posts here, in the form of comments, 
+      and current Cornell students will reply. Try to be detailed; 
+      if we don't have enough information, we can't help. 
+      Also, if you are a prospective student, and have questions about life at 
+      Cornell, feel free to post them here! \n\nAny \"Chance Me\" or 
+      admissions related posts placed elsewhere will be removed. If you are a
+      current student, and think that you could offer advice to someone 
+      considering Cornell, feel free to respond to some of the posts! 
+      Please only respond if you are qualified to do so. 
+      We will be checking through these regularly for spam.";
+    self_text_test "self_text" input 
+      "This weekend, the mods have seen a massive uptick in the number of ad 
+      hominem comments, especially regard to public health and frustration with 
+      the current pandemic situation. Yes, many of us have charged feelings 
+      about the situation, but please do not engage if all you're contributing
+      is calling someone a dumbass or attacking someone because of their 
+      beliefs- no matter how unbased they are. You're creating more work for 
+     [**u/pw11111**](https://www.reddit.com/user/pw11111/) 
+     (other mods try to help too but pw11111 normally beats me to the punch at 
+     least lol)\n\nPls keep r/Cornell a platform for discussion, 
+     not verbal assaults!!";
+    self_text_test "self_text" input 
+      "Especially if you are asking a person specifically, as then they feel 
+      obliged to tell you or just lie about what they got if they 
+      aren\u2019t happy about it.";
+    self_text_test "self_text" input "Pinocchio\u2019s story goes, 
+      \n\nI just want to be a real boy\n\nIt\u2019s funny, Pinocchio lied,
+      \n\nAnd that\u2019s what kept him from it!\n\nI tell the truth \n\nAnd 
+      I keep running!\n\nAnd there is no Gepetto, to guide me,\n\nNo one, 
+      right beside me, \n\nMaybe that was all my fault,\n\nAll my fault to be a 
+      real boy,\n\nCHASING THE AMERICAN DREAM\n\nCHASING EVERYTHING WEVE 
+      SEEN\n\nUP ON THE TV SCREEEN";
+    self_text_test "self_text" input "";
+
+  ]
+  let spoiler_test
+  (name: string)
+  (input: post)
+  (expected_output: bool)=
+  name>:: (fun _ -> assert_equal expected_output(input |> spoiler))
+
+  let spoiler_tests=
+  [
+    spoiler_test "spoiler" input false;
+    spoiler_test "spoiler" input false;
+    spoiler_test "spoiler" input false;
+    spoiler_test "spoiler" input false;
+    spoiler_test "spoiler" input false;
+  ]
+
+  let title_test
+  (name: string)
+  (input: post)
+  (expected_output: string)=
+  name>:: (fun _ -> assert_equal expected_output( input |> Intake.title))
+  
+  let title_tests=
+  [
+    title_test "title" input "Chance Me! and Prospective Student Q&amp;A";
+    title_test "title" input "[META] Reminder that we can have discourse 
+    without making personal attacks";
+    title_test "title" input "Basic etiquette: do not ask people what they got 
+    on a prelim, instead the question to ask is \u201care you happy 
+    with what you got?\u201d";
+    title_test "title" input "I just wanna be a real boy";
+    title_test "title" input "Fuck Enzo";
+  ]
+
+ let upvotes_test
+ (name: string)
+ (input: post)
+ (expected_output: int)=
+  name>:: (fun _ -> assert_equal expected_output(input |> upvotes))
+
+let upvotes_tests=
+[
+  upvotes_test "upvotes" input 99;
+  upvotes_test "upvotes" input 52;
+  upvotes_test "upvotes" input 49;
+  upvotes_test "upvotes" input 5;
+  upvotes_test "upvotes" input 149;
+
+] 
+let intake_tests= List.flatten
+         [
+          author_tests; created_utc_tests;id_tests;num_comments_tests;
+          num_crossposts_tests;self_text_tests;spoiler_tests;title_tests;
+          upvotes_tests;
+         ]
 
 let suite =
   "test suite for Final"
   >::: List.flatten
          [
-           intake_tests; word_processor_tests; sentiment_tests;
+           intake_tests;word_processor_tests; sentiment_tests;
            word_encoding_tests;
          ]
 
