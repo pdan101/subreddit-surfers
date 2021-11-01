@@ -618,13 +618,22 @@ let word_encoding_tests =
       test3_json "Hello format" test3_matrix;
   ]
 
+let rec pp_print_association_list assoc_list =
+  match assoc_list with
+  | [] -> ""
+  | (key, value) :: t ->
+      key ^ " -> " ^ string_of_int value ^ "\n"
+      ^ pp_print_association_list t
+
 let create_find_frequencies_test
     (name : string)
     (word_json : t)
     (matrix : int array array)
     (expected_output : (string * int) list) : test =
   name >:: fun _ ->
-  assert_equal expected_output (find_frequencies word_json matrix)
+  assert_equal expected_output
+    (find_frequencies word_json matrix)
+    ~printer:pp_print_association_list
 
 let statistics_tests =
   [
