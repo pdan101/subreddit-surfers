@@ -51,10 +51,10 @@ let rec find_index (current_index : int) (x : 'a) (arr : 'a array) : int
   else find_index (current_index + 1) x arr
 
 let encode_post
-    (word_json : Yojson.Basic.t)
+    (vocab_json : Yojson.Basic.t)
     (processor_function : string -> string list)
     (post : string) : int array =
-  let vocab_array = word_json_to_array word_json in
+  let vocab_array = word_json_to_array vocab_json in
   let post_array = Array.of_list (processor_function post) in
   let encoded_post = Array.make 1 0 in
   Array.iteri
@@ -66,12 +66,13 @@ let encode_post
   encoded_post
 
 let encode_subreddit
-    (word_json : Yojson.Basic.t)
+    (vocab_json : Yojson.Basic.t)
     (processor_function : string -> string list)
     (subreddit_json : Yojson.Basic.t) : int array list =
   let subreddit = from_json subreddit_json in
   let posts = Intake.posts subreddit in
   let post_texts = List.map Intake.selftext posts in
   List.fold_left
-    (fun acc elt -> encode_post word_json processor_function elt :: acc)
+    (fun acc elt ->
+      encode_post vocab_json processor_function elt :: acc)
     [] post_texts

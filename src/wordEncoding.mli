@@ -22,6 +22,12 @@ val subreddit_json_to_word_json :
    The way each of these words is processed is based on
    [processor_function]*)
 
+val encode_post :
+  Basic.t -> (string -> string list) -> string -> int array
+(**[encode_post vocab_json processor_function post] is the encoded
+   version of [post] with respect to the processing function and the
+   vocabulary json*)
+
 val encode_subreddit :
   Basic.t -> (string -> string list) -> Basic.t -> int array list
 (**[encode_subreddit word_json processor_function subreddit_json] is a
