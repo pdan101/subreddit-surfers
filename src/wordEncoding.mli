@@ -22,7 +22,9 @@ val subreddit_json_to_word_json :
    The way each of these words is processed is based on
    [processor_function]*)
 
-val create_encoded_matrix : Basic.t -> string -> int array array
-(**[create_encoded_matrix word_json post] is a 2d matrix representing
-   [post]. Each row in the matrix is a binary vector representing [word]
-   according to it's index in [word_json] *)
+val encode_subreddit :
+  Basic.t -> (string -> string list) -> Basic.t -> int array list
+(**[encode_subreddit word_json processor_function subreddit_json] is a
+   2d matrix representing the posts of [subreddit_json]. Each row in the
+   matrix is a vector representing the number of occurence of each word
+   in a post*)

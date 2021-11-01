@@ -59,15 +59,19 @@ let print_stemmer post =
 
 let print_encoder subreddit post =
   let encoded_matrix =
-    WordEncoding.create_encoded_matrix subreddit
-      (*(post |> Intake.selftext)*)
-      "business"
+    (* WordEncoding.encode_post subreddit parse "business" *)
+    (*(post |> Intake.selftext)*)
+    [| [||] |]
   in
+
   print_endline
     ("Encoding the most recent post from r/"
     ^ (post |> Intake.subreddit_name)
     ^ " based on all seen vocabulary in the subreddit\n");
-  encoded_matrix |> Array.iter (fun x -> Array.iter print_int x; print_newline ());
+  encoded_matrix
+  |> Array.iter (fun x ->
+         Array.iter print_int x;
+         print_newline ());
   print_newline ()
 
 let run subreddit_name =

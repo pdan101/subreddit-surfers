@@ -612,7 +612,7 @@ let pp_print_matrix acc matrix : string =
       ^ "\n")
     matrix ""
 
-let create_encoded_matrix_test
+(* let create_encoded_matrix_test
     (name : string)
     (word_json : t)
     (post : string)
@@ -620,7 +620,7 @@ let create_encoded_matrix_test
   name >:: fun _ ->
   assert_equal expected_output
     (create_encoded_matrix word_json post)
-    ~printer:(pp_print_matrix "")
+    ~printer:(pp_print_matrix "") *)
 
 let test3_json =
   convert_path_to_json "data/subredditVocabJsons/test3.json"
@@ -641,10 +641,10 @@ let word_encoding_tests =
       "Converts words in cornell\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
       subreddit_json_to_words cornell_json;
-    create_encoded_matrix_test
+    (* create_encoded_matrix_test
       "Json contains: Hello, Did, this, format, correctly. Test post \
        is hello format"
-      test3_json "Hello format" test3_matrix;
+      test3_json "Hello format" test3_matrix; *)
   ]
 
 let suite =

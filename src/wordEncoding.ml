@@ -50,19 +50,28 @@ let rec find_index (current_index : int) (x : 'a) (arr : 'a array) : int
   if x = arr.(current_index) then current_index
   else find_index (current_index + 1) x arr
 
-let create_encoded_matrix (word_json : Yojson.Basic.t) (post : string) :
-    int array array =
+let encode_post
+    (word_json : Yojson.Basic.t)
+    (processor_function : string -> string list)
+    (post : string) : int array =
   let vocab_array = word_json_to_array word_json in
-  let post_array = Array.of_list (parse post) in
-  let matrix =
-    Array.make_matrix
-      (Array.length post_array)
-      (Array.length vocab_array)
-      0
-  in
+  let post_array = Array.of_list (processor_function post) in
+  let encoded_post = Array.make 1 0 in
   Array.iteri
     (fun index x ->
       let word_index = find_index 0 x vocab_array in
-      matrix.(index).(word_index) <- 1)
+      let old_value = encoded_post.(word_index) in
+      encoded_post.(word_index) <- 1 + old_value)
     post_array;
-  matrix
+  encoded_post
+
+let encode_subreddit
+    (word_json : Yojson.Basic.t)
+    (processor_function : string -> string list)
+    (subreddit_json : Yojson.Basic.t) : int array list =
+  let subreddit = from_json subreddit_json in
+  let posts = Intake.posts subreddit in
+  let post_texts = List.map Intake.selftext posts in
+  List.fold_left
+    (fun acc elt -> encode_post word_json processor_function elt :: acc)
+    [] post_texts

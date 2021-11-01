@@ -126,3 +126,8 @@ let make_text_block (text : string) =
   { original_text = text; stemmed_text = stem_paragraph text }
 
 let stemmed_text_block block = block.stemmed_text
+
+let stem_text (text : string) : string list =
+  text |> parse
+  |> List.map String.lowercase_ascii
+  |> List.map stemmer |> extract_stemmed
