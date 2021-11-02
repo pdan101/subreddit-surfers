@@ -94,3 +94,37 @@ let encode_subreddit
     (fun acc elt ->
       encode_post vocab_json processor_function elt :: acc)
     [] post_texts
+
+let rec find_map key map =
+  match map with
+  | [] -> None
+  | (a_key, value) :: tail ->
+      if key = a_key then Some value else find_map key tail
+
+let insert key value map =
+  if List.mem_assoc key map then
+    let old_value = List.assoc key map in
+    let map = List.remove_assoc key map in
+    (key, value + old_value) :: map
+  else (key, value) :: map
+
+let compare_keys (key1, val1) (key2, val2) =
+  if val1 = val2 then 0 else if val1 > val2 then -1 else 1
+
+let find_frequencies
+    (word_json : Yojson.Basic.t)
+    (matrix : int array array) =
+  let vocab_array = word_json_to_array word_json in
+
+  let frequency_map = ref [] in
+  for col = 0 to Array.length vocab_array - 1 do
+    frequency_map := insert vocab_array.(col) 0 !frequency_map
+  done;
+
+  for row = 0 to Array.length matrix - 1 do
+    for col = 0 to Array.length matrix.(0) - 1 do
+      frequency_map :=
+        insert vocab_array.(col) matrix.(row).(col) !frequency_map
+    done
+  done;
+  List.sort compare_keys !frequency_map

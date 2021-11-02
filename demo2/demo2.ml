@@ -34,6 +34,21 @@ let rec get_command () =
       print_endline "Did not recognize command. Please try again.\n";
       get_command ()
 
+let big_string = "---"
+
+let rec extract_top5 lst count =
+  if count >= 5 then ()
+  else
+    match lst with
+    | [] -> print_newline ()
+    | (k, v) :: t ->
+        print_string (k ^ ": ");
+        for i = 1 to v do
+          print_string big_string
+        done;
+        print_newline ();
+        extract_top5 t (count + 1)
+
 (* let rec string_of_array arr pos = if pos < Array.length arr then
    string_of_int arr.(pos) ^ " " ^ string_of_array arr (pos + 1) else ""
 
@@ -41,10 +56,23 @@ let rec get_command () =
    with | [||] -> "" | [| one |] -> string_of_array one 0 | _ ->
    string_of_array mat.(0) 0 ^ "\n" ^ string_matrix (Array.sub mat 1
    (Array.length mat - 1)) *)
-let print_frequencies post =
-  print_endline
-    ("Finding the most frequent words in the most recent post in r/"
-    ^ (post |> Intake.subreddit_name))
+let print_frequencies subreddit_name =
+  let json =
+    Yojson.Basic.from_file
+      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json")
+  in
+  let encoded_matrix =
+    WordEncoding.encode_subreddit
+      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+      |> Yojson.Basic.from_file)
+      WordProcessor.stem_text
+      (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
+  in
+  let frequency_list =
+    WordEncoding.find_frequencies json (Array.of_list encoded_matrix)
+  in
+  print_endline ("Finding the most frequent words r/" ^ subreddit_name);
+  extract_top5 frequency_list 0
 
 let print_stemmer post =
   let original_text = post |> Intake.selftext in
@@ -78,9 +106,15 @@ let print_encoder subreddit_name =
 let run subreddit_name =
   let subreddit = sub subreddit_name in
   match get_command () with
-  | Frequencies -> print_frequencies (subreddit |> Intake.recent_post)
+  | Frequencies ->
+      print_frequencies
+        (subreddit |> Intake.recent_post |> Intake.subreddit_name
+       |> String.lowercase_ascii)
   | Stemmer -> print_stemmer (subreddit |> Intake.recent_post)
-  | Encoder -> print_encoder subreddit_name
+  | Encoder ->
+      print_encoder
+        (subreddit |> Intake.recent_post |> Intake.subreddit_name
+       |> String.lowercase_ascii)
   | NA -> exit 0
 
 let terminal () =
