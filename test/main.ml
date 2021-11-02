@@ -2,7 +2,6 @@ open OUnit2
 open Analyzer
 open Intake
 open WordProcessor
-open Sentiment
 open Stemmer
 open Str
 open WordEncoding
@@ -565,7 +564,14 @@ let write_words_to_json_test
 
 let convert_path_to_json (file_path : string) = file_path |> from_file
 
-let cornell_json = convert_path_to_json "data/college.json"
+let cornell_json = convert_path_to_json "data/cornell.json"
+
+let cornell_json2 =
+  convert_path_to_json "data/subredditVocabJsons/cornell.json"
+
+let college_json = convert_path_to_json "data/college.json"
+
+let anime_json = convert_path_to_json "data/anime.json"
 
 let subreddit_json_to_word_json_test
     (name : string)
@@ -583,15 +589,16 @@ let pp_print_matrix acc matrix : string =
       ^ "\n")
     matrix ""
 
-let create_encoded_matrix_test
+let encode_post_test
     (name : string)
-    (word_json : t)
+    (vocab : t)
+    (processor : string -> string list)
     (post : string)
-    (expected_output : int array array) : test =
+    (expected_output : int array) : test =
   name >:: fun _ ->
-  assert_equal expected_output
-    (create_encoded_matrix word_json post)
-    ~printer:(pp_print_matrix "")
+  assert_equal
+    (Array.to_list expected_output)
+    (Array.to_list (encode_post vocab processor post))
 
 let test3_json =
   convert_path_to_json "data/subredditVocabJsons/test3.json"
@@ -602,6 +609,12 @@ let _ = test3_matrix.(0).(0) <- 1
 
 let _ = test3_matrix.(1).(3) <- 1
 
+let cornell_test_1_matrix = Array.make 492 0
+
+let _ = cornell_test_1_matrix.(39) <- 1
+
+let _ = cornell_test_1_matrix.(40) <- 1
+
 let word_encoding_tests =
   [
     write_words_to_json_test
@@ -609,13 +622,22 @@ let word_encoding_tests =
       [ "Hello"; "Did"; "This"; "format"; "correctly" ]
       "test3.json" (print_int 1);
     subreddit_json_to_word_json_test
+      "Converts words in college\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_words college_json;
+    subreddit_json_to_word_json_test
       "Converts words in cornell\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_words cornell_json;
-    create_encoded_matrix_test
-      "Json contains: Hello, Did, this, format, correctly. Test post \
-       is hello format"
-      test3_json "Hello format" test3_matrix;
+      subreddit_json_to_stemmed_words cornell_json;
+    subreddit_json_to_word_json_test
+      "Converts words in anime\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_stemmed_words anime_json;
+    (* create_encoded_matrix_test "Json contains: Hello, Did, this,
+       format, correctly. Test post \ is hello format" test3_json "Hello
+       format" test3_matrix; encode_post_test "Testing for Cornell.json"
+       cornell_json2 stem_text "attack basketball"
+       cornell_test_1_matrix *)
   ]
 
 let rec pp_print_association_list assoc_list =
@@ -648,13 +670,13 @@ let statistics_tests =
     create_find_frequencies_test "different words" test3_json
       test3_matrix
       [
-        ("format", 1); ("Hello", 1); ("correctly", 0); ("This", 0);
-        ("Did", 0);
+        ("format", 1); ("hello", 1); ("correctly", 0); ("this", 0);
+        ("did", 0);
       ];
     create_find_frequencies_test "repeated word" test3_json test4_matrix
       [
-        ("Hello", 2); ("format", 1); ("correctly", 0); ("This", 0);
-        ("Did", 0);
+        ("hello", 2); ("format", 1); ("correctly", 0); ("this", 0);
+        ("did", 0);
       ];
   ]
 

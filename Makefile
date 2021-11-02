@@ -9,11 +9,8 @@ utop:
 test:
 	OCAMLRUNPARAM=b dune exec --instrument-with bisect_ppx test/main.exe
 
-play:
-	OCAMLRUNPARAM=b dune exec bin/main.exe
-
-demo_one:
-	OCAMLRUNPARAM=b dune exec demo1/demo1.exe
+demo_two:
+	OCAMLRUNPARAM=b dune exec demo2/demo2.exe
 
 bisect: clean test
 	bisect-ppx-report html --theme=light

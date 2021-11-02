@@ -33,6 +33,9 @@ val stem_word_list : string list -> stemmed_word list
 (**[stem_word_list words] is the list of stemmed_words contained in
    words. Requires: text is in English*)
 
+val stem_text : string -> string list
+(**[stem_text text] is the list of words in [text] stemmed*)
+
 val extract_stemmed : stemmed_word list -> string list
 (**[extract_stemmed stemmed_words] is the list of the stemmed version of
    words contained in stemmed_words*)
