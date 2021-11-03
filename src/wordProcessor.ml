@@ -127,13 +127,11 @@ let json_to_assoc_list data =
 
 let word_data = word |> json_to_assoc_list
 
-let remove_stop_words lst word_data =
-  List.filter_map
-    (fun x ->
+let remove_stop_words word_data =
+  List.filter_map (fun x ->
       match x with
       | word_data -> None
       | _ -> Some x)
-    lst
 
 let replace_suffix word =
   let complete23, len23 =
