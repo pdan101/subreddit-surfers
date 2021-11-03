@@ -24,6 +24,7 @@ let rec remove_punc s =
       (current_char |> Char.uppercase_ascii |> Char.code)
       - ('a' |> Char.uppercase_ascii |> Char.code)
     in
+
     if is_char >= 0 && is_char <= 25 then
       String.make 1 current_char
       ^ (String.sub s 1 (String.length s - 1) |> remove_punc)
@@ -112,7 +113,40 @@ let process_sentence (sentence : string) =
   sentence |> String.trim |> parse |> stem_word_list |> extract_stemmed
   |> make_sentence (String.make 1 sentence_delimiter)
 
-let remove_stop_words (words : string list) = [ "" ]
+let parse (text : string) =
+  String.split_on_char ' ' text
+  |> List.filter (fun x -> String.length x > 0)
+  |> List.map (fun x -> String.trim x)
+  |> List.map (fun x -> remove_punc x)
+
+let remove_stop_words lst (word : string list) =
+  List.filter_map
+    (fun x ->
+      match x with
+      | word -> None
+      | _ -> Some x)
+    lst
+
+let replace_suffix word =
+  let complete23, len23 =
+    if calc_vc word > 0 then
+      let replacement = find_suffix_binding hashtbl_step2_3 word "" 0 in
+      let new_string =
+        String.sub word 0 (String.length word - snd replacement)
+      in
+      (new_string ^ fst replacement, snd replacement)
+    else (word, 0)
+  in
+  let complete4, len4 =
+    if calc_vc word > 1 then
+      let replacement2 = find_suffix_binding hashtbl_step4 word "" 1 in
+      let new_string2 =
+        String.sub word 0 (String.length word - snd replacement2)
+      in
+      (new_string2 ^ fst replacement2, snd replacement2)
+    else (word, 0)
+  in
+  if len23 > len4 then complete23 else complete4
 
 let make_paragraph (sentences : string list) =
   List.fold_right (fun acc w -> acc ^ " " ^ w) sentences ""
