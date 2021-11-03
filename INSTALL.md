@@ -8,5 +8,5 @@ sudo apt install python3-pip
 
 pip install vaderSentiment
 
-make demo_one
+make demo_one 
 ```

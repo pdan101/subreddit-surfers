@@ -119,11 +119,19 @@ let parse (text : string) =
   |> List.map (fun x -> String.trim x)
   |> List.map (fun x -> remove_punc x)
 
-let remove_stop_words lst (word : string list) =
+let word = Yojson.Basic.from_file "src/word.json"
+
+let json_to_assoc_list data =
+  data |> Yojson.Basic.Util.to_assoc
+  |> List.map (fun (x, y) -> (x, y |> Yojson.Basic.Util.to_string))
+
+let word_data = word |> json_to_assoc_list
+
+let remove_stop_words lst word_data =
   List.filter_map
     (fun x ->
       match x with
-      | word -> None
+      | word_data -> None
       | _ -> Some x)
     lst
 
