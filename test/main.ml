@@ -644,7 +644,7 @@ let word_encoding_tests =
        is hello format"
       test3_json "Hello format" test3_matrix;
   ]
-  let input = (Yojson.Basic.from_file "cornell.json") |> post_of_json
+(**let input = (Yojson.Basic.from_file "data/cornell.json") |> post_of_json
   let author_test
   (name: string)
   (input:post)
@@ -809,18 +809,19 @@ let upvotes_tests=
   upvotes_test "upvotes" input 149;
 
 ] 
+
 let intake_tests= List.flatten
          [
           author_tests; created_utc_tests;id_tests;num_comments_tests;
           num_crossposts_tests;self_text_tests;spoiler_tests;title_tests;
           upvotes_tests;
          ]
-
+**)
 let suite =
   "test suite for Final"
   >::: List.flatten
          [
-           intake_tests;word_processor_tests; sentiment_tests;
+           word_processor_tests; sentiment_tests;
            word_encoding_tests;
          ]
 
