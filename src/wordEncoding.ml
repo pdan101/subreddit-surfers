@@ -2,12 +2,14 @@ open WordProcessor
 open Intake
 open Yojson.Basic.Util
 
+let post_text post = title post ^ selftext post
+
 let subreddit_json_to_words subreddit_json : string list =
   let subreddit = from_json subreddit_json in
   let all_words =
     List.fold_right
       (fun post acc ->
-        (post |> selftext |> parse |> List.map String.lowercase_ascii)
+        (post |> post_text |> parse |> List.map String.lowercase_ascii)
         @ acc)
       (posts subreddit) []
   in
@@ -60,7 +62,7 @@ let encode_post
     (post : string) : int array =
   let vocab_array = word_json_to_array vocab_json in
   let post_array = Array.of_list (processor_function post) in
-  let encoded_post = ref (Array.make 1 0) in
+  let encoded_post = Array.make (Array.length vocab_array + 1) 0 in
   Array.iteri
     (fun index x ->
       let word_index =
@@ -69,12 +71,12 @@ let encode_post
         | x -> x
       in
       if word_index = Array.length vocab_array then
-        !encoded_post.(0) <- !encoded_post.(0)
+        encoded_post.(0) <- encoded_post.(0)
       else
-        let old_value = !encoded_post.(word_index) in
-        !encoded_post.(word_index) <- 1 + old_value)
+        let old_value = encoded_post.(word_index) in
+        encoded_post.(word_index) <- 1 + old_value)
     post_array;
-  !encoded_post
+  encoded_post
 
 let encode_subreddit
     (vocab_json : Yojson.Basic.t)
@@ -82,7 +84,7 @@ let encode_subreddit
     (subreddit_json : Yojson.Basic.t) : int array list =
   let subreddit = from_json subreddit_json in
   let posts = Intake.posts subreddit in
-  let post_texts = List.map Intake.selftext posts in
+  let post_texts = List.map post_text posts in
   List.fold_left
     (fun acc elt ->
       encode_post vocab_json processor_function elt :: acc)
