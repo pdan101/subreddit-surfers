@@ -39,13 +39,16 @@ let subreddit_json_to_word_json processor_function subreddit_json : unit
   let subreddit = from_json subreddit_json in
   let words = processor_function subreddit_json in
 
-  let filename = subreddit |> recent_post |> subreddit_name in
+  let filename =
+    subreddit |> recent_post |> subreddit_name |> String.lowercase_ascii
+  in
   let filepath = "data/subredditVocabJsons/" ^ filename ^ ".json" in
   let file = open_out filepath in
   write_words_to_json file words
 
 let word_json_to_array (word_json : Yojson.Basic.t) : string array =
   word_json |> member "words" |> to_list |> List.map to_string
+  |> List.map String.lowercase_ascii
   |> Array.of_list
 
 exception Element_Not_Found
@@ -65,10 +68,11 @@ let encode_post
   let encoded_post = Array.make (Array.length vocab_array + 1) 0 in
   Array.iteri
     (fun index x ->
+      let x2 = String.lowercase_ascii x in
       let word_index =
-        match find_index 0 x vocab_array with
+        match find_index 0 x2 vocab_array with
         | exception Element_Not_Found -> Array.length vocab_array
-        | x -> x
+        | x2 -> x2
       in
       if word_index = Array.length vocab_array then
         encoded_post.(0) <- encoded_post.(0)
@@ -84,8 +88,45 @@ let encode_subreddit
     (subreddit_json : Yojson.Basic.t) : int array list =
   let subreddit = from_json subreddit_json in
   let posts = Intake.posts subreddit in
-  let post_texts = List.map post_text posts in
+  let post_texts =
+    List.map post_text posts
+    |> List.filter (fun x -> String.length x > 0)
+  in
   List.fold_left
     (fun acc elt ->
       encode_post vocab_json processor_function elt :: acc)
     [] post_texts
+
+let rec find_map key map =
+  match map with
+  | [] -> None
+  | (a_key, value) :: tail ->
+      if key = a_key then Some value else find_map key tail
+
+let insert key value map =
+  if List.mem_assoc key map then
+    let old_value = List.assoc key map in
+    let map = List.remove_assoc key map in
+    (key, value + old_value) :: map
+  else (key, value) :: map
+
+let compare_keys (key1, val1) (key2, val2) =
+  if val1 = val2 then 0 else if val1 > val2 then -1 else 1
+
+let find_frequencies
+    (word_json : Yojson.Basic.t)
+    (matrix : int array array) =
+  let vocab_array = word_json_to_array word_json in
+
+  let frequency_map = ref [] in
+  for col = 0 to Array.length vocab_array - 1 do
+    frequency_map := insert vocab_array.(col) 0 !frequency_map
+  done;
+
+  for row = 0 to Array.length matrix - 1 do
+    for col = 0 to Array.length matrix.(0) - 1 do
+      frequency_map :=
+        insert vocab_array.(col) matrix.(row).(col) !frequency_map
+    done
+  done;
+  List.sort compare_keys !frequency_map

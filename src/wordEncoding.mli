@@ -34,3 +34,8 @@ val encode_subreddit :
    2d matrix representing the posts of [subreddit_json]. Each row in the
    matrix is a vector representing the number of occurence of each word
    in a post*)
+
+val find_frequencies : Basic.t -> int array array -> (string * int) list
+(**[find_frequencies word_json encoding] is an association list. Each
+   item is a key (the vocab word) and a value (how many posts it appears
+   in)*)

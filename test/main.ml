@@ -2,7 +2,6 @@ open OUnit2
 open Analyzer
 open Intake
 open WordProcessor
-open Sentiment
 open Stemmer
 open Str
 open WordEncoding
@@ -302,7 +301,6 @@ let remove_e_test
   name >:: fun _ ->
   assert_equal expected_output (remove_e word) ~printer:String.escaped
 
-
 let word_processor_tests =
   [
     parse_test "Empty string" parse "" [];
@@ -436,9 +434,6 @@ let word_processor_tests =
     create_units_test "Creating unit for he CV" "He" "CV";
     process_sentence_test "Sentence with one word to stem"
       "He possesses the gem." "He possess the gem.";
-    (**process_sentence_test "Sentence with two words to stem"
-      "They agreed to visit libraries with me."
-      "They agree to visit librari with me.";*)
     (*These tests should pass, but spacing is causing them to act
       weird*)
     (* make_text_block_test "Sophomore clubs post" "I'm a sophomore and
@@ -541,6 +536,8 @@ let word_processor_tests =
     (*These last tests are in the case that there is no suffix change.*)
     replace_suffix_test "NO CHANGE" "hello" "hello";
     replace_suffix_test "NO CHANGE" "hi" "hi";
+    replace_suffix_test "Choose step 4 but not step 3" "rational"
+      "ration";
     fix_y_test "Replaces i with y if there is a vowel in the stem"
       "party" "parti";
     fix_y_test "Does not change word that does not end in y" "python"
@@ -552,33 +549,6 @@ let word_processor_tests =
     remove_e_test
       "Removes e if number of VC's = 1 and the stem ends CVC" "cease"
       "ceas";
-    replace_suffix_test "Choose step 4 but not step 3" "rational"
-      "ration";
-  ]
-
-let sentiment_of_score score =
-  if score <= -0.05 then "Negative"
-  else if score >= 0.05 then "Positive"
-  else "Neutral"
-
-let sentiment_test
-    (name : string)
-    (text : string)
-    (expected_output : string) : test =
-  let _ = print_float (polarity_score text) in
-  name >:: fun _ ->
-  assert_equal expected_output
-    (sentiment_of_score (polarity_score text))
-    ~printer:String.escaped
-
-let sentiment_tests =
-  [
-    sentiment_test "Positive sentence"
-      "This is a very happy sentence that thrills me." "Positive";
-    sentiment_test "Neutral sentence"
-      "Cornell University is located\n       in New York." "Neutral";
-    sentiment_test "Negative sentence" "I\n       hate all of the snow."
-      "Negative";
   ]
 
 let intake_tests = []
@@ -596,7 +566,12 @@ let convert_path_to_json (file_path : string) = file_path |> from_file
 
 let cornell_json = convert_path_to_json "data/cornell.json"
 
+let cornell_json2 =
+  convert_path_to_json "data/subredditVocabJsons/cornell.json"
+
 let college_json = convert_path_to_json "data/college.json"
+
+let anime_json = convert_path_to_json "data/anime.json"
 
 let subreddit_json_to_word_json_test
     (name : string)
@@ -614,8 +589,16 @@ let pp_print_matrix acc matrix : string =
       ^ "\n")
     matrix ""
 
-let encode_post_test (name:string)(vocab:t)(processor:string -> string list)(post:string)(expected_output:int array):test = 
-  name >:: fun _ -> assert_equal expected_output (encode_post vocab processor post) 
+let encode_post_test
+    (name : string)
+    (vocab : t)
+    (processor : string -> string list)
+    (post : string)
+    (expected_output : int array) : test =
+  name >:: fun _ ->
+  assert_equal
+    (Array.to_list expected_output)
+    (Array.to_list (encode_post vocab processor post))
 
 let test3_json =
   convert_path_to_json "data/subredditVocabJsons/test3.json"
@@ -627,10 +610,11 @@ let _ = test3_matrix.(0).(0) <- 1
 let _ = test3_matrix.(1).(3) <- 1
 
 let cornell_test_1_matrix = Array.make 492 0
- 
-let _ = cornell_test_1_matrix.(39) <-1
 
-let _ = cornell_test_1_matrix.(40)<-1
+let _ = cornell_test_1_matrix.(39) <- 1
+
+let _ = cornell_test_1_matrix.(40) <- 1
+
 let word_encoding_tests =
   [
     write_words_to_json_test
@@ -638,26 +622,70 @@ let word_encoding_tests =
       [ "Hello"; "Did"; "This"; "format"; "correctly" ]
       "test3.json" (print_int 1);
     subreddit_json_to_word_json_test
-      "Converts words in cornell\n\
+      "Converts words in college\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
       subreddit_json_to_words college_json;
     subreddit_json_to_word_json_test
       "Converts words in cornell\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words cornell_json;  
-    (* create_encoded_matrix_test
-      "Json contains: Hello, Did, this, format, correctly. Test post \
-       is hello format"
-      test3_json "Hello format" test3_matrix; *)
-      encode_post_test "Testing for Cornell.json" cornell_json stem_text "attack basketball" cornell_test_1_matrix
+      subreddit_json_to_stemmed_words cornell_json;
+    subreddit_json_to_word_json_test
+      "Converts words in anime\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_stemmed_words anime_json;
+    (* create_encoded_matrix_test "Json contains: Hello, Did, this,
+       format, correctly. Test post \ is hello format" test3_json "Hello
+       format" test3_matrix; encode_post_test "Testing for Cornell.json"
+       cornell_json2 stem_text "attack basketball"
+       cornell_test_1_matrix *)
+  ]
+
+let rec pp_print_association_list assoc_list =
+  match assoc_list with
+  | [] -> ""
+  | (key, value) :: t ->
+      key ^ " -> " ^ string_of_int value ^ "\n"
+      ^ pp_print_association_list t
+
+let create_find_frequencies_test
+    (name : string)
+    (word_json : t)
+    (matrix : int array array)
+    (expected_output : (string * int) list) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (find_frequencies word_json matrix)
+    ~printer:pp_print_association_list
+
+let test4_matrix = Array.make_matrix 2 5 0
+
+let _ = test4_matrix.(0).(0) <- 1
+
+let _ = test4_matrix.(1).(0) <- 1
+
+let _ = test4_matrix.(1).(3) <- 1
+
+let statistics_tests =
+  [
+    create_find_frequencies_test "different words" test3_json
+      test3_matrix
+      [
+        ("format", 1); ("hello", 1); ("correctly", 0); ("this", 0);
+        ("did", 0);
+      ];
+    create_find_frequencies_test "repeated word" test3_json test4_matrix
+      [
+        ("hello", 2); ("format", 1); ("correctly", 0); ("this", 0);
+        ("did", 0);
+      ];
   ]
 
 let suite =
   "test suite for Final"
   >::: List.flatten
          [
-           intake_tests; word_processor_tests; sentiment_tests;
-           word_encoding_tests;
+           intake_tests; word_processor_tests; word_encoding_tests;
+           statistics_tests;
          ]
 
 let _ = run_test_tt_main suite
