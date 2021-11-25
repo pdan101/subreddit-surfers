@@ -66,13 +66,19 @@ let calc_bulk_upvotes features_test weights =
           encoded_post)
       posts
   in
+  let without_last_weight =
+    Array.map
+      (fun post_array ->
+        List.fold_right
+          (fun element init -> element +. init)
+          (Array.to_list post_array)
+          0.0)
+      with_weights
+  in
+
   Array.map
-    (fun post_array ->
-      List.fold_right
-        (fun element init -> element +. init)
-        (Array.to_list post_array)
-        0.0)
-    with_weights
+    (fun weight -> weight +. weights.(Array.length weights - 1))
+    without_last_weight
 
 let train_test_model data percent_training regression_type =
   let matrix = create_matrix data in
