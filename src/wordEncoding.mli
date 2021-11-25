@@ -23,13 +23,21 @@ val subreddit_json_to_word_json :
    [processor_function]*)
 
 val encode_post :
-  Basic.t -> (string -> string list) -> string -> int array
+  Basic.t ->
+  (string -> string list) ->
+  Intake.post ->
+  (Intake.post -> int) ->
+  int array
 (**[encode_post vocab_json processor_function post] is the encoded
    version of [post] with respect to the processing function and the
    vocabulary json*)
 
 val encode_subreddit :
-  Basic.t -> (string -> string list) -> Basic.t -> int array list
+  Basic.t ->
+  (string -> string list) ->
+  Basic.t ->
+  (Intake.post -> int) ->
+  int array list
 (**[encode_subreddit word_json processor_function subreddit_json] is a
    2d matrix representing the posts of [subreddit_json]. Each row in the
    matrix is a vector representing the number of occurence of each word

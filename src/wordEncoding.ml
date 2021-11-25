@@ -62,9 +62,12 @@ let rec find_index (current_index : int) (x : 'a) (arr : 'a array) : int
 let encode_post
     (vocab_json : Yojson.Basic.t)
     (processor_function : string -> string list)
-    (post : string) : int array =
+    (post : Intake.post)
+    (numerical_data : post -> int) : int array =
   let vocab_array = word_json_to_array vocab_json in
-  let post_array = Array.of_list (processor_function post) in
+  let post_array =
+    Array.of_list (processor_function (post_text post))
+  in
   let encoded_post = Array.make (Array.length vocab_array + 1) 0 in
   Array.iteri
     (fun index x ->
@@ -80,21 +83,24 @@ let encode_post
         let old_value = encoded_post.(word_index) in
         encoded_post.(word_index) <- 1 + old_value)
     post_array;
+  encoded_post.(Array.length encoded_post - 1) <- upvotes post;
   encoded_post
 
 let encode_subreddit
     (vocab_json : Yojson.Basic.t)
     (processor_function : string -> string list)
-    (subreddit_json : Yojson.Basic.t) : int array list =
+    (subreddit_json : Yojson.Basic.t)
+    (numerical_data_retriever : post -> int) : int array list =
   let subreddit = from_json subreddit_json in
   let posts = Intake.posts subreddit in
   let post_texts =
-    List.map post_text posts
-    |> List.filter (fun x -> String.length x > 0)
+    posts |> List.filter (fun x -> String.length (post_text x) > 0)
   in
   List.fold_left
     (fun acc elt ->
-      encode_post vocab_json processor_function elt :: acc)
+      encode_post vocab_json processor_function elt
+        numerical_data_retriever
+      :: acc)
     [] post_texts
 
 let rec find_map key map =
@@ -124,7 +130,7 @@ let find_frequencies
   done;
 
   for row = 0 to Array.length matrix - 1 do
-    for col = 0 to Array.length matrix.(0) - 1 do
+    for col = 0 to Array.length matrix.(0) - 2 do
       frequency_map :=
         insert vocab_array.(col) matrix.(row).(col) !frequency_map
     done
