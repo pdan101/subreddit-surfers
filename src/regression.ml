@@ -8,6 +8,13 @@ type regression =
   | SVM
   | OLS
 
+type train_test_data = {
+  features_training : Owl.Mat.mat;
+  features_test : Owl.Mat.mat;
+  output_training : Owl.Mat.mat;
+  output_testing : Owl.Mat.mat;
+}
+
 let get_model regression_type features output =
   match regression_type with
   | OLS -> Regression.D.ols ~i:true features output
@@ -20,14 +27,15 @@ let get_num_posts (rows, cols) = rows
 
 let get_num_features (rows, cols) = cols
 
-let train_test_model data percent_training regression_type =
+let create_matrix data =
   let floats =
     List.map (fun x -> Array.map (fun x -> float_of_int x) x) data
   in
   let array = Array.of_list floats in
 
-  let matrix = Mat.of_arrays array in
+  Mat.of_arrays array
 
+let get_training_data matrix percent_training =
   let shape = Mat.shape matrix in
 
   let num_posts = get_num_posts shape in
@@ -49,28 +57,28 @@ let train_test_model data percent_training regression_type =
   let features_test =
     Mat.get_slice [ [ rows_training; -1 ]; [ 0; num_cols - 2 ] ] matrix
   in
-  let output_test =
+  let output_testing =
     Mat.get_slice [ [ rows_training; -1 ]; [ num_cols - 1 ] ] matrix
   in
 
+  { features_training; features_test; output_training; output_testing }
+
+let train_test_model data percent_training regression_type =
+  let matrix = create_matrix data in
+
+  let train_test_data = get_training_data matrix 0.75 in
+
   let weights =
-    get_model regression_type features_training output_training
+    get_model regression_type train_test_data.features_test
+      train_test_data.output_testing
   in
   let dense_matrix = MX.(weights.(0) @= weights.(1)) in
   Array.to_list (Owl_dense_matrix.D.to_array dense_matrix)
 
-(*let calc_upvotes test_features test_output weights = let
-  shape_features = Mat.shape test_features in let num_posts =
-  get_num_posts shape_features in let num_features = get_num_features
-  shape_features in let num_upvotes = ref 0.0 in
-
-  Mat.map (fun post -> List.iteri (fun i weight -> post.(i) *. weight)
-  weights) test_features
-
-  for post_num = 0 to num_posts - 1 do for feature_num = 0 to
-  num_features - 1 do let weight = weights.(feature_num) in let feature
-  = test_features.(feature_num) in num_upvotes := !num_upvotes +.
-  (weight *. feature) done done*)
+let calc_bulk_upvotes test_features =
+  (*Mat.map (fun encoded_post -> Mat.mapi (fun index word -> word *.
+    weights.(index)) encoded_post) test_features*)
+  Mat.shape test_features
 
 let calc_upvote weights encoded_post =
   let features_weights =

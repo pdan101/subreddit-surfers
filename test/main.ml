@@ -683,6 +683,8 @@ let cornell_encoded =
     (Yojson.Basic.from_file "data/cornell.json")
     upvotes
 
+let cornell_matrix = create_matrix cornell_encoded
+
 let get_vocab_length matrix =
   match matrix with
   | h :: t -> Array.length h
@@ -699,19 +701,50 @@ let create_train_test_model_test
     (List.length (train_test_model matrix percent_training regression))
     ~printer:string_of_int
 
+open Owl
+
+let get_training_data_shapes train_test_data =
+  [
+    Mat.shape train_test_data.features_training;
+    Mat.shape train_test_data.features_test;
+    Mat.shape train_test_data.output_training;
+    Mat.shape train_test_data.output_testing;
+  ]
+
+let pp_int_pair (row, col) =
+  "(" ^ string_of_int row ^ ", " ^ string_of_int col ^ ")"
+
+let create_get_training_data_test
+    (name : string)
+    (matrix : Owl.Mat.mat)
+    (percent_training : float)
+    (expected_output : (int * int) list) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (get_training_data_shapes
+       (get_training_data matrix percent_training))
+    ~printer:(pp_list pp_int_pair)
+
 let regression_tests =
   [
-    (*create_format_data_test "check number of Ridge weights"
-      cornell_encoded Ridge (get_vocab_length cornell_encoded);
-      create_format_data_test "check number of LASSO weights"
-      cornell_encoded LASSO (get_vocab_length cornell_encoded);*)
+    create_train_test_model_test "check number of Ridge weights"
+      cornell_encoded 0.75 Ridge
+      (get_vocab_length cornell_encoded);
+    create_train_test_model_test "check number of LASSO weights"
+      cornell_encoded 0.75 LASSO
+      (get_vocab_length cornell_encoded);
     create_train_test_model_test "check number of OLS weights"
       cornell_encoded 0.75 OLS
       (get_vocab_length cornell_encoded);
-    (*create_format_data_test "check number of Logistic weights"
-      cornell_encoded Logistic (get_vocab_length cornell_encoded);
-      create_format_data_test "check number of SVM weights"
-      cornell_encoded SVM (get_vocab_length cornell_encoded);*)
+    create_train_test_model_test "check number of Logistic weights"
+      cornell_encoded 0.75 Logistic
+      (get_vocab_length cornell_encoded);
+    create_train_test_model_test "check number of SVM weights"
+      cornell_encoded 0.75 SVM
+      (get_vocab_length cornell_encoded);
+    create_get_training_data_test "check number of columns"
+      cornell_matrix 0.75
+      [ (21, 570); (7, 570); (21, 1); (7, 1) ];
   ]
 
 let suite =
