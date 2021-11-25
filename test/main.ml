@@ -676,20 +676,39 @@ let statistics_tests =
       ];
   ]
 
+let cornell_encoded =
+  encode_subreddit
+    ("data/subredditVocabJsons/cornell.json" |> Yojson.Basic.from_file)
+    WordProcessor.stem_text
+    (Yojson.Basic.from_file "data/cornell.json")
+    upvotes
+
+let get_vocab_length matrix =
+  match matrix with
+  | h :: t -> Array.length h
+  | [] -> 0
+
 let create_format_data_test
     (name : string)
-    (matrix : float array array)
+    (matrix : int array list)
     expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (format_data matrix)
+  name >:: fun _ ->
+  assert_equal expected_output
+    (List.length (format_data matrix))
+    ~printer:string_of_int
 
-let regression_tests = [ create_format_data_test "basic test" ]
+let regression_tests =
+  [
+    create_format_data_test "basic test" cornell_encoded
+      (get_vocab_length cornell_encoded);
+  ]
 
 let suite =
   "test suite for Final"
   >::: List.flatten
          [
            intake_tests; word_processor_tests; word_encoding_tests;
-           statistics_tests;
+           statistics_tests; regression_tests;
          ]
 
 let _ = run_test_tt_main suite
