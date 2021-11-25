@@ -1,3 +1,6 @@
+(**This module contains that functions and types necessary to remove
+   suffixes*)
+
 val hashtbl_step2_3 : (string, string) Hashtbl.t
 (**[hashtbl_step2_3] is the abstract hashtable that contains key value
    pairs corresponding to the suffix mappings necessary for the second

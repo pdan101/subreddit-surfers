@@ -6,6 +6,7 @@ open Stemmer
 open Str
 open WordEncoding
 open Yojson.Basic
+open Regression
 
 let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
@@ -679,6 +680,14 @@ let statistics_tests =
         ("did", 0);
       ];
   ]
+
+let create_format_data_test
+    (name : string)
+    (matrix : float array array)
+    expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (format_data matrix)
+
+let regression_tests = [ create_format_data_test "basic test" ]
 
 let suite =
   "test suite for Final"
