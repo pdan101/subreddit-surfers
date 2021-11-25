@@ -9,6 +9,10 @@ type post
 type subreddit
 (** The abstract type of values representing a specific subreddit.*)
 
+val post_of_text : string -> post
+(** [post_of_text text] converts text into a dummy post, so it can be
+    used in other functions.*)
+
 val from_json : Yojson.Basic.t -> subreddit
 (** [from_json json] is the subreddit that [json] represents. Requires:
     [json] is a valid JSON subreddit representation. *)

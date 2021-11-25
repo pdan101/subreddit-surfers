@@ -59,16 +59,10 @@ let train_test_model data percent_training regression_type =
   let dense_matrix = MX.(weights.(0) @= weights.(1)) in
   Array.to_list (Owl_dense_matrix.D.to_array dense_matrix)
 
-let calc_upvotes test_features test_output weights =
-  let shape_features = Mat.shape test_features in
-  let num_posts = get_num_posts shape_features in
-  let num_features = get_num_features shape_features in
-  let num_upvotes = ref 0.0 in
-  for post_num = 0 to num_posts - 1 do
-    for feature_num = 0 to num_features - 1 do
-      num_upvotes :=
-        !num_upvotes
-        +. weights.(feature_num)
-           *. float_of_int test_features.(feature_num)
-    done
-  done
+(* let calc_upvotes test_features test_output weights = let
+   shape_features = Mat.shape test_features in let num_posts =
+   get_num_posts shape_features in let num_features = get_num_features
+   shape_features in let num_upvotes = ref 0.0 in for post_num = 0 to
+   num_posts - 1 do for feature_num = 0 to num_features - 1 do
+   num_upvotes := !num_upvotes +. weights.(feature_num) *. float_of_int
+   test_features.(feature_num) done done *)

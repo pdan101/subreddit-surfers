@@ -9,6 +9,7 @@ type command =
   | Stemmer
   | Encoder
   | Popularity
+  | Prediction
   | NA
 
 (*Extracts the Intake.subreddit data structure of a given subreddit
@@ -41,6 +42,8 @@ let rec get_command () =
       Encoder
   | command when command |> String.lowercase_ascii = "popularity" ->
       Popularity
+  | command when command |> String.lowercase_ascii = "prediction" ->
+      Prediction
   | _ ->
       print_endline "Did not recognize command. Please try again.\n";
       get_command ()
@@ -144,6 +147,32 @@ let print_encoder subreddit_name =
          print_newline ());
   print_newline ()
 
+let print_prediction subreddit_name =
+  let input_text =
+    print_endline
+      "Enter text to predict how many upvotes it would receive: ";
+    print_string "> ";
+    match read_line () with
+    | exception End_of_file -> ""
+    | text -> text
+  in
+  let converted_to_post =
+    Intake.post_of_text (input_text |> WordProcessor.stem_paragraph)
+  in
+  let vocab_json =
+    "data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+    |> Yojson.Basic.from_file
+  in
+  let encode_temp =
+    WordEncoding.encode_post vocab_json WordProcessor.stem_text
+      converted_to_post Intake.upvotes
+  in
+  let encoded_arr =
+    Array.sub encode_temp 0 (Array.length encode_temp - 1)
+  in
+  (* TODO: USE FUNCTION TO PREDICT UPVOTES FROM ENCODED_ARR *)
+  ()
+
 (*Runs the terminal interface that gets a command after specifying
   subreddit.*)
 let run subreddit_name =
@@ -154,6 +183,8 @@ let run subreddit_name =
   | Stemmer -> print_stemmer (subreddit |> recent_post)
   | Encoder -> print_encoder (subreddit_name |> String.lowercase_ascii)
   | Popularity -> print_users (subreddit |> posts |> top_users) 0
+  | Prediction ->
+      print_prediction (subreddit_name |> String.lowercase_ascii)
   | NA -> exit 0
 
 (*Runs the initial terminal that allows a subreddit to be selected.*)
