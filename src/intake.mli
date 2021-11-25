@@ -46,3 +46,6 @@ val upvotes : post -> int
 
 val subreddit_name : post -> string
 (**[subreddit post] is the name of the subreddit that [post] belongs to.*)
+
+val title : post -> string
+(**[title post] is the title of [post]*)

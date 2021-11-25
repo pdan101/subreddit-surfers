@@ -100,6 +100,7 @@ let print_frequencies subreddit_name =
       |> Yojson.Basic.from_file)
       WordProcessor.stem_text
       (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
+      Intake.upvotes
   in
   let frequency_list =
     WordEncoding.find_frequencies json (Array.of_list encoded_matrix)
@@ -128,6 +129,7 @@ let print_encoder subreddit_name =
       |> Yojson.Basic.from_file)
       WordProcessor.stem_text
       ("data/" ^ subreddit_name ^ ".json" |> Yojson.Basic.from_file)
+      Intake.upvotes
   in
   print_endline
     ("Encoding r/" ^ subreddit_name
