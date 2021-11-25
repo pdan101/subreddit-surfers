@@ -589,16 +589,10 @@ let pp_print_matrix acc matrix : string =
       ^ "\n")
     matrix ""
 
-let encode_post_test
-    (name : string)
-    (vocab : t)
-    (processor : string -> string list)
-    (post : string)
-    (expected_output : int array) : test =
-  name >:: fun _ ->
-  assert_equal
-    (Array.to_list expected_output)
-    (Array.to_list (encode_post vocab processor post))
+(* let encode_post_test (name : string) (vocab : t) (processor : string
+   -> string list) (post : string) (expected_output : int array) : test
+   = name >:: fun _ -> assert_equal (Array.to_list expected_output)
+   (Array.to_list (encode_post vocab processor Intake.upvotes)) *)
 
 let test3_json =
   convert_path_to_json "data/subredditVocabJsons/test3.json"
