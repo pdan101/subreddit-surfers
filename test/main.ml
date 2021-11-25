@@ -691,15 +691,29 @@ let get_vocab_length matrix =
 let create_format_data_test
     (name : string)
     (matrix : int array list)
-    expected_output : test =
+    regression
+    (expected_output : int) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (List.length (format_data matrix))
+    (List.length (format_data matrix regression))
     ~printer:string_of_int
 
 let regression_tests =
   [
-    create_format_data_test "basic test" cornell_encoded
+    create_format_data_test "check number of Ridge weights"
+      cornell_encoded Ridge
+      (get_vocab_length cornell_encoded);
+    create_format_data_test "check number of LASSO weights"
+      cornell_encoded LASSO
+      (get_vocab_length cornell_encoded);
+    create_format_data_test "check number of OLS weights"
+      cornell_encoded OLS
+      (get_vocab_length cornell_encoded);
+    create_format_data_test "check number of Logistic weights"
+      cornell_encoded Logistic
+      (get_vocab_length cornell_encoded);
+    create_format_data_test "check number of SVM weights"
+      cornell_encoded SVM
       (get_vocab_length cornell_encoded);
   ]
 
