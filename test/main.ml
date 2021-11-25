@@ -648,8 +648,9 @@ let create_find_frequencies_test
     (matrix : int array array)
     (expected_output : (string * int) list) : test =
   name >:: fun _ ->
-  assert_equal expected_output
-    (find_frequencies word_json matrix)
+  assert_equal
+    (List.sort compare expected_output)
+    (List.sort compare (find_frequencies word_json matrix))
     ~printer:pp_print_association_list
 
 let test4_matrix = Array.make_matrix 2 5 0

@@ -2,4 +2,4 @@
    test data*)
 
 val format_data :
-  int array array -> Owl.Regression.D.Optimise.Algodiff.A.arr array
+  float array array -> Owl.Regression.D.Optimise.Algodiff.A.arr array
