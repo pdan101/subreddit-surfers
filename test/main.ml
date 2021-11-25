@@ -688,33 +688,30 @@ let get_vocab_length matrix =
   | h :: t -> Array.length h
   | [] -> 0
 
-let create_format_data_test
+let create_train_test_model_test
     (name : string)
     (matrix : int array list)
+    (percent_training : float)
     regression
     (expected_output : int) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (List.length (format_data matrix regression))
+    (List.length (train_test_model matrix percent_training regression))
     ~printer:string_of_int
 
 let regression_tests =
   [
-    create_format_data_test "check number of Ridge weights"
-      cornell_encoded Ridge
+    (*create_format_data_test "check number of Ridge weights"
+      cornell_encoded Ridge (get_vocab_length cornell_encoded);
+      create_format_data_test "check number of LASSO weights"
+      cornell_encoded LASSO (get_vocab_length cornell_encoded);*)
+    create_train_test_model_test "check number of OLS weights"
+      cornell_encoded 0.75 OLS
       (get_vocab_length cornell_encoded);
-    create_format_data_test "check number of LASSO weights"
-      cornell_encoded LASSO
-      (get_vocab_length cornell_encoded);
-    create_format_data_test "check number of OLS weights"
-      cornell_encoded OLS
-      (get_vocab_length cornell_encoded);
-    create_format_data_test "check number of Logistic weights"
-      cornell_encoded Logistic
-      (get_vocab_length cornell_encoded);
-    create_format_data_test "check number of SVM weights"
-      cornell_encoded SVM
-      (get_vocab_length cornell_encoded);
+    (*create_format_data_test "check number of Logistic weights"
+      cornell_encoded Logistic (get_vocab_length cornell_encoded);
+      create_format_data_test "check number of SVM weights"
+      cornell_encoded SVM (get_vocab_length cornell_encoded);*)
   ]
 
 let suite =

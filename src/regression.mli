@@ -8,4 +8,5 @@ type regression =
   | SVM
   | OLS
 
-val format_data : int array list -> regression -> float list
+val train_test_model :
+  int array list -> float -> regression -> float list
