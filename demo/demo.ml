@@ -1,11 +1,15 @@
 open Analyzer
 
+(*Type of command to execute.*)
 type command =
   | Frequencies
   | Stemmer
   | Encoder
+  | Popularity
   | NA
 
+(*Extracts the Intake.subreddit data structure of a given subreddit
+  name, retries in command line if the file is not found.*)
 let rec sub subreddit_name =
   try
     Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json")
@@ -16,11 +20,13 @@ let rec sub subreddit_name =
       print_string "> ";
       sub (read_line ())
 
+(*Converts text command into our command type.*)
 let rec get_command () =
   print_endline "Enter one of the following commands:";
   print_endline "Frequencies";
   print_endline "Stemmer";
   print_endline "Encoder";
+  print_endline "Popularity";
   print_string "> ";
   match read_line () with
   | exception End_of_file -> NA
@@ -30,32 +36,59 @@ let rec get_command () =
       Stemmer
   | command when command |> String.lowercase_ascii = "encoder" ->
       Encoder
+  | command when command |> String.lowercase_ascii = "popularity" ->
+      Popularity
   | _ ->
       print_endline "Did not recognize command. Please try again.\n";
       get_command ()
 
+(*Current representation of 1 instance of a word in a subreddit for the
+  text based graphic.*)
 let big_string = "---"
 
+(*Extracts the top 5 words appearing in a subreddit.*)
 let rec extract_top5 lst count =
   if count >= 5 then ()
   else
     match lst with
     | [] -> print_newline ()
     | (k, v) :: t ->
-        print_string (k ^ ": ");
+        print_string (k ^ " (" ^ string_of_int v ^ ")" ^ ": ");
         for i = 1 to v do
           print_string big_string
         done;
         print_newline ();
         extract_top5 t (count + 1)
 
-(* let rec string_of_array arr pos = if pos < Array.length arr then
-   string_of_int arr.(pos) ^ " " ^ string_of_array arr (pos + 1) else ""
+(*Prints the top 5 users in a subreddit, and their total upvotes.*)
+let rec print_users lst count =
+  if count >= 5 then ()
+  else
+    match lst with
+    | [] -> print_newline ()
+    | (k, v) :: t ->
+        print_endline
+          ("User Name: " ^ k ^ "\nTotal Upvotes: " ^ string_of_int v
+         ^ "\n");
+        print_users t (count + 1)
 
-   let rec string_matrix (mat : int array array) : string = match mat
-   with | [||] -> "" | [| one |] -> string_of_array one 0 | _ ->
-   string_of_array mat.(0) 0 ^ "\n" ^ string_matrix (Array.sub mat 1
-   (Array.length mat - 1)) *)
+(*Builds a descending order sorted association list of users and their
+  total upvotes.*)
+let rec top_users post_list =
+  let user_tbl = Hashtbl.create (List.length post_list) in
+  List.iter
+    (fun x ->
+      let author = x |> Intake.author in
+      let upvotes = x |> Intake.upvotes in
+      match Hashtbl.find_opt user_tbl author with
+      | None -> Hashtbl.add user_tbl author upvotes
+      | Some value -> Hashtbl.add user_tbl author (value + upvotes))
+    post_list;
+  print_endline "Finding top users in this subreddit: \n";
+  Hashtbl.fold (fun k v acc -> (k, v) :: acc) user_tbl []
+  |> List.sort_uniq (fun x y -> snd y - snd x)
+
+(*Prints the most frequent words in a subreddit.*)
 let print_frequencies subreddit_name =
   let json =
     Yojson.Basic.from_file
@@ -74,6 +107,7 @@ let print_frequencies subreddit_name =
   print_endline ("Finding the most frequent words r/" ^ subreddit_name);
   extract_top5 frequency_list 0
 
+(*Prints the stemmed text of the most recent post in a subreddit.*)
 let print_stemmer post =
   let original_text = post |> Intake.selftext in
   let text_block = original_text |> WordProcessor.make_text_block in
@@ -85,6 +119,8 @@ let print_stemmer post =
   print_endline ("Original text: " ^ original_text ^ "\n");
   print_endline ("Stemmed text: " ^ stemmed_text)
 
+(*Prints the encoded matrix for all the non-empty posts in the
+  subreddit.*)
 let print_encoder subreddit_name =
   let encoded_matrix =
     WordEncoding.encode_subreddit
@@ -103,20 +139,19 @@ let print_encoder subreddit_name =
          print_newline ());
   print_newline ()
 
+(*Runs the terminal interface that gets a command after specifying
+  subreddit.*)
 let run subreddit_name =
   let subreddit = sub subreddit_name in
   match get_command () with
   | Frequencies ->
-      print_frequencies
-        (subreddit |> Intake.recent_post |> Intake.subreddit_name
-       |> String.lowercase_ascii)
+      print_frequencies (subreddit_name |> String.lowercase_ascii)
   | Stemmer -> print_stemmer (subreddit |> Intake.recent_post)
-  | Encoder ->
-      print_encoder
-        (subreddit |> Intake.recent_post |> Intake.subreddit_name
-       |> String.lowercase_ascii)
+  | Encoder -> print_encoder (subreddit_name |> String.lowercase_ascii)
+  | Popularity -> print_users (subreddit |> Intake.posts |> top_users) 0
   | NA -> exit 0
 
+(*Runs the initial terminal that allows a subreddit to be selected.*)
 let terminal () =
   ANSITerminal.print_string [ ANSITerminal.green ]
     "\nWelcome to our NLP project.\n";
@@ -126,4 +161,5 @@ let terminal () =
   | exception End_of_file -> ()
   | subreddit_name -> run (subreddit_name |> String.lowercase_ascii)
 
+(*Starts the executable program.*)
 let () = terminal ()
