@@ -16,7 +16,7 @@ type train_test_data = {
 }
 
 val train_test_model :
-  int array list -> float -> regression -> float list
+  int array list -> float -> regression -> float array
 
 val get_training_data : Owl.Mat.mat -> float -> train_test_data
 

@@ -698,7 +698,7 @@ let create_train_test_model_test
     (expected_output : int) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (List.length (train_test_model matrix percent_training regression))
+    (Array.length (train_test_model matrix percent_training regression))
     ~printer:string_of_int
 
 open Owl

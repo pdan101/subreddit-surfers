@@ -32,53 +32,59 @@ let create_matrix data =
     List.map (fun x -> Array.map (fun x -> float_of_int x) x) data
   in
   let array = Array.of_list floats in
-
   Mat.of_arrays array
 
 let get_training_data matrix percent_training =
   let shape = Mat.shape matrix in
-
   let num_posts = get_num_posts shape in
-
   let num_features = get_num_features shape in
-
   let rows_training =
     int_of_float (float_of_int num_posts *. percent_training)
   in
   let num_cols = num_features in
-
   let features_training =
     Mat.get_slice [ [ 0; rows_training ]; [ 0; num_cols - 2 ] ] matrix
   in
   let output_training =
     Mat.get_slice [ [ 0; rows_training ]; [ num_cols - 1 ] ] matrix
   in
-
   let features_test =
     Mat.get_slice [ [ rows_training; -1 ]; [ 0; num_cols - 2 ] ] matrix
   in
   let output_testing =
     Mat.get_slice [ [ rows_training; -1 ]; [ num_cols - 1 ] ] matrix
   in
-
   { features_training; features_test; output_training; output_testing }
+
+let calc_bulk_upvotes features_test weights =
+  let posts = Mat.to_arrays features_test in
+  let with_weights =
+    Array.map
+      (fun encoded_post ->
+        Array.mapi
+          (fun index word -> word *. weights.(index))
+          encoded_post)
+      posts
+  in
+  Array.map
+    (fun post_array ->
+      List.fold_right
+        (fun element init -> element +. init)
+        (Array.to_list post_array)
+        0.0)
+    with_weights
 
 let train_test_model data percent_training regression_type =
   let matrix = create_matrix data in
-
   let train_test_data = get_training_data matrix 0.75 in
-
   let weights =
     get_model regression_type train_test_data.features_test
       train_test_data.output_testing
   in
   let dense_matrix = MX.(weights.(0) @= weights.(1)) in
-  Array.to_list (Owl_dense_matrix.D.to_array dense_matrix)
+  let formatted_weights = Owl_dense_matrix.D.to_array dense_matrix in
 
-let calc_bulk_upvotes test_features =
-  (*Mat.map (fun encoded_post -> Mat.mapi (fun index word -> word *.
-    weights.(index)) encoded_post) test_features*)
-  Mat.shape test_features
+  calc_bulk_upvotes train_test_data.features_test formatted_weights
 
 let calc_upvote weights encoded_post =
   let features_weights =
