@@ -56,7 +56,7 @@ let get_training_data matrix percent_training =
   in
   { features_training; features_test; output_training; output_testing }
 
-let calc_bulk_upvotes features_test weights =
+let calc_upvotes features_test weights =
   let posts = Mat.to_arrays features_test in
   let with_weights =
     Array.map
@@ -69,16 +69,29 @@ let calc_bulk_upvotes features_test weights =
   let without_last_weight =
     Array.map
       (fun post_array ->
-        List.fold_right
+        Array.fold_right
           (fun element init -> element +. init)
-          (Array.to_list post_array)
-          0.0)
+          post_array 0.0)
       with_weights
   in
-
   Array.map
     (fun weight -> weight +. weights.(Array.length weights - 1))
     without_last_weight
+
+let calc_error predicted_upvotes actual_upvotes =
+  let actual_upvotes = Mat.to_array actual_upvotes in
+  let squared_sum_array =
+    Array.mapi
+      (fun index element -> (element -. actual_upvotes.(index)) ** 2.0)
+      predicted_upvotes
+  in
+  let squared_sum =
+    Array.fold_right
+      (fun element init -> element +. init)
+      squared_sum_array 0.0
+  in
+
+  squared_sum /. float_of_int (Array.length predicted_upvotes)
 
 let train_test_model data percent_training regression_type =
   let matrix = create_matrix data in
@@ -89,15 +102,7 @@ let train_test_model data percent_training regression_type =
   in
   let dense_matrix = MX.(weights.(0) @= weights.(1)) in
   let formatted_weights = Owl_dense_matrix.D.to_array dense_matrix in
-
-  calc_bulk_upvotes train_test_data.features_test formatted_weights
-
-let calc_upvote weights encoded_post =
-  let features_weights =
-    List.mapi
-      (fun index weight -> encoded_post.(index) *. weight)
-      weights
+  let predicted_upvotes =
+    calc_upvotes train_test_data.features_test formatted_weights
   in
-  List.fold_right
-    (fun feature_weight init -> init +. feature_weight)
-    features_weights 0.0
+  calc_error predicted_upvotes train_test_data.output_testing
