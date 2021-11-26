@@ -6,6 +6,8 @@ open Stemmer
 open Str
 open WordEncoding
 open Yojson.Basic
+open Regression
+open Owl
 
 let state_test : test = "name" >:: fun _ -> assert_equal "" ""
 
@@ -647,8 +649,9 @@ let create_find_frequencies_test
     (matrix : int array array)
     (expected_output : (string * int) list) : test =
   name >:: fun _ ->
-  assert_equal expected_output
-    (find_frequencies word_json matrix)
+  assert_equal
+    (List.sort compare expected_output)
+    (List.sort compare (find_frequencies word_json matrix))
     ~printer:pp_print_association_list
 
 let test4_matrix = Array.make_matrix 2 5 0
@@ -674,12 +677,80 @@ let statistics_tests =
       ];
   ]
 
+let cornell_encoded =
+  encode_subreddit
+    ("data/subredditVocabJsons/cornell.json" |> Yojson.Basic.from_file)
+    WordProcessor.stem_text
+    (Yojson.Basic.from_file "data/cornell.json")
+    upvotes
+
+let cornell_matrix = create_matrix cornell_encoded
+
+let get_vocab_length matrix =
+  match matrix with
+  | h :: t -> Array.length h
+  | [] -> 0
+
+let get_training_data_shapes train_test_data =
+  [
+    Mat.shape train_test_data.features_training;
+    Mat.shape train_test_data.features_test;
+    Mat.shape train_test_data.output_training;
+    Mat.shape train_test_data.output_testing;
+  ]
+
+let pp_int_pair (row, col) =
+  "(" ^ string_of_int row ^ ", " ^ string_of_int col ^ ")"
+
+let compare_float expected actual =
+  let min = expected -. 1.0 in
+  let max = expected +. 1.0 in
+  actual <= max && actual >= min
+
+let create_train_test_model_test
+    (name : string)
+    (matrix : int array list)
+    (percent_training : float)
+    regression
+    expected_output : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (train_test_model matrix percent_training regression)
+    ~printer:string_of_float ~cmp:compare_float
+
+let create_get_training_data_test
+    (name : string)
+    (matrix : Owl.Mat.mat)
+    (percent_training : float)
+    (expected_output : (int * int) list) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (get_training_data_shapes
+       (get_training_data matrix percent_training))
+    ~printer:(pp_list pp_int_pair)
+
+let regression_tests =
+  [
+    create_get_training_data_test "check number of columns"
+      cornell_matrix 0.75
+      [ (21, 570); (7, 570); (21, 1); (7, 1) ];
+    create_train_test_model_test
+      "check mean squared error of Ridge weights with cornell data"
+      cornell_encoded 0.75 Ridge 70.0;
+    create_train_test_model_test
+      "check mean squared error of LASSO weights with cornell data"
+      cornell_encoded 0.75 LASSO 70.0;
+    create_train_test_model_test
+      "check mean squared error of OLS weights with cornell data"
+      cornell_encoded 0.75 OLS 70.0;
+  ]
+
 let suite =
   "test suite for Final"
   >::: List.flatten
          [
            intake_tests; word_processor_tests; word_encoding_tests;
-           statistics_tests;
+           statistics_tests; regression_tests;
          ]
 
 let _ = run_test_tt_main suite
