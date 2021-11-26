@@ -102,7 +102,3 @@ let train_test_model data percent_training regression_type =
   in
   let dense_matrix = MX.(weights.(0) @= weights.(1)) in
   Owl_dense_matrix.D.to_array dense_matrix
-
-(*calc_upvotes train_test_data.features_test formatted_weights*)
-
-(*calc_error predicted_upvotes train_test_data.output_testing*)
