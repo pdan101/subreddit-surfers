@@ -702,17 +702,6 @@ let get_training_data_shapes train_test_data =
 let pp_int_pair (row, col) =
   "(" ^ string_of_int row ^ ", " ^ string_of_int col ^ ")"
 
-let compare_float expected actual =
-  let min = expected -. 1.0 in
-  let max = expected +. 1.0 in
-  actual <= max && actual >= min
-
-(*let create_train_test_model_test (name : string) (matrix : int array
-  list) (percent_training : float) regression expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (Array.length
-  (train_test_model matrix percent_training regression))
-  ~printer:string_of_int*)
-
 let create_get_training_data_test
     (name : string)
     (matrix : Owl.Mat.mat)
@@ -729,8 +718,6 @@ let regression_tests =
     create_get_training_data_test "check number of columns"
       cornell_matrix 0.75
       [ (21, 570); (7, 570); (21, 1); (7, 1) ];
-    (*create_train_test_model_test "check mean squared error of Ridge
-      weights with cornell data" cornell_encoded 0.75 Ridge 7;*)
   ]
 
 let suite =
