@@ -1,7 +1,4 @@
 open Analyzer
-open WordEncoding
-open Intake
-open WordProcessor
 
 (*Type of command to execute.*)
 type command =
@@ -16,7 +13,7 @@ type command =
 let rec sub subreddit_name =
   try
     Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json")
-    |> from_json
+    |> Intake.from_json
   with
   | Sys_error _ ->
       print_endline "Invalid subreddit name. Try again.";
@@ -81,8 +78,8 @@ let rec top_users post_list =
   let user_tbl = Hashtbl.create (List.length post_list) in
   List.iter
     (fun x ->
-      let author = x |> author in
-      let upvotes = x |> upvotes in
+      let author = x |> Intake.author in
+      let upvotes = x |> Intake.upvotes in
       match Hashtbl.find_opt user_tbl author with
       | None -> Hashtbl.add user_tbl author upvotes
       | Some value -> Hashtbl.add user_tbl author (value + upvotes))
@@ -98,27 +95,27 @@ let print_frequencies subreddit_name =
       ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json")
   in
   let encoded_matrix =
-    encode_subreddit
+    WordEncoding.encode_subreddit
       ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
       |> Yojson.Basic.from_file)
-      stem_text
+      WordProcessor.stem_text
       (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
-      upvotes
+      Intake.upvotes
   in
   let frequency_list =
-    find_frequencies json (Array.of_list encoded_matrix)
+    WordEncoding.find_frequencies json (Array.of_list encoded_matrix)
   in
   print_endline ("Finding the most frequent words r/" ^ subreddit_name);
   extract_top5 frequency_list 0
 
 (*Prints the stemmed text of the most recent post in a subreddit.*)
 let print_stemmer post =
-  let original_text = post |> selftext in
+  let original_text = post |> Intake.selftext in
   let text_block = original_text |> WordProcessor.make_text_block in
   let stemmed_text = text_block |> WordProcessor.stemmed_text_block in
   print_endline
     ("Stemming the text of most recent post from r/"
-    ^ (post |> subreddit_name)
+    ^ (post |> Intake.subreddit_name)
     ^ "\n");
   print_endline ("Original text: " ^ original_text ^ "\n");
   print_endline ("Stemmed text: " ^ stemmed_text)
@@ -127,12 +124,12 @@ let print_stemmer post =
   subreddit.*)
 let print_encoder subreddit_name =
   let encoded_matrix =
-    encode_subreddit
+    WordEncoding.encode_subreddit
       ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
       |> Yojson.Basic.from_file)
       WordProcessor.stem_text
       ("data/" ^ subreddit_name ^ ".json" |> Yojson.Basic.from_file)
-      upvotes
+      Intake.upvotes
   in
   print_endline
     ("Encoding r/" ^ subreddit_name
@@ -151,9 +148,9 @@ let run subreddit_name =
   match get_command () with
   | Frequencies ->
       print_frequencies (subreddit_name |> String.lowercase_ascii)
-  | Stemmer -> print_stemmer (subreddit |> recent_post)
+  | Stemmer -> print_stemmer (subreddit |> Intake.recent_post)
   | Encoder -> print_encoder (subreddit_name |> String.lowercase_ascii)
-  | Popularity -> print_users (subreddit |> posts |> top_users) 0
+  | Popularity -> print_users (subreddit |> Intake.posts |> top_users) 0
   | NA -> exit 0
 
 (*Runs the initial terminal that allows a subreddit to be selected.*)
