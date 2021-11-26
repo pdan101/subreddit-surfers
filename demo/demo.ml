@@ -2,8 +2,6 @@ open Analyzer
 open WordEncoding
 open Intake
 open WordProcessor
-open CustomRegression
-open Owl
 
 (*Type of command to execute.*)
 type command =
@@ -33,7 +31,6 @@ let rec get_command () =
   print_endline "Stemmer";
   print_endline "Encoder";
   print_endline "Popularity";
-  print_endline "Prediction";
   print_string "> ";
   match read_line () with
   | exception End_of_file -> NA
@@ -173,27 +170,8 @@ let print_prediction subreddit_name =
   let encoded_arr =
     Array.sub encode_temp 0 (Array.length encode_temp - 1)
   in
-  let encoded_subreddit =
-    WordEncoding.encode_subreddit
-      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
-      |> Yojson.Basic.from_file)
-      WordProcessor.stem_text
-      (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
-      upvotes
-  in
-  let weights =
-    CustomRegression.train_test_model encoded_subreddit 0.75 OLS
-  in
-  let float_array = Array.map (fun x -> float_of_int x) encoded_arr in
-  let upvotes =
-    CustomRegression.calc_upvotes
-      (Mat.of_array float_array 1 (Array.length float_array))
-      weights
-  in
-  print_endline
-    ("This post would get "
-    ^ string_of_int (int_of_float upvotes.(0))
-    ^ " upvotes!")
+  (* TODO: USE FUNCTION TO PREDICT UPVOTES FROM ENCODED_ARR *)
+  ()
 
 (*Runs the terminal interface that gets a command after specifying
   subreddit.*)

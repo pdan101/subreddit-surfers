@@ -6,7 +6,7 @@ open Stemmer
 open Str
 open WordEncoding
 open Yojson.Basic
-open CustomRegression
+open Regression
 open Owl
 
 let state_test : test = "name" >:: fun _ -> assert_equal "" ""
@@ -707,11 +707,16 @@ let compare_float expected actual =
   let max = expected +. 1.0 in
   actual <= max && actual >= min
 
-(*let create_train_test_model_test (name : string) (matrix : int array
-  list) (percent_training : float) regression expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (Array.length
-  (train_test_model matrix percent_training regression))
-  ~printer:string_of_int*)
+let create_train_test_model_test
+    (name : string)
+    (matrix : int array list)
+    (percent_training : float)
+    regression
+    expected_output : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (train_test_model matrix percent_training regression)
+    ~printer:string_of_float ~cmp:compare_float
 
 let create_get_training_data_test
     (name : string)
@@ -729,8 +734,15 @@ let regression_tests =
     create_get_training_data_test "check number of columns"
       cornell_matrix 0.75
       [ (21, 570); (7, 570); (21, 1); (7, 1) ];
-    (*create_train_test_model_test "check mean squared error of Ridge
-      weights with cornell data" cornell_encoded 0.75 Ridge 7;*)
+    create_train_test_model_test
+      "check mean squared error of Ridge weights with cornell data"
+      cornell_encoded 0.75 Ridge 70.0;
+    create_train_test_model_test
+      "check mean squared error of LASSO weights with cornell data"
+      cornell_encoded 0.75 LASSO 70.0;
+    create_train_test_model_test
+      "check mean squared error of OLS weights with cornell data"
+      cornell_encoded 0.75 OLS 70.0;
   ]
 
 let suite =
