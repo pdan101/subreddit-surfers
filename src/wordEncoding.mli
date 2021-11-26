@@ -16,8 +16,8 @@ val write_words_to_json : out_channel -> string list -> unit
    has been written to file*)
 
 val subreddit_json_to_word_json :
-  (Basic.t -> string list) -> Basic.t -> unit
-(**[subreddit_json_to_word_json processor_function subreddit_json]
+  (Basic.t -> string list) -> Basic.t -> string -> unit
+(**[subreddit_json_to_word_json processor_function subreddit_json filename]
    writes all the words of every post in the subreddit to a json file.
    The way each of these words is processed is based on
    [processor_function]*)

@@ -150,15 +150,23 @@ let print_encoder subreddit_name =
          print_newline ());
   print_newline ()
 
-let print_prediction subreddit_name =
-  let input_text =
-    print_endline
-      "Enter text to predict how many upvotes it would receive: ";
-    print_string "> ";
-    match read_line () with
-    | exception End_of_file -> ""
-    | text -> text
+(*Calculates predicted upvotes based on encoded input array and encoded
+  subreddit.*)
+let predict_upvotes encoded_arr encoded_subreddit =
+  let weights =
+    CustomRegression.train_test_model encoded_subreddit 0.75 OLS
   in
+  let float_array = Array.map (fun x -> float_of_int x) encoded_arr in
+  let upvotes =
+    CustomRegression.calc_upvotes
+      (Mat.of_array float_array 1 (Array.length float_array))
+      weights
+  in
+  upvotes.(0)
+
+(*Retrieves encoding of text and subreddit based on inputted subreddit
+  name and text.*)
+let get_both_arrays subreddit_name input_text =
   let converted_to_post =
     Intake.post_of_text (input_text |> WordProcessor.stem_paragraph)
   in
@@ -181,18 +189,32 @@ let print_prediction subreddit_name =
       (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
       upvotes
   in
-  let weights =
-    CustomRegression.train_test_model encoded_subreddit 0.75 OLS
+  (encoded_arr, encoded_subreddit)
+
+(*Prints prediction algorithm results.*)
+let print_prediction subreddit_name =
+  let input_text =
+    print_endline
+      "Enter text to predict how many upvotes it would receive: ";
+    print_string "> ";
+    match read_line () with
+    | exception End_of_file -> ""
+    | text -> text
   in
-  let float_array = Array.map (fun x -> float_of_int x) encoded_arr in
-  let upvotes =
-    CustomRegression.calc_upvotes
-      (Mat.of_array float_array 1 (Array.length float_array))
-      weights
+  let encoded_arr1, encoded_subreddit1 =
+    get_both_arrays subreddit_name input_text
+  in
+  let encoded_arr2, encoded_subreddit2 =
+    get_both_arrays (subreddit_name ^ "_new") input_text
+  in
+  let avg_upvotes =
+    (predict_upvotes encoded_arr1 encoded_subreddit1
+    +. predict_upvotes encoded_arr2 encoded_subreddit2)
+    /. 2.
   in
   print_endline
     ("This post would get "
-    ^ string_of_int (int_of_float upvotes.(0))
+    ^ string_of_int (int_of_float avg_upvotes)
     ^ " upvotes!")
 
 (*Runs the terminal interface that gets a command after specifying

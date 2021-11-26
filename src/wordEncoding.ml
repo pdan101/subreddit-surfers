@@ -34,15 +34,16 @@ let rec write_words_to_json (file : out_channel) (words : string list) :
         output_string file ("\t\t\"" ^ h ^ "\",\n");
         write_words_to_json file t)
 
-let subreddit_json_to_word_json processor_function subreddit_json : unit
-    =
-  let subreddit = from_json subreddit_json in
+let subreddit_json_to_word_json
+    processor_function
+    subreddit_json
+    filename : unit =
   let words = processor_function subreddit_json in
-
-  let filename =
-    subreddit |> recent_post |> subreddit_name |> String.lowercase_ascii
+  let filepath =
+    "data/subredditVocabJsons/"
+    ^ (filename |> String.lowercase_ascii)
+    ^ ".json"
   in
-  let filepath = "data/subredditVocabJsons/" ^ filename ^ ".json" in
   let file = open_out filepath in
   write_words_to_json file words
 

@@ -579,10 +579,11 @@ let subreddit_json_to_word_json_test
     (name : string)
     (expected_output : unit)
     (processor : Yojson.Basic.t -> string list)
-    (subreddit : Yojson.Basic.t) : test =
+    (subreddit : Yojson.Basic.t)
+    (filename : string) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (subreddit_json_to_word_json processor subreddit)
+    (subreddit_json_to_word_json processor subreddit filename)
 
 let pp_print_matrix acc matrix : string =
   Array.fold_right
@@ -620,20 +621,56 @@ let word_encoding_tests =
     subreddit_json_to_word_json_test
       "Converts words in college\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_words college_json;
+      subreddit_json_to_words college_json "college";
     subreddit_json_to_word_json_test
       "Converts words in cornell\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words cornell_json;
+      subreddit_json_to_stemmed_words cornell_json "cornell";
     subreddit_json_to_word_json_test
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words anime_json;
+      subreddit_json_to_stemmed_words anime_json "anime";
     (* create_encoded_matrix_test "Json contains: Hello, Did, this,
        format, correctly. Test post \ is hello format" test3_json "Hello
        format" test3_matrix; encode_post_test "Testing for Cornell.json"
        cornell_json2 stem_text "attack basketball"
        cornell_test_1_matrix *)
+    subreddit_json_to_word_json_test
+      "Converts words in anime\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_stemmed_words
+      (convert_path_to_json "data/anime_new.json")
+      "anime_new";
+    subreddit_json_to_word_json_test
+      "Converts words in anime\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_stemmed_words
+      (convert_path_to_json "data/college_new.json")
+      "college_new";
+    subreddit_json_to_word_json_test
+      "Converts words in anime\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_stemmed_words
+      (convert_path_to_json "data/cornell_new.json")
+      "cornell_new";
+    subreddit_json_to_word_json_test
+      "Converts words in anime\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_stemmed_words
+      (convert_path_to_json "data/csmajors_new.json")
+      "csmajors_new";
+    subreddit_json_to_word_json_test
+      "Converts words in anime\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_stemmed_words
+      (convert_path_to_json "data/ocaml_new.json")
+      "ocaml_new";
+    subreddit_json_to_word_json_test
+      "Converts words in anime\n\
+      \       subreddit posts to a json of all the  words" (print_int 1)
+      subreddit_json_to_stemmed_words
+      (convert_path_to_json "data/running_new.json")
+      "running_new";
   ]
 
 let rec pp_print_association_list assoc_list =
