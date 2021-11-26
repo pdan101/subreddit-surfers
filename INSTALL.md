@@ -4,5 +4,10 @@
 ```
 opam install -y utop odoc ounit2 qcheck bisect_ppx menhir ocaml-lsp-server ocamlformat ocamlformat-rpc ANSITerminal pyml owl
 
-make demo_two
+(
+  If there's an issue with owl installation, run the following: 
+  opam depext conf-openblas.0.2.0
+)
+
+make final_demo
 ```

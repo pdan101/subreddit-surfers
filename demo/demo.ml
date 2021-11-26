@@ -1,4 +1,7 @@
 open Analyzer
+open WordEncoding
+open Intake
+open WordProcessor
 
 (*Type of command to execute.*)
 type command =
@@ -6,6 +9,7 @@ type command =
   | Stemmer
   | Encoder
   | Popularity
+  | Prediction
   | NA
 
 (*Extracts the Intake.subreddit data structure of a given subreddit
@@ -13,7 +17,7 @@ type command =
 let rec sub subreddit_name =
   try
     Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json")
-    |> Intake.from_json
+    |> from_json
   with
   | Sys_error _ ->
       print_endline "Invalid subreddit name. Try again.";
@@ -38,6 +42,8 @@ let rec get_command () =
       Encoder
   | command when command |> String.lowercase_ascii = "popularity" ->
       Popularity
+  | command when command |> String.lowercase_ascii = "prediction" ->
+      Prediction
   | _ ->
       print_endline "Did not recognize command. Please try again.\n";
       get_command ()
@@ -78,8 +84,8 @@ let rec top_users post_list =
   let user_tbl = Hashtbl.create (List.length post_list) in
   List.iter
     (fun x ->
-      let author = x |> Intake.author in
-      let upvotes = x |> Intake.upvotes in
+      let author = x |> author in
+      let upvotes = x |> upvotes in
       match Hashtbl.find_opt user_tbl author with
       | None -> Hashtbl.add user_tbl author upvotes
       | Some value -> Hashtbl.add user_tbl author (value + upvotes))
@@ -95,27 +101,27 @@ let print_frequencies subreddit_name =
       ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json")
   in
   let encoded_matrix =
-    WordEncoding.encode_subreddit
+    encode_subreddit
       ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
       |> Yojson.Basic.from_file)
-      WordProcessor.stem_text
+      stem_text
       (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
-      Intake.upvotes
+      upvotes
   in
   let frequency_list =
-    WordEncoding.find_frequencies json (Array.of_list encoded_matrix)
+    find_frequencies json (Array.of_list encoded_matrix)
   in
   print_endline ("Finding the most frequent words r/" ^ subreddit_name);
   extract_top5 frequency_list 0
 
 (*Prints the stemmed text of the most recent post in a subreddit.*)
 let print_stemmer post =
-  let original_text = post |> Intake.selftext in
+  let original_text = post |> selftext in
   let text_block = original_text |> WordProcessor.make_text_block in
   let stemmed_text = text_block |> WordProcessor.stemmed_text_block in
   print_endline
     ("Stemming the text of most recent post from r/"
-    ^ (post |> Intake.subreddit_name)
+    ^ (post |> subreddit_name)
     ^ "\n");
   print_endline ("Original text: " ^ original_text ^ "\n");
   print_endline ("Stemmed text: " ^ stemmed_text)
@@ -124,12 +130,12 @@ let print_stemmer post =
   subreddit.*)
 let print_encoder subreddit_name =
   let encoded_matrix =
-    WordEncoding.encode_subreddit
+    encode_subreddit
       ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
       |> Yojson.Basic.from_file)
       WordProcessor.stem_text
       ("data/" ^ subreddit_name ^ ".json" |> Yojson.Basic.from_file)
-      Intake.upvotes
+      upvotes
   in
   print_endline
     ("Encoding r/" ^ subreddit_name
@@ -141,6 +147,32 @@ let print_encoder subreddit_name =
          print_newline ());
   print_newline ()
 
+let print_prediction subreddit_name =
+  let input_text =
+    print_endline
+      "Enter text to predict how many upvotes it would receive: ";
+    print_string "> ";
+    match read_line () with
+    | exception End_of_file -> ""
+    | text -> text
+  in
+  let converted_to_post =
+    Intake.post_of_text (input_text |> WordProcessor.stem_paragraph)
+  in
+  let vocab_json =
+    "data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+    |> Yojson.Basic.from_file
+  in
+  let encode_temp =
+    WordEncoding.encode_post vocab_json WordProcessor.stem_text
+      converted_to_post Intake.upvotes
+  in
+  let encoded_arr =
+    Array.sub encode_temp 0 (Array.length encode_temp - 1)
+  in
+  (* TODO: USE FUNCTION TO PREDICT UPVOTES FROM ENCODED_ARR *)
+  ()
+
 (*Runs the terminal interface that gets a command after specifying
   subreddit.*)
 let run subreddit_name =
@@ -148,9 +180,11 @@ let run subreddit_name =
   match get_command () with
   | Frequencies ->
       print_frequencies (subreddit_name |> String.lowercase_ascii)
-  | Stemmer -> print_stemmer (subreddit |> Intake.recent_post)
+  | Stemmer -> print_stemmer (subreddit |> recent_post)
   | Encoder -> print_encoder (subreddit_name |> String.lowercase_ascii)
-  | Popularity -> print_users (subreddit |> Intake.posts |> top_users) 0
+  | Popularity -> print_users (subreddit |> posts |> top_users) 0
+  | Prediction ->
+      print_prediction (subreddit_name |> String.lowercase_ascii)
   | NA -> exit 0
 
 (*Runs the initial terminal that allows a subreddit to be selected.*)

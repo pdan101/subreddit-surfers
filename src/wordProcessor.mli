@@ -56,3 +56,7 @@ val replace_suffix : string -> string
 (**[replace_suffix word] is the adjusted [word] after checking and
    replacing known suffixes in step 2, 3, and 4 of our porter stemmer.
    Returns [word] if no suffixes are found.*)
+
+val stem_paragraph : string -> string
+(**[stem_paragraph paragraph] returns the stemmed version of a
+   paragraph.*)

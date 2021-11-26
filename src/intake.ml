@@ -30,6 +30,20 @@ let post_of_json json =
     upvotes = next |> member "score" |> to_int;
   }
 
+let post_of_text text : post =
+  {
+    author = "";
+    created_utc = 0.0;
+    subreddit = "";
+    id = "";
+    num_comments = 0;
+    num_crossposts = 0;
+    selftext = text;
+    spoiler = false;
+    title = "";
+    upvotes = 0;
+  }
+
 let from_json json =
   json |> member "data" |> member "children" |> to_list
   |> List.map post_of_json
