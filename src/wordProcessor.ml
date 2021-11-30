@@ -1,5 +1,6 @@
 open Stemmer
 open SuffixMapping
+open Yojson.Basic.Util
 
 (*Making sure this gets copied*)
 type stemmed_word = {
@@ -15,6 +16,8 @@ type text_block = {
   original_text : string;
   stemmed_text : string;
 }
+
+type stopwords = { stop_words : string list }
 
 let rec remove_punc s =
   if String.length s = 0 then s
@@ -112,7 +115,15 @@ let process_sentence (sentence : string) =
   sentence |> String.trim |> parse |> stem_word_list |> extract_stemmed
   |> make_sentence (String.make 1 sentence_delimiter)
 
-let remove_stop_words (words : string list) = [ "" ]
+let stop_words_json : Yojson.Basic.t =
+  Yojson.Basic.from_file "data/stop_words.json"
+
+let stop_words_from_json (stop_words_json : Yojson.Basic.t) : stopwords
+    =
+  { stop_words = stop_words_json |> to_list |> filter_string }
+
+let remove_stop_words words =
+  List.filter (fun x -> x <> stop_words_from_json stop_words_json) words
 
 let make_paragraph (sentences : string list) =
   List.fold_right (fun acc w -> acc ^ " " ^ w) sentences ""
