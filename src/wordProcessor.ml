@@ -118,12 +118,19 @@ let process_sentence (sentence : string) =
 let stop_words_json : Yojson.Basic.t =
   Yojson.Basic.from_file "data/stop_words.json"
 
-let stop_words_from_json (stop_words_json : Yojson.Basic.t) : stopwords
-    =
-  { stop_words = stop_words_json |> to_list |> filter_string }
+let stop_words_from_json (stop_words_json : Yojson.Basic.t) =
+  stop_words_json |> member "stop_words" |> to_list |> filter_string
 
-let remove_stop_words words =
-  List.filter (fun x -> x <> stop_words_from_json stop_words_json) words
+let remove_words = stop_words_from_json stop_words_json
+
+let rec remove_stop_words
+    (remove_words : string list)
+    (words : string list) : string list =
+  match words with
+  | [] -> words
+  | h :: t ->
+      if List.mem h remove_words then t
+      else h :: remove_stop_words remove_words t
 
 let make_paragraph (sentences : string list) =
   List.fold_right (fun acc w -> acc ^ " " ^ w) sentences ""

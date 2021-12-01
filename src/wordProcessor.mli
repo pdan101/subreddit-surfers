@@ -43,7 +43,7 @@ val extract_stemmed : stemmed_word list -> string list
 val process_sentence : string -> string
 (**[processed_sentence sentence] is the stemmed version of sentence*)
 
-val remove_stop_words : string list -> string list
+val remove_stop_words : string list -> string list-> string list
 (**[remove_stop_words words] is words with stop words removed*)
 
 val make_text_block : string -> text_block
