@@ -34,7 +34,7 @@ let rec get_command () =
   print_endline "Stemmer";
   print_endline "Encoder";
   print_endline "Popularity";
-  print_endline "Prediction";
+  print_endline "Text Prediction";
   print_endline "Upvote Prediction";
   print_string "> ";
   match read_line () with
@@ -47,7 +47,8 @@ let rec get_command () =
       Encoder
   | command when command |> String.lowercase_ascii = "popularity" ->
       Popularity
-  | command when command |> String.lowercase_ascii = "prediction" ->
+  | command when command |> String.lowercase_ascii = "text prediction"
+    ->
       Prediction
   | command when command |> String.lowercase_ascii = "upvote prediction"
     ->
@@ -247,6 +248,10 @@ let print_prediction subreddit_name =
     /. 2.
   in
   print_endline
+    ("Your text stemmed: "
+    ^ (input_text |> WordProcessor.stem_paragraph));
+  print_newline ();
+  print_endline
     ("This post would get "
     ^ string_of_int (int_of_float avg_upvotes)
     ^ " upvotes!")
@@ -255,15 +260,17 @@ let print_prediction subreddit_name =
   subreddit.*)
 let run subreddit_name =
   let subreddit = sub subreddit_name in
+  let fixed_sub_name =
+    subreddit |> Intake.recent_post |> Intake.subreddit_name
+    |> String.lowercase_ascii
+  in
   match get_command () with
-  | Frequencies ->
-      print_frequencies (subreddit_name |> String.lowercase_ascii)
+  | Frequencies -> print_frequencies fixed_sub_name
   | Stemmer -> print_stemmer (subreddit |> recent_post)
-  | Encoder -> print_encoder (subreddit_name |> String.lowercase_ascii)
+  | Encoder -> print_encoder fixed_sub_name
   | Popularity -> print_users (subreddit |> posts |> top_users) 0
-  | Prediction ->
-      print_prediction (subreddit_name |> String.lowercase_ascii)
-  | UPrediction -> graph_error (subreddit_name |> String.lowercase_ascii)
+  | Prediction -> print_prediction fixed_sub_name
+  | UPrediction -> graph_error fixed_sub_name
   | NA -> exit 0
 
 (*Runs the initial terminal that allows a subreddit to be selected.*)

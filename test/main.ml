@@ -142,6 +142,15 @@ let stemmer_test
   name >:: fun _ ->
   assert_equal expected_output (stemmer word) ~printer:pp_stemmed_word
 
+let stemmer_paragraph_test
+    (name : string)
+    (sentence : string)
+    (expected_output : string) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (stem_paragraph sentence)
+    ~printer:String.escaped
+
 let process_sentence_test
     (name : string)
     (sentence : string)
@@ -432,7 +441,6 @@ let word_processor_tests =
       "Do not add e is stem is CVC but length greater than 3" "fail"
       "fail"; stemmer_test "Stemming possesses" "possesses" possesses;
     stemmer_test "Stemming agreed -> agree" "agreed" agreed;
-    create_units_test "Just seeing what" "H" "C";
     create_units_test "Creating unit for he CV" "He" "CV";
     process_sentence_test "Sentence with one word to stem"
       "He possesses the gem." "He possess the gem.";
