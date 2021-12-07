@@ -122,28 +122,28 @@ let generate_spaces num =
   !str
 
 let create_column (predicted_vote : float) (actual_vote : float) =
-  let col = "-|-" in
+  let col = " |" in
   if predicted_vote < actual_vote then
     let pred_spaces = generate_spaces (int_of_float predicted_vote) in
-    let col = col ^ pred_spaces ^ "%" in
+    let col = col ^ pred_spaces ^ "⊡" in
     let actual_spaces =
       generate_spaces (int_of_float (actual_vote -. predicted_vote))
     in
     let extra_spaces =
       generate_spaces (int_of_float (50.0 -. actual_vote))
     in
-    let col = col ^ actual_spaces ^ "@" ^ extra_spaces in
+    let col = col ^ actual_spaces ^ "⊙" ^ extra_spaces in
     col
   else
     let actual_spaces = generate_spaces (int_of_float actual_vote) in
-    let col = col ^ actual_spaces ^ "@" in
+    let col = col ^ actual_spaces ^ "⊙" in
     let pred_spaces =
       generate_spaces (int_of_float (predicted_vote -. actual_vote))
     in
     let extra_spaces =
       generate_spaces (int_of_float (50.0 -. predicted_vote))
     in
-    let col = col ^ pred_spaces ^ "%" ^ extra_spaces in
+    let col = col ^ pred_spaces ^ "⊡" ^ extra_spaces in
     col
 
 let graph_results predicted_upvotes (actual_upvotes : float array) =
@@ -157,12 +157,16 @@ let graph_results predicted_upvotes (actual_upvotes : float array) =
   in
   let scaling_factor = 50.0 /. float_of_int max in
   let columns =
-    [ "------------------------------------------------->" ]
+    [ "  ―――――――――――――――――――――――――――――――――――――――――――――――˃" ]
   in
 
   let predicted_upvotes =
     Array.map (fun e -> float_of_int e) predicted_upvotes
   in
+  print_newline ();
+  print_newline ();
+  print_string "     ⊙- Actual Upvotes, ⊡- Predicted Upvotes";
+  print_newline ();
 
   let additional_cols =
     Array.mapi
@@ -176,4 +180,9 @@ let graph_results predicted_upvotes (actual_upvotes : float array) =
     (fun i ->
       print_string i;
       print_newline ())
-    all_columns
+    all_columns;
+  print_string " |";
+  print_newline ();
+  print_string " ˅";
+  print_newline ();
+  print_newline ()
