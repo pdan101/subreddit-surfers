@@ -12,6 +12,7 @@ type command =
   | Encoder
   | Popularity
   | Prediction
+  | UPrediction
   | NA
 
 (*Extracts the Intake.subreddit data structure of a given subreddit
@@ -34,6 +35,7 @@ let rec get_command () =
   print_endline "Encoder";
   print_endline "Popularity";
   print_endline "Prediction";
+  print_endline "Upvote Prediction";
   print_string "> ";
   match read_line () with
   | exception End_of_file -> NA
@@ -47,6 +49,9 @@ let rec get_command () =
       Popularity
   | command when command |> String.lowercase_ascii = "prediction" ->
       Prediction
+  | command when command |> String.lowercase_ascii = "upvote prediction"
+    ->
+      UPrediction
   | _ ->
       print_endline "Did not recognize command. Please try again.\n";
       get_command ()
@@ -164,6 +169,35 @@ let predict_upvotes encoded_arr encoded_subreddit =
   in
   upvotes.(0)
 
+let graph_error subreddit_name =
+  let encoded_subreddit =
+    WordEncoding.encode_subreddit
+      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+      |> Yojson.Basic.from_file)
+      WordProcessor.stem_text
+      (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
+      upvotes
+  in
+
+  let matrix = CustomRegression.create_matrix encoded_subreddit in
+  let train_test_data =
+    CustomRegression.get_training_data matrix 0.75
+  in
+  let actual_upvotes = train_test_data.output_testing in
+
+  let weights =
+    CustomRegression.train_test_model encoded_subreddit 0.75 OLS
+  in
+  let predicted_upvotes =
+    CustomRegression.calc_upvotes actual_upvotes weights
+  in
+
+  let predicted_upvotes =
+    Array.map (fun e -> int_of_float e) predicted_upvotes
+  in
+  CustomRegression.graph_results predicted_upvotes
+    (Mat.to_array actual_upvotes)
+
 (*Retrieves encoding of text and subreddit based on inputted subreddit
   name and text.*)
 let get_both_arrays subreddit_name input_text =
@@ -229,6 +263,7 @@ let run subreddit_name =
   | Popularity -> print_users (subreddit |> posts |> top_users) 0
   | Prediction ->
       print_prediction (subreddit_name |> String.lowercase_ascii)
+  | UPrediction -> graph_error (subreddit_name |> String.lowercase_ascii)
   | NA -> exit 0
 
 (*Runs the initial terminal that allows a subreddit to be selected.*)
