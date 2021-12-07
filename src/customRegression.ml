@@ -62,7 +62,7 @@ let calc_upvotes features_test weights =
     Array.map
       (fun encoded_post ->
         Array.mapi
-          (fun index word -> word *. weights.(index))
+          (fun index word -> word *. (weights.(index) *. 500.))
           encoded_post)
       posts
   in
