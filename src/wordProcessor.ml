@@ -11,11 +11,6 @@ type stemmed_word = {
 
 type vocabulary = stemmed_word list
 
-type text_block = {
-  original_text : string;
-  stemmed_text : string;
-}
-
 let rec remove_punc s =
   if String.length s = 0 then s
   else
@@ -121,11 +116,6 @@ let stem_paragraph (paragraph : string) =
   paragraph |> parse_sentence
   |> List.map process_sentence
   |> make_paragraph
-
-let make_text_block (text : string) =
-  { original_text = text; stemmed_text = stem_paragraph text }
-
-let stemmed_text_block block = block.stemmed_text
 
 let stem_text (text : string) : string list =
   text |> parse

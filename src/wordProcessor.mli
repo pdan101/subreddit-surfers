@@ -11,11 +11,6 @@ type stemmed_word = {
 type vocabulary
 (**the abstract type containing all the words seen so far*)
 
-type text_block = {
-  original_text : string;
-  stemmed_text : string;
-}
-
 val parse : string -> string list
 (**[parse text] is the list of words contained in text excluding
    trailing whitespace and punctuation, but including the punctuation of
@@ -45,12 +40,6 @@ val process_sentence : string -> string
 
 val remove_stop_words : string list -> string list
 (**[remove_stop_words words] is words with stop words removed*)
-
-val make_text_block : string -> text_block
-(**[make_text_block text] is the text_block of text*)
-
-val stemmed_text_block : text_block -> string
-(**[stemmed_text_block] is the stemmed text of text_block*)
 
 val replace_suffix : string -> string
 (**[replace_suffix word] is the adjusted [word] after checking and

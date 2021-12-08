@@ -40,7 +40,7 @@ let subreddit_json_to_word_json
     filename : unit =
   let words = processor_function subreddit_json in
   let filepath =
-    "data/subredditVocabJsons/"
+    "data" ^ Filename.dir_sep ^ "subredditVocabJsons" ^ Filename.dir_sep
     ^ (filename |> String.lowercase_ascii)
     ^ ".json"
   in

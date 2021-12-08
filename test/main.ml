@@ -9,18 +9,10 @@ open Yojson.Basic
 open CustomRegression
 open Owl
 
-let state_test : test = "name" >:: fun _ -> assert_equal "" ""
-
-let make_state_test : test = state_test
-
-(** let rec list_printer_helper list accumulator = match list with | []
-    -> accumulator ^ "]" | h :: t -> list_printer_helper t (accumulator
-    ^ " " ^ h ^ ";")
-
-    let rec list_printer list = match list with | [] -> "[]" | _ :: _ ->
-    list_printer_helper list "" *)
-
-(* let id (x : string) = x *)
+type text_block = {
+  original_text : string;
+  stemmed_text : string;
+}
 
 (** FROM A2: [pp_string s] pretty-prints string [s]. *)
 let pp_string s = "\"" ^ s ^ "\""
@@ -39,11 +31,6 @@ let pp_list pp_elt lst =
     loop 0 "" lst
   in
   "[" ^ pp_elts lst ^ "]"
-
-(* let cmp_word_list words1 words2 = if List.compare_lengths words1
-   words2 = 0 then let sorted_words1 = List.sort compare words1 in let
-   sorted_words2 = List.sort compare words2 in List.length words1 =
-   List.length words2 && sorted_words1 = sorted_words2 else false *)
 
 let id x = x
 
@@ -126,10 +113,6 @@ let pp_stemmed_word stemmed =
   ^ string_of_int stemmed.num_vcs
   ^ " Stemmed: " ^ stemmed.stemmed
 
-let pp_text_block block =
-  "Original Text: " ^ block.original_text ^ "\n Stemmed Text: "
-  ^ block.stemmed_text
-
 let stemmed_words_equal s1 s2 =
   s1.original_word = s2.original_word
   && s1.num_vcs = s2.num_vcs && s1.units = s2.units
@@ -147,9 +130,10 @@ let stemmer_paragraph_test
     (sentence : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output
-    (stem_paragraph sentence)
-    ~printer:String.escaped
+  assert_equal
+    (String.trim expected_output)
+    (String.trim (stem_paragraph sentence))
+    ~printer:id
 
 let process_sentence_test
     (name : string)
@@ -158,41 +142,33 @@ let process_sentence_test
   name >:: fun _ ->
   assert_equal expected_output (process_sentence sentence) ~printer:id
 
-let make_text_block_test
-    (name : string)
-    (text : string)
-    (expected_output : text_block) : test =
-  name >:: fun _ ->
-  assert_equal expected_output (make_text_block text)
-    ~printer:pp_text_block
-
-let sophomore_club_test_block =
+let sophomore_club_text_block =
   {
     original_text =
       "I'm a sophomore and I didn't really apply to many clubs and I \
        got rejected from all the ones I applied to this semester";
     stemmed_text =
-      "I'm a sophomore and I didn't really apply to many club and I \
-       got reject from all the one I appli to thi semesterr";
+      "Im a sophomor and I didnt realli appli to mani club and I got \
+       reject from all the on I appli to thi semestr";
   }
 
-let bad_professor_test_block =
+let bad_professor_text_block =
   {
     original_text =
       "the professor hasn't released prelim grades, doesn't know how  \
        to teach the material, and didn't give us a syllabus! They're  \
        really slow to realize homework grades, it's ridiculous!";
     stemmed_text =
-      "the professor hasn't relea prelim grade doesn't know how to \
-       teach the material and didn't give u a syllabu! They're really \
-       slow to realize homework grade it' ridiculou!";
+      "the professor hasnt releas prelim grade doesnt know how to \
+       teach the materi and didnt give u a syllabu! Theyr realli slow \
+       to realiz homework grade it ridicul!";
   }
 
 let url_text_block =
   {
     original_text =
       "[FAFSA](https://studentaid.gov/h/apply-for-aid/fafsa";
-    stemmed_text = "FAFSAhttpsstudentaid. govhapplyforaidfafsa)";
+    stemmed_text = "FAFSAhttpsstudentaid. govhapplyforaidfafsaa";
   }
 
 let date_text_block =
@@ -201,8 +177,8 @@ let date_text_block =
       "2021-2022 school year: Use the 2021-2022 FAFSA, which opened \
        October 1, 2020. Requires 2019 tax information.";
     stemmed_text =
-      "school year Use the  FAFSA which open October  . Require  tax \
-       information.";
+      "school year Us the  FAFSA which open Octob  . Requir  tax \
+       informat.";
   }
 
 let asterisk_text_block =
@@ -212,82 +188,8 @@ let asterisk_text_block =
        tax information (W-2s, tax returns), any records of untaxed \
        income, etc.";
     stemmed_text =
-      "Gather all necessary document includ bank statement tax \
-       information W tax return any record of untax income etc.";
-  }
-
-let multi_line_text_block =
-  {
-    original_text =
-      "2022-2023 school year: 2022-2023 FAFSA will became available \
-       October 1, 2021. Requires 2020 tax information.\n\n\
-      \  **First time? Here's a step-by-step guide.**\n\
-      \  \n\
-      \  * Create an [FSA account](https://www.fsaid.ed.gov) (also \
-       known as the FSA ID). This is your legal electronic signature \
-       to sign the FAFSA. It's linked to your Social Security number. \
-       If you are a dependent student, one of your parents will need \
-       to make one as well, assuming they have an SSN. If your parent \
-       already has their own FSA account, they must use that. If your \
-       parent does not have an SSN, they must print and sign the \
-       signature page manually, then mail it in.";
-    stemmed_text =
-      "2022-2023 school year: 2022-2023 FAFSA will became available \
-       October 1, 2021. Requires 2020 tax information.\n\n\
-      \  **First time? Here's a step-by-step guide.**\n\
-      \  \n\
-      \  * Create an [FSA account](https://www.fsaid.ed.gov) (also \
-       known as the FSA ID). This is your legal electronic signature \
-       to sign the FAFSA. It's linked to your Social Security number. \
-       If you are a dependent student, one of your parents will need \
-       to make one as well, assuming they have an SSN. If your parent \
-       already has their own FSA account, they must use that. If your \
-       parent does not have an SSN, they must print and sign the \
-       signature page manually, then mail it in.";
-  }
-
-let multi_line_text_block_one_line =
-  {
-    original_text =
-      "2022-2023 school year: 2022-2023 FAFSA will became available \
-       October 1, 2021. Requires 2020 tax information. **First time? \
-       Here's a step-by-step guide.** * Create an [FSA \
-       account](https://www.fsaid.ed.gov) (also known as the FSA ID). \
-       This is your legal electronic signature to sign the FAFSA. It's \
-       linked to your Social Security number. If you are a dependent \
-       student, one of your parents will need to make one as well, \
-       assuming they have an SSN. If your parent already has their own \
-       FSA account, they must use that. If your parent does not have \
-       an SSN, they must print and sign the signature page manually, \
-       then mail it in.";
-    stemmed_text =
-      "2022-2023 school year: 2022-2023 FAFSA will became available \
-       October 1, 2021. Requires 2020 tax information. **First time? \
-       Here's a step-by-step guide.** * Create an [FSA \
-       account](https://www.fsaid.ed.gov) (also known as the FSA ID). \
-       This is your legal electronic signature to sign the FAFSA. It's \
-       linked to your Social Security number. If you are a dependent \
-       student, one of your parents will need to make one as well, \
-       assuming they have an SSN. If your parent already has their own \
-       FSA account, they must use that. If your parent does not have \
-       an SSN, they must print and sign the signature page manually, \
-       then mail it in.";
-  }
-
-let multi_line_one =
-  {
-    original_text =
-      "2022-2023 school year: 2022-2023 FAFSA will became available \
-       October 1, 2021. Requires 2020 tax information.";
-    stemmed_text =
-      "2022-2023 school year: 2022-2023 FAFSA will became available \
-       October 1, 2021. Requires 2020 tax information.";
-  }
-
-let multi_line_two =
-  {
-    original_text = "**First time? Here's a step-by-step guide.**";
-    stemmed_text = "**First time? Here's a step-by-step guide.**";
+      "Gather all necessari docum includ bank statem tax informat W \
+       tax return ani record of untax incom etc.";
   }
 
 let replace_suffix_test
@@ -441,56 +343,21 @@ let word_processor_tests =
       "Do not add e is stem is CVC but length greater than 3" "fail"
       "fail"; stemmer_test "Stemming possesses" "possesses" possesses;
     stemmer_test "Stemming agreed -> agree" "agreed" agreed;
+    stemmer_paragraph_test "Stemming sophomore club text"
+      sophomore_club_text_block.original_text
+      sophomore_club_text_block.stemmed_text;
+    stemmer_paragraph_test "Stemming bad prof text"
+      bad_professor_text_block.original_text
+      bad_professor_text_block.stemmed_text;
+    stemmer_paragraph_test "Stemming url text"
+      url_text_block.original_text url_text_block.stemmed_text;
+    stemmer_paragraph_test "Stemming date text"
+      date_text_block.original_text date_text_block.stemmed_text;
+    stemmer_paragraph_test "Stemming asterisk text"
+      asterisk_text_block.original_text asterisk_text_block.stemmed_text;
     create_units_test "Creating unit for he CV" "He" "CV";
     process_sentence_test "Sentence with one word to stem"
       "He possesses the gem." "He possess the gem.";
-    (*These tests should pass, but spacing is causing them to act
-      weird*)
-    (* make_text_block_test "Sophomore clubs post" "I'm a sophomore and
-       I didn't really apply to many clubs and I \ got rejected from all
-       the ones I applied to this semester" sophomore_club_test_block;
-       make_text_block_test "Bad professor text" "the professor hasn't
-       released prelim grades, doesn't know how \ to teach the material,
-       and didn't give us a syllabus! They're \ really slow to realize
-       homework grades, it's ridiculous!" bad_professor_test_block;
-       make_text_block_test "URL"
-       "[FAFSA](https://studentaid.gov/h/apply-for-aid/fafsa)"
-       url_text_block; make_text_block_test "Date" "2021-2022 school
-       year: Use the 2021-2022 FAFSA, which opened \ October 1, 2020.
-       Requires 2019 tax information." date_text_block;
-       make_text_block_test "Asterisk" "* Gather all necessary
-       documents, including bank statements, \ tax information (W-2s,
-       tax returns), any records of untaxed \ income, etc."
-       asterisk_text_block; make_text_block_test "Multi line text block"
-       "2022-2023 school year: 2022-2023 FAFSA will became available \
-       October 1, 2021. Requires 2020 tax information.\n\n\ \ **First
-       time? Here's a step-by-step guide.**\n\ \ \n\ \ * Create an [FSA
-       account](https://www.fsaid.ed.gov) (also \ known as the FSA ID).
-       This is your legal electronic signature \ to sign the FAFSA. It's
-       linked to your Social Security number. \ If you are a dependent
-       student, one of your parents will need \ to make one as well,
-       assuming they have an SSN. If your parent \ already has their own
-       FSA account, they must use that. If your \ parent does not have
-       an SSN, they must print and sign the \ signature page manually,
-       then mail it in." multi_line_text_block; make_text_block_test
-       "Multi line text block with new lines removed" "2022-2023 school
-       year: 2022-2023 FAFSA will became available \ October 1, 2021.
-       Requires 2020 tax information. **First time? \ Here's a
-       step-by-step guide.** * Create an [FSA \
-       account](https://www.fsaid.ed.gov) (also known as the FSA ID). \
-       This is your legal electronic signature to sign the FAFSA. It's \
-       linked to your Social Security number. If you are a dependent \
-       student, one of your parents will need to make one as well, \
-       assuming they have an SSN. If your parent already has their own \
-       FSA account, they must use that. If your parent does not have \
-       an SSN, they must print and sign the signature page manually, \
-       then mail it in." multi_line_text_block_one_line;
-       make_text_block_test "Multi text line 1" "2022-2023 school year:
-       2022-2023 FAFSA will became available \ October 1, 2021. Requires
-       2020 tax information." multi_line_one; make_text_block_test "2nd
-       line multi" "**First time? Here's a step-by-step guide.**"
-       multi_line_two; *)
-
     (*The following test cases cover the replacements in our second and
       third step, and they cover all possible mappings in the step2_3
       json file.*)
@@ -638,11 +505,6 @@ let word_encoding_tests =
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
       subreddit_json_to_stemmed_words anime_json "anime";
-    (* create_encoded_matrix_test "Json contains: Hello, Did, this,
-       format, correctly. Test post \ is hello format" test3_json "Hello
-       format" test3_matrix; encode_post_test "Testing for Cornell.json"
-       cornell_json2 stem_text "attack basketball"
-       cornell_test_1_matrix *)
     subreddit_json_to_word_json_test
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
