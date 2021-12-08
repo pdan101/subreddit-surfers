@@ -38,8 +38,9 @@ val extract_stemmed : stemmed_word list -> string list
 val process_sentence : string -> string
 (**[processed_sentence sentence] is the stemmed version of sentence*)
 
-val remove_stop_words : string list -> string list
-(**[remove_stop_words words] is words with stop words removed*)
+val is_stopword : string -> bool
+(**[is_stopword word] is true if the [word] is a stopword based on
+   NLTK's stopword list*)
 
 val replace_suffix : string -> string
 (**[replace_suffix word] is the adjusted [word] after checking and

@@ -11,6 +11,18 @@ type stemmed_word = {
 
 type vocabulary = stemmed_word list
 
+module MySet = Set.Make (String)
+
+let stopword_set =
+  Yojson.Basic.from_file ("src" ^ Filename.dir_sep ^ "stopwords.json")
+  |> Yojson.Basic.Util.member "stopwords"
+  |> Yojson.Basic.Util.to_list
+  |> List.map (fun x -> Yojson.Basic.Util.to_string x)
+  |> MySet.of_list
+
+let rec is_stopword word =
+  MySet.mem (String.lowercase_ascii word) stopword_set
+
 let rec remove_punc s =
   if String.length s = 0 then s
   else
@@ -29,6 +41,7 @@ let parse (text : string) =
   |> List.filter (fun x -> String.length x > 0)
   |> List.map (fun x -> String.trim x)
   |> List.map (fun x -> remove_punc x)
+  |> List.filter (fun x -> is_stopword x = false)
 
 let replace_suffix word =
   let complete23, len23 =
@@ -85,6 +98,7 @@ let parse_sentence (text : string) =
   match
     try
       split_sentence_list (Str.full_split (Str.regexp "[.!?]") text)
+      |> List.filter (fun x -> is_stopword x = false)
     with
     | Unsupported_sentence_format -> [ text ]
   with
@@ -106,8 +120,6 @@ let process_sentence (sentence : string) =
   let sentence_delimiter = sentence.[String.length sentence - 1] in
   sentence |> String.trim |> parse |> stem_word_list |> extract_stemmed
   |> make_sentence (String.make 1 sentence_delimiter)
-
-let remove_stop_words (words : string list) = [ "" ]
 
 let make_paragraph (sentences : string list) =
   List.fold_right (fun acc w -> acc ^ " " ^ w) sentences ""

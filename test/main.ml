@@ -148,8 +148,8 @@ let sophomore_club_text_block =
       "I'm a sophomore and I didn't really apply to many clubs and I \
        got rejected from all the ones I applied to this semester";
     stemmed_text =
-      "Im a sophomor and I didnt realli appli to mani club and I got \
-       reject from all the on I appli to thi semestr";
+      "Im sophomor didnt realli appli mani club got reject on appli \
+       semestr";
   }
 
 let bad_professor_text_block =
@@ -159,9 +159,9 @@ let bad_professor_text_block =
        to teach the material, and didn't give us a syllabus! They're  \
        really slow to realize homework grades, it's ridiculous!";
     stemmed_text =
-      "the professor hasnt releas prelim grade doesnt know how to \
-       teach the materi and didnt give u a syllabu! Theyr realli slow \
-       to realiz homework grade it ridicul!";
+      "professor hasnt releas prelim grade doesnt know teach materi \
+       didnt give u syllabu! Theyr realli slow realiz homework grade \
+       ridicul!";
   }
 
 let url_text_block =
@@ -177,8 +177,7 @@ let date_text_block =
       "2021-2022 school year: Use the 2021-2022 FAFSA, which opened \
        October 1, 2020. Requires 2019 tax information.";
     stemmed_text =
-      "school year Us the  FAFSA which open Octob  . Requir  tax \
-       informat.";
+      "school year Us  FAFSA open Octob  . Requir  tax informat.";
   }
 
 let asterisk_text_block =
@@ -188,8 +187,8 @@ let asterisk_text_block =
        tax information (W-2s, tax returns), any records of untaxed \
        income, etc.";
     stemmed_text =
-      "Gather all necessari docum includ bank statem tax informat W \
-       tax return ani record of untax incom etc.";
+      "Gather necessari docum includ bank statem tax informat W tax \
+       return record untax incom etc.";
   }
 
 let replace_suffix_test
@@ -214,15 +213,21 @@ let remove_e_test
   name >:: fun _ ->
   assert_equal expected_output (remove_e word) ~printer:String.escaped
 
+let stopword_test
+    (name : string)
+    (word : string)
+    (expected_output : bool) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (WordProcessor.is_stopword word)
+    ~printer:string_of_bool
+
 let word_processor_tests =
   [
     parse_test "Empty string" parse "" [];
     parse_test "Parsing text\n       with no punctuation" parse
       "And just like that a copy pasta was\n       born"
-      [
-        "And"; "just"; "like"; "that"; "a"; "copy"; "pasta"; "was";
-        "born";
-      ];
+      [ "like"; "copy"; "pasta"; "born" ];
     parse_test
       "Parsing text with conjunctions but\n\
       \       no sentence punctuation" parse
@@ -231,9 +236,8 @@ let word_processor_tests =
       \  got rejected from all the\n\
       \       ones I applied to this semester"
       [
-        "Im"; "a"; "sophomore"; "and"; "I"; "didnt"; "really"; "apply";
-        "to"; "many"; "clubs"; "and"; "I"; "got"; "rejected"; "from";
-        "all"; "the"; "ones"; "I"; "applied"; "to"; "this"; "semester";
+        "Im"; "sophomore"; "didnt"; "really"; "apply"; "many"; "clubs";
+        "got"; "rejected"; "ones"; "applied"; "semester";
       ];
     parse_test "Parsing text\n       on multiple lines" parse
       "They should really be more clear on the\n\
@@ -242,10 +246,8 @@ let word_processor_tests =
       \       locally on your  machine. Send\n\
       \  help"
       [
-        "They"; "should"; "really"; "be"; "more"; "clear"; "on"; "the";
-        "fact"; "that"; "the"; "deploy"; "button"; "means"; "to";
-        "production"; "not"; "to"; "locally"; "on"; "your"; "machine";
-        "Send"; "help";
+        "really"; "clear"; "fact"; "deploy"; "button"; "means";
+        "production"; "locally"; "machine"; "Send"; "help";
       ];
     parse_test
       "Parsing text with punctuation, doesn't remove\n\
@@ -255,9 +257,8 @@ let word_processor_tests =
        get\n\
       \       canvas back?"
       [
-        "So"; "like"; "I"; "missed"; "my"; "test"; "and"; "Im"; "about";
-        "to"; "get"; "tested"; "rn"; "How"; "long"; "till"; "I"; "get";
-        "canvas"; "back";
+        "like"; "missed"; "test"; "Im"; "get"; "tested"; "rn"; "long";
+        "till"; "get"; "canvas"; "back";
       ];
     parse_test "Don't\n       conjunction and punctuation" parse
       "And he has spent a long time\n\
@@ -267,12 +268,10 @@ let word_processor_tests =
       \       the point of\n\
       \  his fave."
       [
-        "And"; "he"; "has"; "spent"; "a"; "long"; "time"; "constantly";
-        "targeting"; "me"; "in"; "these"; "implicit"; "ways"; "by";
-        "either"; "pretending"; "I"; "dont"; "contribute"; "quickly";
-        "moving"; "on"; "without"; "an"; "acknowledgement"; "or";
-        "emphasizing"; "how"; "I"; "should"; "have"; "followed"; "the";
-        "point"; "of"; "his"; "fave";
+        "spent"; "long"; "time"; "constantly"; "targeting"; "implicit";
+        "ways"; "either"; "pretending"; "dont"; "contribute"; "quickly";
+        "moving"; "without"; "acknowledgement"; "emphasizing";
+        "followed"; "point"; "fave";
       ];
     parse_test "Manyconjunctions and types of punctuation" parse
       "the\n\
@@ -282,10 +281,9 @@ let word_processor_tests =
       \       really\n\
       \  slow to realize homework grades, it's ridiculous! "
       [
-        "the"; "professor"; "hasnt"; "released"; "prelim"; "grades";
-        "doesnt"; "know"; "how"; "to"; "teach"; "the"; "material";
-        "and"; "didnt"; "give"; "us"; "a"; "syllabus"; "Theyre";
-        "really"; "slow"; "to"; "realize"; "homework"; "grades"; "its";
+        "professor"; "hasnt"; "released"; "prelim"; "grades"; "doesnt";
+        "know"; "teach"; "material"; "didnt"; "give"; "us"; "syllabus";
+        "Theyre"; "really"; "slow"; "realize"; "homework"; "grades";
         "ridiculous";
       ];
     (*Parse does not work with right apostrophe parse_test "Round right
@@ -342,6 +340,9 @@ let word_processor_tests =
     finalize_plurals_past_participles_test
       "Do not add e is stem is CVC but length greater than 3" "fail"
       "fail"; stemmer_test "Stemming possesses" "possesses" possesses;
+    stopword_test "Check if 'a' stopword" "a" true;
+    stopword_test "Check if 'to' stopword" "to" true;
+    stopword_test "Check if 'hello' stopword" "hello" false;
     stemmer_test "Stemming agreed -> agree" "agreed" agreed;
     stemmer_paragraph_test "Stemming sophomore club text"
       sophomore_club_text_block.original_text
@@ -357,7 +358,7 @@ let word_processor_tests =
       asterisk_text_block.original_text asterisk_text_block.stemmed_text;
     create_units_test "Creating unit for he CV" "He" "CV";
     process_sentence_test "Sentence with one word to stem"
-      "He possesses the gem." "He possess the gem.";
+      "He possesses the gem." "possess gem.";
     (*The following test cases cover the replacements in our second and
       third step, and they cover all possible mappings in the step2_3
       json file.*)
@@ -725,7 +726,7 @@ let regression_tests =
   [
     create_get_training_data_test "check number of columns"
       cornell_matrix 0.75
-      [ (21, 570); (7, 570); (21, 1); (7, 1) ];
+      [ (21, 483); (7, 483); (21, 1); (7, 1) ];
   ]
 
 let suite =
