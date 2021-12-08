@@ -137,3 +137,4 @@ let find_frequencies
     done
   done;
   List.sort compare_keys !frequency_map
+  |> List.filter (fun x -> fst x <> "")
