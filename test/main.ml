@@ -428,7 +428,119 @@ let word_processor_tests =
       "ceas";
   ]
 
-let intake_tests = []
+let convert_path_to_json (file_path : string) = file_path |> from_file
+
+let cornell_json = convert_path_to_json "data/cornell.json"
+
+let cornell_sub_post =
+  Intake.from_json cornell_json |> Intake.recent_post
+
+let cornell_json2 =
+  convert_path_to_json "data/subredditVocabJsons/cornell.json"
+
+let college_json = convert_path_to_json "data/college.json"
+
+let anime_json = convert_path_to_json "data/anime.json"
+
+let anime_sub_post = Intake.from_json anime_json |> Intake.recent_post
+
+let author_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output (Intake.author input)
+    ~printer:String.escaped
+
+let created_utc_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (Intake.created_utc input)
+    ~printer:string_of_float
+
+let id_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output (Intake.id input) ~printer:String.escaped
+
+let num_comments_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (Intake.num_comments input)
+    ~printer:string_of_int
+
+let num_crossposts_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (Intake.num_crossposts input)
+    ~printer:string_of_int
+
+let selftext_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output (Intake.selftext input)
+    ~printer:String.escaped
+
+let spoiler_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output (Intake.spoiler input)
+    ~printer:string_of_bool
+
+let upvotes_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output (Intake.upvotes input)
+    ~printer:string_of_int
+
+let subreddit_name_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (Intake.subreddit_name input)
+    ~printer:String.escaped
+
+let title_test name input expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output (Intake.title input)
+    ~printer:String.escaped
+
+let intake_tests =
+  [
+    author_test "Author of recent is ..." cornell_sub_post "pw11111";
+    author_test "Author of recent is ..." anime_sub_post "mpp00";
+    created_utc_test "Created utc of recent is ..." cornell_sub_post
+      1618803237.;
+    created_utc_test "Created utc of recent is ..." anime_sub_post
+      1633726977.;
+    id_test "ID of recent is ..." cornell_sub_post "mts7re";
+    id_test "ID of recent is ..." anime_sub_post "q46s7i";
+    num_comments_test "Num comments of recent is ..." cornell_sub_post
+      806;
+    num_comments_test "Num comments of recent is ..." anime_sub_post 93;
+    num_crossposts_test "Num crossposts of recent is ..."
+      cornell_sub_post 0;
+    num_crossposts_test "Num crossposts of recent is ..." anime_sub_post
+      0;
+    selftext_test "Selftext of recent is ..." cornell_sub_post
+      "Please place all admissions related posts here, in the form of \
+       comments, and current Cornell students will reply. Try to be \
+       detailed; if we don't have enough information, we can't help. \
+       Also, if you are a prospective student, and have questions \
+       about life at Cornell, feel free to post them here! \n\n\
+       Any \"Chance Me\" or admissions related posts placed elsewhere \
+       will be removed. If you are a current student, and think that \
+       you could offer advice to someone considering Cornell, feel \
+       free to respond to some of the posts! Please only respond if \
+       you are qualified to do so. We will be checking through these \
+       regularly for spam.";
+    (*The text for this post is too long, so we aren't including it.
+      selftext_test "Selftext of recent is ..." anime_sub_post "";*)
+    spoiler_test "Spoiler of recent is ..." cornell_sub_post false;
+    spoiler_test "Spoiler of recent is ..." anime_sub_post false;
+    upvotes_test "Upvotes of recent is ..." cornell_sub_post 99;
+    upvotes_test "Upvotes of recent is ..." anime_sub_post 293;
+    subreddit_name_test "Subreddit name of recent is ..."
+      cornell_sub_post "Cornell";
+    subreddit_name_test "Subreddit name of recent is ..." anime_sub_post
+      "anime";
+    title_test "Title of recent is ..." cornell_sub_post
+      "Chance Me! and Prospective Student Q&amp;A";
+    title_test "Title of recent is ..." anime_sub_post
+      "The 2021 r/anime Awards Announcement and Jury Application";
+  ]
 
 let write_words_to_json_test
     (name : string)
@@ -438,17 +550,6 @@ let write_words_to_json_test
   let file = open_out ("data/subredditVocabJsons/" ^ filename) in
   name >:: fun _ ->
   assert_equal expected_output (write_words_to_json file words)
-
-let convert_path_to_json (file_path : string) = file_path |> from_file
-
-let cornell_json = convert_path_to_json "data/cornell.json"
-
-let cornell_json2 =
-  convert_path_to_json "data/subredditVocabJsons/cornell.json"
-
-let college_json = convert_path_to_json "data/college.json"
-
-let anime_json = convert_path_to_json "data/anime.json"
 
 let subreddit_json_to_word_json_test
     (name : string)
