@@ -19,7 +19,8 @@ type command =
   name, retries in command line if the file is not found.*)
 let rec sub subreddit_name =
   try
-    Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json")
+    Yojson.Basic.from_file
+      ("data" ^ Filename.dir_sep ^ subreddit_name ^ ".json")
     |> from_json
   with
   | Sys_error _ ->
@@ -59,7 +60,7 @@ let rec get_command () =
 
 (*Current representation of 1 instance of a word in a subreddit for the
   text based graphic.*)
-let big_string = "---"
+let occurence_string = "---"
 
 (*Extracts the top 5 words appearing in a subreddit.*)
 let rec extract_top5 lst count =
@@ -70,7 +71,7 @@ let rec extract_top5 lst count =
     | (k, v) :: t ->
         print_string (k ^ " (" ^ string_of_int v ^ ")" ^ ": ");
         for i = 1 to v do
-          print_string big_string
+          print_string occurence_string
         done;
         print_newline ();
         extract_top5 t (count + 1)
@@ -107,27 +108,31 @@ let rec top_users post_list =
 let print_frequencies subreddit_name =
   let json =
     Yojson.Basic.from_file
-      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json")
+      ("data" ^ Filename.dir_sep ^ "subredditVocabJsons"
+     ^ Filename.dir_sep ^ subreddit_name ^ ".json")
   in
   let encoded_matrix =
     encode_subreddit
-      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+      ("data" ^ Filename.dir_sep ^ "subredditVocabJsons"
+       ^ Filename.dir_sep ^ subreddit_name ^ ".json"
       |> Yojson.Basic.from_file)
       stem_text
-      (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
+      (Yojson.Basic.from_file
+         ("data" ^ Filename.dir_sep ^ subreddit_name ^ ".json"))
       upvotes
   in
   let frequency_list =
     find_frequencies json (Array.of_list encoded_matrix)
   in
-  print_endline ("Finding the most frequent words r/" ^ subreddit_name);
+  print_endline
+    ("Finding the most frequent words r" ^ Filename.dir_sep
+   ^ subreddit_name);
   extract_top5 frequency_list 0
 
 (*Prints the stemmed text of the most recent post in a subreddit.*)
 let print_stemmer post =
   let original_text = post |> selftext in
-  let text_block = original_text |> WordProcessor.make_text_block in
-  let stemmed_text = text_block |> WordProcessor.stemmed_text_block in
+  let stemmed_text = original_text |> WordProcessor.stem_paragraph in
   print_endline
     ("Stemming the text of most recent post from r/"
     ^ (post |> subreddit_name)
@@ -140,10 +145,12 @@ let print_stemmer post =
 let print_encoder subreddit_name =
   let encoded_matrix =
     encode_subreddit
-      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+      ("data" ^ Filename.dir_sep ^ "subredditVocabJsons"
+       ^ Filename.dir_sep ^ subreddit_name ^ ".json"
       |> Yojson.Basic.from_file)
       WordProcessor.stem_text
-      ("data/" ^ subreddit_name ^ ".json" |> Yojson.Basic.from_file)
+      ("data" ^ Filename.dir_sep ^ subreddit_name ^ ".json"
+      |> Yojson.Basic.from_file)
       upvotes
   in
   print_endline
@@ -173,10 +180,12 @@ let predict_upvotes encoded_arr encoded_subreddit =
 let graph_error subreddit_name =
   let encoded_subreddit =
     WordEncoding.encode_subreddit
-      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+      ("data" ^ Filename.dir_sep ^ "subredditVocabJsons"
+       ^ Filename.dir_sep ^ subreddit_name ^ ".json"
       |> Yojson.Basic.from_file)
       WordProcessor.stem_text
-      (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
+      (Yojson.Basic.from_file
+         ("data" ^ Filename.dir_sep ^ subreddit_name ^ ".json"))
       upvotes
   in
 
@@ -206,7 +215,8 @@ let get_both_arrays subreddit_name input_text =
     Intake.post_of_text (input_text |> WordProcessor.stem_paragraph)
   in
   let vocab_json =
-    "data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+    "data" ^ Filename.dir_sep ^ "subredditVocabJsons" ^ Filename.dir_sep
+    ^ subreddit_name ^ ".json"
     |> Yojson.Basic.from_file
   in
   let encode_temp =
@@ -218,10 +228,12 @@ let get_both_arrays subreddit_name input_text =
   in
   let encoded_subreddit =
     WordEncoding.encode_subreddit
-      ("data/subredditVocabJsons/" ^ subreddit_name ^ ".json"
+      ("data" ^ Filename.dir_sep ^ "subredditVocabJsons"
+       ^ Filename.dir_sep ^ subreddit_name ^ ".json"
       |> Yojson.Basic.from_file)
       WordProcessor.stem_text
-      (Yojson.Basic.from_file ("data/" ^ subreddit_name ^ ".json"))
+      (Yojson.Basic.from_file
+         ("data" ^ Filename.dir_sep ^ subreddit_name ^ ".json"))
       upvotes
   in
   (encoded_arr, encoded_subreddit)
