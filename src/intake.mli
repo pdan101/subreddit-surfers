@@ -3,8 +3,19 @@
     converts it into more usable types, which can be used in function
     applications. *)
 
-type post
-(** The abstract type of values representing a specific reddit post. *)
+type post = {
+  author : string;
+  created_utc : float;
+  subreddit : string;
+  id : string;
+  num_comments : int;
+  num_crossposts : int;
+  selftext : string;
+  spoiler : bool;
+  title : string;
+  upvotes : int;
+}
+(** The type of values representing a specific reddit post. *)
 
 type subreddit
 (** The abstract type of values representing a specific subreddit.*)
