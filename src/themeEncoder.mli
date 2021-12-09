@@ -21,3 +21,13 @@ val theme_breakdown_of_subreddit :
    array of floats where each index corresponds to a theme and the
    values at each index are the percentages of the corresponding theme
    in the subreddit*)
+
+val num_theme_words_of_post : Intake.post -> Yojson.Basic.t -> int
+(**[num_theme_words_of_post post theme_json] is the number of words in
+   post that correspond to a word in theme_json*)
+
+val theme_table_of_post :
+  Intake.post -> string array -> string -> (string, int) Hashtbl.t
+(**[theme_table_of_post post themes theme_dir] is the Hashtbl where the
+   keys are themes and the values are the number of words corresponding
+   to that theme in post*)
