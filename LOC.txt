@@ -1,0 +1,18 @@
+Things to exclude from our lines of code:
+demo.ml
+  N/A 
+customRegression.ml 
+  N/A 
+intake.ml 
+  post_of_text function, it's just for creating dummy posts in other places (~10 lines)
+stemmer.ml
+  N/A 
+suffixMapping.ml 
+  N/A 
+wordEncoding.ml 
+  N/A 
+wordProcessor.ml 
+  N/A 
+test.ml
+  pp_string and pp_list, they're from A2 (~15 lines)
+  word_encoding_tests, this was just used for us to generate jsons of vocabulary (~50 lines)

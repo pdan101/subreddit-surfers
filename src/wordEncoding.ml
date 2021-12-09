@@ -40,7 +40,7 @@ let subreddit_json_to_word_json
     filename : unit =
   let words = processor_function subreddit_json in
   let filepath =
-    "data/subredditVocabJsons/"
+    "data" ^ Filename.dir_sep ^ "subredditVocabJsons" ^ Filename.dir_sep
     ^ (filename |> String.lowercase_ascii)
     ^ ".json"
   in
@@ -137,3 +137,4 @@ let find_frequencies
     done
   done;
   List.sort compare_keys !frequency_map
+  |> List.filter (fun x -> fst x <> "")

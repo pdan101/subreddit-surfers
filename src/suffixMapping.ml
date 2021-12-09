@@ -1,8 +1,10 @@
 open Stemmer
 
-let step2_3data = Yojson.Basic.from_file "src/step2_3.json"
+let step2_3data =
+  Yojson.Basic.from_file ("src/" ^ Filename.dir_sep ^ "step2_3.json")
 
-let step4data = Yojson.Basic.from_file "src/step4.json"
+let step4data =
+  Yojson.Basic.from_file ("src" ^ Filename.dir_sep ^ "step4.json")
 
 let json_to_assoc_list data =
   data |> Yojson.Basic.Util.to_assoc
@@ -19,13 +21,10 @@ let rec add_pairs_to_table table (lst : (string * string) list) =
       Hashtbl.add table x y;
       add_pairs_to_table table tail_lst
 
-let assoc_list_to_hashtbl tbl (data : (string * string) list) =
-  add_pairs_to_table tbl data
-
 let build_tables =
   step2_3data |> json_to_assoc_list
-  |> assoc_list_to_hashtbl hashtbl_step2_3;
-  step4data |> json_to_assoc_list |> assoc_list_to_hashtbl hashtbl_step4
+  |> add_pairs_to_table hashtbl_step2_3;
+  step4data |> json_to_assoc_list |> add_pairs_to_table hashtbl_step4
 
 let rec find_suffix_binding tbl word remainder m =
   if String.length word < 2 then ("", 0)
