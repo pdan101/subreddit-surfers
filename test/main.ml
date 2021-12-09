@@ -431,7 +431,6 @@ let word_processor_tests =
   ]
 
 let convert_path_to_json (file_path : string) = file_path |> from_file
-
 let cornell_json = convert_path_to_json "data/cornell.json"
 
 let cornell_sub_post =
@@ -441,9 +440,7 @@ let cornell_json2 =
   convert_path_to_json "data/subredditVocabJsons/cornell.json"
 
 let college_json = convert_path_to_json "data/college.json"
-
 let anime_json = convert_path_to_json "data/anime.json"
-
 let anime_sub_post = Intake.from_json anime_json |> Intake.recent_post
 
 let author_test name input expected_output =
@@ -579,15 +576,10 @@ let test3_json =
   convert_path_to_json "data/subredditVocabJsons/test3.json"
 
 let test3_matrix = Array.make_matrix 2 5 0
-
 let _ = test3_matrix.(0).(0) <- 1
-
 let _ = test3_matrix.(1).(3) <- 1
-
 let cornell_test_1_matrix = Array.make 492 0
-
 let _ = cornell_test_1_matrix.(39) <- 1
-
 let _ = cornell_test_1_matrix.(40) <- 1
 
 let word_encoding_tests =
@@ -665,11 +657,8 @@ let create_find_frequencies_test
     ~printer:pp_print_association_list
 
 let test4_matrix = Array.make_matrix 2 5 0
-
 let _ = test4_matrix.(0).(0) <- 1
-
 let _ = test4_matrix.(1).(0) <- 1
-
 let _ = test4_matrix.(1).(3) <- 1
 
 let statistics_tests =
@@ -794,8 +783,8 @@ let theme_array =
 
 let percentage_breakdown_of_test_post =
   [
-    ("food", 28.); ("miscellaneous", 69.); ("music", 0.);
-    ("school", 3.); ("tv", 0.);
+    ("food", 44.); ("miscellaneous", 50.); ("music", 0.);
+    ("school", 6.); ("tv", 0.);
   ]
 
 let theme_breakdown_of_post_test
@@ -813,8 +802,8 @@ let theme_encoder_tests =
       "testing post against food theme, should be 8" theme_test_post
       food_theme_json 8;
     num_theme_of_word_posts_test
-      "testing post against school theme,\n       should be 1"
-      theme_test_post school_theme_json 1;
+      "testing post against school theme, should be 1" theme_test_post
+      school_theme_json 1;
     theme_table_of_post_test "generating theme table for test post"
       theme_test_post theme_array theme_table_of_test_post;
     theme_breakdown_of_post_test "testing theme breakdown of test post"
