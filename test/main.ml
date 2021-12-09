@@ -8,6 +8,7 @@ open WordEncoding
 open Yojson.Basic
 open CustomRegression
 open Owl
+open ThemeEncoder
 
 type text_block = {
   original_text : string;
@@ -430,7 +431,6 @@ let word_processor_tests =
   ]
 
 let convert_path_to_json (file_path : string) = file_path |> from_file
-
 let cornell_json = convert_path_to_json "data/cornell.json"
 
 let cornell_sub_post =
@@ -440,9 +440,7 @@ let cornell_json2 =
   convert_path_to_json "data/subredditVocabJsons/cornell.json"
 
 let college_json = convert_path_to_json "data/college.json"
-
 let anime_json = convert_path_to_json "data/anime.json"
-
 let anime_sub_post = Intake.from_json anime_json |> Intake.recent_post
 
 let author_test name input expected_output =
@@ -578,15 +576,10 @@ let test3_json =
   convert_path_to_json "data/subredditVocabJsons/test3.json"
 
 let test3_matrix = Array.make_matrix 2 5 0
-
 let _ = test3_matrix.(0).(0) <- 1
-
 let _ = test3_matrix.(1).(3) <- 1
-
 let cornell_test_1_matrix = Array.make 492 0
-
 let _ = cornell_test_1_matrix.(39) <- 1
-
 let _ = cornell_test_1_matrix.(40) <- 1
 
 let word_encoding_tests =
@@ -664,11 +657,8 @@ let create_find_frequencies_test
     ~printer:pp_print_association_list
 
 let test4_matrix = Array.make_matrix 2 5 0
-
 let _ = test4_matrix.(0).(0) <- 1
-
 let _ = test4_matrix.(1).(0) <- 1
-
 let _ = test4_matrix.(1).(3) <- 1
 
 let statistics_tests =
@@ -729,12 +719,104 @@ let regression_tests =
       [ (21, 483); (7, 483); (21, 1); (7, 1) ];
   ]
 
+let food_theme_json =
+  "data" ^ Filename.dir_sep ^ "test_themes" ^ Filename.dir_sep ^ "food"
+  ^ ".json"
+  |> Yojson.Basic.from_file
+
+let school_theme_json =
+  "data" ^ Filename.dir_sep ^ "test_themes" ^ Filename.dir_sep
+  ^ "school" ^ ".json"
+  |> Yojson.Basic.from_file
+
+let theme_test_post =
+  {
+    author = "maria";
+    created_utc = 5.;
+    subreddit = "yoyo";
+    id = "identifier";
+    num_comments = 30;
+    num_crossposts = 25;
+    selftext =
+      "I prefer noodles, especially hand-ripped spicy noodles. At \
+       school, the noodles aren't very good and tend to be salty so I \
+       opt to get rice instead";
+    spoiler = false;
+    title = "Noodles over rice ?";
+    upvotes = 37;
+  }
+
+let theme_table_of_test_post =
+  let h = Hashtbl.create 8 in
+  Hashtbl.add h "food" 8;
+  Hashtbl.add h "music" 0;
+  Hashtbl.add h "school" 1;
+  Hashtbl.add h "tv" 0;
+  h
+
+let num_theme_of_word_posts_test
+    (name : string)
+    (post : Intake.post)
+    (theme_json : t)
+    (expected_output : int) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (ThemeEncoder.num_theme_words_of_post post theme_json)
+    ~printer:string_of_int
+
+let theme_table_of_post_test
+    (name : string)
+    (post : Intake.post)
+    (themes : string array)
+    (expected_output : (string, int) Hashtbl.t) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (theme_table_of_post post themes "test_themes")
+
+let theme_array =
+  let themes = Array.make 4 "" in
+  themes.(0) <- "food";
+  themes.(1) <- "music";
+  themes.(2) <- "school";
+  themes.(3) <- "tv";
+  themes
+
+let percentage_breakdown_of_test_post =
+  [
+    ("food", 44.); ("miscellaneous", 50.); ("music", 0.);
+    ("school", 6.); ("tv", 0.);
+  ]
+
+let theme_breakdown_of_post_test
+    (name : string)
+    (post : Intake.post)
+    (theme_table : (string, int) Hashtbl.t)
+    (expected_output : (string * float) list) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (theme_breakdown_of_post post theme_table)
+
+let theme_encoder_tests =
+  [
+    num_theme_of_word_posts_test
+      "testing post against food theme, should be 8" theme_test_post
+      food_theme_json 8;
+    num_theme_of_word_posts_test
+      "testing post against school theme, should be 1" theme_test_post
+      school_theme_json 1;
+    theme_table_of_post_test "generating theme table for test post"
+      theme_test_post theme_array theme_table_of_test_post;
+    theme_breakdown_of_post_test "testing theme breakdown of test post"
+      theme_test_post theme_table_of_test_post
+      percentage_breakdown_of_test_post;
+  ]
+
 let suite =
   "test suite for Final"
   >::: List.flatten
          [
            intake_tests; word_processor_tests; word_encoding_tests;
-           statistics_tests; regression_tests;
+           statistics_tests; regression_tests; theme_encoder_tests;
          ]
 
 let _ = run_test_tt_main suite

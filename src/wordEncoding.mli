@@ -2,6 +2,14 @@ open Yojson
 (**This module contains that functions and types necessary for word
    encoding*)
 
+val post_text : Intake.post -> string
+(**[post_text post] is the text of the post including the title and
+   selftext*)
+
+val word_json_to_array : Basic.t -> string array
+(**[word_json_to_array vocab_json] is the array of words in the vocab
+   json*)
+
 val subreddit_json_to_words : Basic.t -> string list
 (**[subreddit_json_to_words subreddit_json] parses the words of every
    post in the subreddit and creates unqiue list of words*)
