@@ -199,7 +199,7 @@ let graph_error subreddit_name =
     CustomRegression.train_test_model encoded_subreddit 0.75 OLS
   in
   let predicted_upvotes =
-    CustomRegression.calc_upvotes actual_upvotes weights
+    CustomRegression.calc_upvotes train_test_data.features_test weights
   in
 
   let predicted_upvotes =
