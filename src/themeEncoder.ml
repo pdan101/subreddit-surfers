@@ -94,7 +94,6 @@ let theme_breakdown_of_post
     WordProcessor.stem_text (WordEncoding.post_text post)
   in
   let num_words = List.length post_words in
-  let _ = print_int num_words in
   let theme_percentages =
     theme_breakdown_of_post_acc themes [] theme_table num_words
   in
