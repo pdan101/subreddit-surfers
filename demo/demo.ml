@@ -285,10 +285,20 @@ let run subreddit_name =
   | UPrediction -> graph_error fixed_sub_name
   | NA -> exit 0
 
-(*Runs the initial terminal that allows a subreddit to be selected.*)
+let print_text_file filename =
+  let input = open_in filename in
+  try
+    while true do
+      ANSITerminal.print_string [ ANSITerminal.blue ] (input_line input);
+      print_newline ()
+    done
+  with
+  | _ -> close_in input
+
+(*Runs the initial terminal that allows a subreddit to be selected.
+  Surfer art from https://www.asciiart.eu/sports-and-outdoors/surfing*)
 let terminal () =
-  ANSITerminal.print_string [ ANSITerminal.green ]
-    "\nWelcome to our NLP project.\n";
+  print_text_file "data/graphics/logo.txt";
   print_endline "Enter the name of desired subreddit (excluding r/)";
   print_string "> ";
   match read_line () with
