@@ -114,11 +114,14 @@ let make_sentence (delim : string) (sep_sentence : string list) =
   let sentence =
     List.fold_right (fun acc w -> acc ^ " " ^ w) sep_sentence ""
   in
-  String.sub sentence 0 (String.length sentence - 1) ^ delim
+  if String.length sentence > 0 then
+    String.sub sentence 0 (String.length sentence - 1) ^ delim
+  else ""
 
 let process_sentence (sentence : string) =
   let sentence_delimiter = sentence.[String.length sentence - 1] in
   sentence |> String.trim |> parse |> stem_word_list |> extract_stemmed
+  |> List.filter (fun x -> is_stopword x = false)
   |> make_sentence (String.make 1 sentence_delimiter)
 
 let make_paragraph (sentences : string list) =

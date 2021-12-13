@@ -76,6 +76,93 @@ let rec get_command () =
       print_endline "Did not recognize command. Please try again.\n";
       get_command ()
 
+let get_absolute_max array =
+  let current_max = ref 1 in
+  for i = 0 to Array.length array - 1 do
+    if array.(i) < 0 then
+      if array.(i) * -1 > !current_max then
+        current_max := array.(i) * -1
+      else ()
+    else if array.(i) > !current_max then current_max := array.(i)
+    else ()
+  done;
+  !current_max
+
+let generate_spaces num =
+  let str = ref "" in
+  for i = 0 to num do
+    str := !str ^ " "
+  done;
+  !str
+
+let create_column (predicted_vote : float) (actual_vote : float) =
+  let col = " |" in
+  if predicted_vote < actual_vote then
+    let pred_spaces = generate_spaces (int_of_float predicted_vote) in
+    let col = col ^ pred_spaces ^ "⊡" in
+    let actual_spaces =
+      generate_spaces (int_of_float (actual_vote -. predicted_vote))
+    in
+    let extra_spaces =
+      generate_spaces (int_of_float (50.0 -. actual_vote))
+    in
+    let col = col ^ actual_spaces ^ "⊙" ^ extra_spaces in
+    col
+  else
+    let actual_spaces = generate_spaces (int_of_float actual_vote) in
+    let col = col ^ actual_spaces ^ "⊙" in
+    let pred_spaces =
+      generate_spaces (int_of_float (predicted_vote -. actual_vote))
+    in
+    let extra_spaces =
+      generate_spaces (int_of_float (50.0 -. predicted_vote))
+    in
+    let col = col ^ pred_spaces ^ "⊡" ^ extra_spaces in
+    col
+
+let graph_results
+    (predicted_upvotes : int array)
+    (actual_upvotes : float array) =
+  let actual_upvotes_int =
+    Array.map (fun e -> int_of_float e) actual_upvotes
+  in
+  let max_predicted = get_absolute_max predicted_upvotes in
+  let max_actual = get_absolute_max actual_upvotes_int in
+  let max =
+    if max_predicted <= max_actual then max_actual else max_predicted
+  in
+  let scaling_factor = 50.0 /. float_of_int max in
+  let columns =
+    [ "  ―――――――――――――――――――――――――――――――――――――――――――――――˃" ]
+  in
+
+  let predicted_upvotes =
+    Array.map (fun e -> float_of_int e) predicted_upvotes
+  in
+  print_newline ();
+  print_newline ();
+  print_string "     ⊙- Actual Upvotes, ⊡- Predicted Upvotes";
+  print_newline ();
+
+  let additional_cols =
+    Array.mapi
+      (fun i e ->
+        create_column (scaling_factor *. e)
+          (scaling_factor *. actual_upvotes.(i)))
+      predicted_upvotes
+  in
+  let all_columns = columns @ Array.to_list additional_cols in
+  List.iter
+    (fun i ->
+      print_string i;
+      print_newline ())
+    all_columns;
+  print_string " |";
+  print_newline ();
+  print_string " ˅";
+  print_newline ();
+  print_newline ()
+
 (*Current representation of 1 instance of a word in a subreddit for the
   text based graphic.*)
 let occurence_string = "---"
@@ -239,8 +326,7 @@ let graph_error subreddit_name =
   let predicted_upvotes =
     Array.map (fun e -> int_of_float e) predicted_upvotes
   in
-  CustomRegression.graph_results predicted_upvotes
-    (Mat.to_array actual_upvotes)
+  graph_results predicted_upvotes (Mat.to_array actual_upvotes)
 
 (*Retrieves encoding of text and subreddit based on inputted subreddit
   name and text.*)
@@ -326,7 +412,9 @@ let run subreddit_name =
     | Popularity -> print_podium (subreddit |> posts |> top_users)
     | Prediction -> print_prediction fixed_sub_name
     | UPrediction -> graph_error fixed_sub_name
-    | NA -> exit 0
+    | NA ->
+        print_text_file "data/graphics/waves.txt" ANSITerminal.blue;
+        exit 0
   done
 
 (*Runs the initial terminal that allows a subreddit to be selected.
