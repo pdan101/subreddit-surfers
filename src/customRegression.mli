@@ -32,5 +32,3 @@ val create_matrix : int array list -> Owl.Mat.mat
 val calc_upvotes : Owl.Mat.mat -> float array -> float array
 (**[calc_upvotes encoded_matrix encoded_post] is the predicted number of
    upvotes for a given post*)
-
-val graph_results : int array -> float array -> unit
