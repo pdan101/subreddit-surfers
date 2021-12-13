@@ -40,7 +40,7 @@ let rec sub subreddit_name =
 
 (*Converts text command into our command type.*)
 let rec get_command () =
-  print_text_file "data/graphics/options.txt" ANSITerminal.green;
+  print_text_file "data/graphics/options.txt" ANSITerminal.cyan;
   print_string "> ";
   match read_line () with
   | exception End_of_file -> NA
@@ -68,6 +68,10 @@ let rec get_command () =
     when let lower = command |> String.lowercase_ascii in
          lower = "upvote prediction" || lower = "6" ->
       UPrediction
+  | command
+    when let lower = command |> String.lowercase_ascii in
+         lower = "quit" || lower = "7" ->
+      NA
   | _ ->
       print_endline "Did not recognize command. Please try again.\n";
       get_command ()
@@ -197,7 +201,7 @@ let print_encoder subreddit_name =
   subreddit.*)
 let predict_upvotes encoded_arr encoded_subreddit =
   let weights =
-    CustomRegression.get_weights encoded_subreddit 1.0 OLS
+    CustomRegression.get_weights encoded_subreddit 0.0 OLS
   in
   let float_array = Array.map (fun x -> float_of_int x) encoded_arr in
   let upvotes =
@@ -298,22 +302,32 @@ let print_prediction subreddit_name =
     ^ string_of_int (int_of_float avg_upvotes)
     ^ " upvotes!")
 
+let list_of_subs =
+  [ "cornell"; "csmajors"; "ocaml"; "running"; "college" ]
+
+let convert_to_name input =
+  match int_of_string_opt input with
+  | None -> input
+  | Some x -> List.nth list_of_subs (x - 1)
+
 (*Runs the terminal interface that gets a command after specifying
   subreddit.*)
 let run subreddit_name =
-  let subreddit = sub subreddit_name in
+  let subreddit = sub (subreddit_name |> convert_to_name) in
   let fixed_sub_name =
     subreddit |> Intake.recent_post |> Intake.subreddit_name
     |> String.lowercase_ascii
   in
-  match get_command () with
-  | Frequencies -> print_frequencies fixed_sub_name
-  | Stemmer -> print_stemmer (subreddit |> recent_post)
-  | Encoder -> print_encoder fixed_sub_name
-  | Popularity -> print_podium (subreddit |> posts |> top_users)
-  | Prediction -> print_prediction fixed_sub_name
-  | UPrediction -> graph_error fixed_sub_name
-  | NA -> exit 0
+  while true do
+    match get_command () with
+    | Frequencies -> print_frequencies fixed_sub_name
+    | Stemmer -> print_stemmer (subreddit |> recent_post)
+    | Encoder -> print_encoder fixed_sub_name
+    | Popularity -> print_podium (subreddit |> posts |> top_users)
+    | Prediction -> print_prediction fixed_sub_name
+    | UPrediction -> graph_error fixed_sub_name
+    | NA -> exit 0
+  done
 
 (*Runs the initial terminal that allows a subreddit to be selected.
   Surfer art from https://www.asciiart.eu/sports-and-outdoors/surfing*)
