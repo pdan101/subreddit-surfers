@@ -15,6 +15,16 @@ type command =
   | UPrediction
   | NA
 
+let print_text_file filename color =
+  let input = open_in filename in
+  try
+    while true do
+      ANSITerminal.print_string [ color ] (input_line input);
+      print_newline ()
+    done
+  with
+  | _ -> close_in input
+
 (*Extracts the Intake.subreddit data structure of a given subreddit
   name, retries in command line if the file is not found.*)
 let rec sub subreddit_name =
@@ -30,13 +40,7 @@ let rec sub subreddit_name =
 
 (*Converts text command into our command type.*)
 let rec get_command () =
-  print_endline "Enter one of the following commands:";
-  print_endline "Frequencies";
-  print_endline "Stemmer";
-  print_endline "Encoder";
-  print_endline "Popularity";
-  print_endline "Text Prediction";
-  print_endline "Upvote Prediction";
+  print_text_file "data/graphics/table.txt" ANSITerminal.green;
   print_string "> ";
   match read_line () with
   | exception End_of_file -> NA
@@ -285,20 +289,10 @@ let run subreddit_name =
   | UPrediction -> graph_error fixed_sub_name
   | NA -> exit 0
 
-let print_text_file filename =
-  let input = open_in filename in
-  try
-    while true do
-      ANSITerminal.print_string [ ANSITerminal.blue ] (input_line input);
-      print_newline ()
-    done
-  with
-  | _ -> close_in input
-
 (*Runs the initial terminal that allows a subreddit to be selected.
   Surfer art from https://www.asciiart.eu/sports-and-outdoors/surfing*)
 let terminal () =
-  print_text_file "data/graphics/logo.txt";
+  print_text_file "data/graphics/logo.txt" ANSITerminal.blue;
   print_endline "Enter the name of desired subreddit (excluding r/)";
   print_string "> ";
   match read_line () with
