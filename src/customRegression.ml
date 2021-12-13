@@ -80,7 +80,6 @@ let calc_upvotes features_test weights =
     without_last_weight
 
 let calc_error predicted_upvotes actual_upvotes =
-  let actual_upvotes = Mat.to_array actual_upvotes in
   let squared_sum_array =
     Array.mapi
       (fun index element -> (element -. actual_upvotes.(index)) ** 2.0)

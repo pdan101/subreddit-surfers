@@ -34,3 +34,8 @@ val create_matrix : int array list -> Owl.Mat.mat
 val calc_upvotes : Owl.Mat.mat -> float array -> float array
 (**[calc_upvotes encoded_matrix encoded_post] is the predicted number of
    upvotes for a given [encoded_post]*)
+
+val calc_error : float array -> float array -> float
+(**[calc_error predicted_upvotes actual_upvotes] is the mean squared
+   error of the difference between actual and predicted upvotes. The
+   number of upvotes should be the same in actual and predicted upvotes.*)

@@ -760,6 +760,19 @@ let create_calc_upvotes_test
           weights))
     ~printer:string_of_int
 
+let compare_floats float1 float2 =
+  int_of_float (float1 *. 100.0) = int_of_float (float2 *. 100.0)
+
+let create_calc_error_test
+    (name : string)
+    (predicted_upvotes : float array)
+    (actual_upvotes : float array)
+    (expected_output : float) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (CustomRegression.calc_error predicted_upvotes actual_upvotes)
+    ~cmp:compare_floats ~printer:string_of_float
+
 let regression_tests =
   [
     create_get_training_data_test
@@ -782,6 +795,14 @@ let regression_tests =
     create_calc_upvotes_test
       "check number of predicted upvotes Logistic 1.0%" cornell_encoded
       1.0 Logistic 1;
+    create_calc_error_test "check mean squared error same arrays"
+      (Array.of_list [ 1.0; 8.9; 4.2 ])
+      (Array.of_list [ 1.0; 8.9; 4.2 ])
+      0.0;
+    create_calc_error_test "check mean squared error negative"
+      (Array.of_list [ 1.0; 8.9; 4.2 ])
+      (Array.of_list [ 1.5; 4.89; -6.7 ])
+      45.0467;
   ]
 
 let food_theme_json =
