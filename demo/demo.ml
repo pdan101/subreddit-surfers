@@ -323,10 +323,17 @@ let graph_error subreddit_name =
     CustomRegression.calc_upvotes train_test_data.features_test weights
   in
 
-  let predicted_upvotes =
+  let predicted_upvotes_int =
     Array.map (fun e -> int_of_float e) predicted_upvotes
   in
-  graph_results predicted_upvotes (Mat.to_array actual_upvotes)
+  graph_results predicted_upvotes_int (Mat.to_array actual_upvotes);
+  let error =
+    CustomRegression.calc_error predicted_upvotes
+      (Mat.to_array actual_upvotes)
+  in
+  print_string ("Mean Squared Error: " ^ string_of_float error);
+  print_newline ();
+  print_newline ()
 
 (*Retrieves encoding of text and subreddit based on inputted subreddit
   name and text.*)
