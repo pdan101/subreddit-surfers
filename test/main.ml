@@ -149,7 +149,7 @@ let sophomore_club_text_block =
       "I'm a sophomore and I didn't really apply to many clubs and I \
        got rejected from all the ones I applied to this semester";
     stemmed_text =
-      "Im sophomor didnt realli appli mani club got reject on appli \
+      "Im sophomor didnt realli appli mani club got reject appli \
        semestr";
   }
 
