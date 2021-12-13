@@ -41,6 +41,9 @@ let get_training_data matrix percent_training =
   let rows_training =
     int_of_float (float_of_int num_posts *. percent_training)
   in
+  let rows_training =
+    if rows_training >= num_posts then num_posts - 1 else rows_training
+  in
   let num_cols = num_features in
   let features_training =
     Mat.get_slice [ [ 0; rows_training ]; [ 0; num_cols - 2 ] ] matrix
@@ -146,7 +149,9 @@ let create_column (predicted_vote : float) (actual_vote : float) =
     let col = col ^ pred_spaces ^ "⊡" ^ extra_spaces in
     col
 
-let graph_results predicted_upvotes (actual_upvotes : float array) =
+let graph_results
+    (predicted_upvotes : int array)
+    (actual_upvotes : float array) =
   let actual_upvotes_int =
     Array.map (fun e -> int_of_float e) actual_upvotes
   in

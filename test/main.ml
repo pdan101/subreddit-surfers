@@ -1,14 +1,7 @@
 open OUnit2
 open Analyzer
-open Intake
-open WordProcessor
-open Stemmer
-open Str
-open WordEncoding
 open Yojson.Basic
-open CustomRegression
 open Owl
-open ThemeEncoder
 
 type text_block = {
   original_text : string;
@@ -50,20 +43,22 @@ let create_units_test
     (expected_output : string) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (create_simplified_units (create_units word) "")
+    (Stemmer.create_simplified_units (Stemmer.create_units word) "")
     ~printer:String.escaped
 
 let calc_vc_test (name : string) (word : string) (expected_output : int)
     : test =
   name >:: fun _ ->
-  assert_equal expected_output (calc_vc word) ~printer:string_of_int
+  assert_equal expected_output (Stemmer.calc_vc word)
+    ~printer:string_of_int
 
 let remove_plurals_test
     (name : string)
     (word : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output (remove_plurals word)
+  assert_equal expected_output
+    (Stemmer.remove_plurals word)
     ~printer:String.escaped
 
 let remove_past_participles_test
@@ -72,7 +67,7 @@ let remove_past_participles_test
     (expected_output : string) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (remove_past_participles word)
+    (Stemmer.remove_past_participles word)
     ~printer:String.escaped
 
 let finalize_plurals_past_participles_test
@@ -81,7 +76,7 @@ let finalize_plurals_past_participles_test
     (expected_output : string) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (finalize_plurals_past_participles word)
+    (Stemmer.finalize_plurals_past_participles word)
     ~printer:String.escaped
 
 let replace_suffix_test
@@ -89,10 +84,11 @@ let replace_suffix_test
     (word : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output (replace_suffix word)
+  assert_equal expected_output
+    (WordProcessor.replace_suffix word)
     ~printer:String.escaped
 
-let possesses : stemmed_word =
+let possesses : WordProcessor.stemmed_word =
   {
     original_word = "possesses";
     units = "CVCVCVC";
@@ -100,7 +96,7 @@ let possesses : stemmed_word =
     stemmed = "possess";
   }
 
-let agreed : stemmed_word =
+let agreed : WordProcessor.stemmed_word =
   {
     original_word = "agreed";
     units = "VCVC";
@@ -109,22 +105,24 @@ let agreed : stemmed_word =
   }
 
 let pp_stemmed_word stemmed =
-  "Word: " ^ stemmed.original_word ^ " Units: " ^ stemmed.units
-  ^ " Num VCs: "
+  "Word: " ^ stemmed.WordProcessor.original_word ^ " Units: "
+  ^ stemmed.units ^ " Num VCs: "
   ^ string_of_int stemmed.num_vcs
   ^ " Stemmed: " ^ stemmed.stemmed
 
 let stemmed_words_equal s1 s2 =
-  s1.original_word = s2.original_word
+  s1.WordProcessor.original_word = s2.WordProcessor.original_word
   && s1.num_vcs = s2.num_vcs && s1.units = s2.units
   && s1.stemmed = s2.stemmed
 
 let stemmer_test
     (name : string)
     (word : string)
-    (expected_output : stemmed_word) : test =
+    (expected_output : WordProcessor.stemmed_word) : test =
   name >:: fun _ ->
-  assert_equal expected_output (stemmer word) ~printer:pp_stemmed_word
+  assert_equal expected_output
+    (WordProcessor.stemmer word)
+    ~printer:pp_stemmed_word
 
 let stemmer_paragraph_test
     (name : string)
@@ -133,7 +131,7 @@ let stemmer_paragraph_test
   name >:: fun _ ->
   assert_equal
     (String.trim expected_output)
-    (String.trim (stem_paragraph sentence))
+    (String.trim (WordProcessor.stem_paragraph sentence))
     ~printer:id
 
 let process_sentence_test
@@ -141,7 +139,9 @@ let process_sentence_test
     (sentence : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output (process_sentence sentence) ~printer:id
+  assert_equal expected_output
+    (WordProcessor.process_sentence sentence)
+    ~printer:id
 
 let sophomore_club_text_block =
   {
@@ -197,7 +197,8 @@ let replace_suffix_test
     (word : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output (replace_suffix word)
+  assert_equal expected_output
+    (WordProcessor.replace_suffix word)
     ~printer:String.escaped
 
 let fix_y_test
@@ -205,14 +206,16 @@ let fix_y_test
     (word : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output (fix_y word) ~printer:String.escaped
+  assert_equal expected_output (Stemmer.fix_y word)
+    ~printer:String.escaped
 
 let remove_e_test
     (name : string)
     (word : string)
     (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output (remove_e word) ~printer:String.escaped
+  assert_equal expected_output (Stemmer.remove_e word)
+    ~printer:String.escaped
 
 let stopword_test
     (name : string)
@@ -225,13 +228,14 @@ let stopword_test
 
 let word_processor_tests =
   [
-    parse_test "Empty string" parse "" [];
-    parse_test "Parsing text\n       with no punctuation" parse
+    parse_test "Empty string" WordProcessor.parse "" [];
+    parse_test "Parsing text\n       with no punctuation"
+      WordProcessor.parse
       "And just like that a copy pasta was\n       born"
       [ "like"; "copy"; "pasta"; "born" ];
     parse_test
       "Parsing text with conjunctions but\n\
-      \       no sentence punctuation" parse
+      \       no sentence punctuation" WordProcessor.parse
       "I'm a sophomore and I didn't\n\
       \       really apply to many clubs and I\n\
       \  got rejected from all the\n\
@@ -240,7 +244,8 @@ let word_processor_tests =
         "Im"; "sophomore"; "didnt"; "really"; "apply"; "many"; "clubs";
         "got"; "rejected"; "ones"; "applied"; "semester";
       ];
-    parse_test "Parsing text\n       on multiple lines" parse
+    parse_test "Parsing text\n       on multiple lines"
+      WordProcessor.parse
       "They should really be more clear on the\n\
       \       fact that the deploy\n\
       \  button means to production not to\n\
@@ -252,7 +257,8 @@ let word_processor_tests =
       ];
     parse_test
       "Parsing text with punctuation, doesn't remove\n\
-      \       punctuation in  the middle of the word" parse
+      \       punctuation in  the middle of the word"
+      WordProcessor.parse
       "So like I missed\n\
       \       my test and I'm about to get tested rn. How  long till I \
        get\n\
@@ -261,7 +267,8 @@ let word_processor_tests =
         "like"; "missed"; "test"; "Im"; "get"; "tested"; "rn"; "long";
         "till"; "get"; "canvas"; "back";
       ];
-    parse_test "Don't\n       conjunction and punctuation" parse
+    parse_test "Don't\n       conjunction and punctuation"
+      WordProcessor.parse
       "And he has spent a long time\n\
       \       constantly targeting me in these  implicit ways by either\n\
       \ pretending I don't contribute, quickly moving on  without an\n\
@@ -274,7 +281,8 @@ let word_processor_tests =
         "moving"; "without"; "acknowledgement"; "emphasizing";
         "followed"; "point"; "fave";
       ];
-    parse_test "Manyconjunctions and types of punctuation" parse
+    parse_test "Manyconjunctions and types of punctuation"
+      WordProcessor.parse
       "the\n\
       \       professor hasn't released prelim grades, doesn't know \
        how to\n\
@@ -290,24 +298,28 @@ let word_processor_tests =
     (*Parse does not work with right apostrophe parse_test "Round right
       apostrophe" (parse) "It’s" [ "It’s" ];*)
     parse_test "Parses text into sentences separated by periods"
-      parse_sentence "the professor is great. He gave everyone an A."
+      WordProcessor.parse_sentence
+      "the professor is great. He gave everyone an A."
       [ "the professor is great."; "He gave everyone an A." ];
     parse_test
       "Parses text into sentences separated by exclamation marks"
-      parse_sentence "Hello there! It's so great to see you!"
+      WordProcessor.parse_sentence
+      "Hello there! It's so great to see you!"
       [ "Hello there!"; "It's so great to see you!" ];
     parse_test "Parses text into sentences separated by question marks"
-      parse_sentence "Hello there? Is anybody home?"
+      WordProcessor.parse_sentence "Hello there? Is anybody home?"
       [ "Hello there?"; "Is anybody home?" ];
     parse_test
       "Parses text into sentences with punctuation in middle of  \
        sentence"
-      parse_sentence "Hello there, my name is Usnavi. Who are you?"
+      WordProcessor.parse_sentence
+      "Hello there, my name is Usnavi. Who are you?"
       [ "Hello there, my name is Usnavi."; "Who are you?" ];
     parse_test
       "Doesn't parse text with text containing no sentence delimiting  \
        punctuation"
-      parse_sentence "Hello there, my name is Usnavi Who are you"
+      WordProcessor.parse_sentence
+      "Hello there, my name is Usnavi Who are you"
       [ "Hello there, my name is Usnavi Who are you" ];
     create_units_test "Consonant group" "hello" "CVCV";
     create_units_test "Vowel group" "helloooooo" "CVCV";
@@ -551,7 +563,8 @@ let write_words_to_json_test
     (expected_output : unit) : test =
   let file = open_out ("data/subredditVocabJsons/" ^ filename) in
   name >:: fun _ ->
-  assert_equal expected_output (write_words_to_json file words)
+  assert_equal expected_output
+    (WordEncoding.write_words_to_json file words)
 
 let subreddit_json_to_word_json_test
     (name : string)
@@ -561,7 +574,8 @@ let subreddit_json_to_word_json_test
     (filename : string) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (subreddit_json_to_word_json processor subreddit filename)
+    (WordEncoding.subreddit_json_to_word_json processor subreddit
+       filename)
 
 let pp_print_matrix acc matrix : string =
   Array.fold_right
@@ -599,49 +613,50 @@ let word_encoding_tests =
     subreddit_json_to_word_json_test
       "Converts words in college\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_words college_json "college";
+      WordEncoding.subreddit_json_to_words college_json "college";
     subreddit_json_to_word_json_test
       "Converts words in cornell\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words cornell_json "cornell";
+      WordEncoding.subreddit_json_to_stemmed_words cornell_json
+      "cornell";
     subreddit_json_to_word_json_test
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words anime_json "anime";
+      WordEncoding.subreddit_json_to_stemmed_words anime_json "anime";
     subreddit_json_to_word_json_test
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words
+      WordEncoding.subreddit_json_to_stemmed_words
       (convert_path_to_json "data/anime_new.json")
       "anime_new";
     subreddit_json_to_word_json_test
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words
+      WordEncoding.subreddit_json_to_stemmed_words
       (convert_path_to_json "data/college_new.json")
       "college_new";
     subreddit_json_to_word_json_test
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words
+      WordEncoding.subreddit_json_to_stemmed_words
       (convert_path_to_json "data/cornell_new.json")
       "cornell_new";
     subreddit_json_to_word_json_test
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words
+      WordEncoding.subreddit_json_to_stemmed_words
       (convert_path_to_json "data/csmajors_new.json")
       "csmajors_new";
     subreddit_json_to_word_json_test
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words
+      WordEncoding.subreddit_json_to_stemmed_words
       (convert_path_to_json "data/ocaml_new.json")
       "ocaml_new";
     subreddit_json_to_word_json_test
       "Converts words in anime\n\
       \       subreddit posts to a json of all the  words" (print_int 1)
-      subreddit_json_to_stemmed_words
+      WordEncoding.subreddit_json_to_stemmed_words
       (convert_path_to_json "data/running_new.json")
       "running_new";
   ]
@@ -661,7 +676,7 @@ let create_find_frequencies_test
   name >:: fun _ ->
   assert_equal
     (List.sort compare expected_output)
-    (List.sort compare (find_frequencies word_json matrix))
+    (List.sort compare (WordEncoding.find_frequencies word_json matrix))
     ~printer:pp_print_association_list
 
 let test4_matrix = Array.make_matrix 2 5 0
@@ -688,19 +703,13 @@ let statistics_tests =
   ]
 
 let cornell_encoded =
-  encode_subreddit
+  WordEncoding.encode_subreddit
     ("data/subredditVocabJsons/cornell.json" |> Yojson.Basic.from_file)
     WordProcessor.stem_text
     (Yojson.Basic.from_file "data/cornell.json")
-    upvotes
+    Intake.upvotes
 
-let cornell_matrix = create_matrix cornell_encoded
-
-let cornell_training_data = get_training_data cornell_matrix 0.75
-
-(*let weights = get_weights cornell_encoded 0.75 OLS in
-
-  calc_upvotes cornell_training_data.features_test weights*)
+let predicted_upvotes = CustomRegression.calc_upvotes
 
 let get_vocab_length matrix =
   match matrix with
@@ -709,7 +718,7 @@ let get_vocab_length matrix =
 
 let get_training_data_shapes train_test_data =
   [
-    Mat.shape train_test_data.features_training;
+    Mat.shape train_test_data.CustomRegression.features_training;
     Mat.shape train_test_data.features_test;
     Mat.shape train_test_data.output_training;
     Mat.shape train_test_data.output_testing;
@@ -720,46 +729,59 @@ let pp_int_pair (row, col) =
 
 let create_get_training_data_test
     (name : string)
-    (matrix : Owl.Mat.mat)
+    (encoded_matrix : int array list)
     (percent_training : float)
     (expected_output : (int * int) list) : test =
   name >:: fun _ ->
+  let matrix = CustomRegression.create_matrix encoded_matrix in
   assert_equal expected_output
     (get_training_data_shapes
-       (get_training_data matrix percent_training))
+       (CustomRegression.get_training_data matrix percent_training))
     ~printer:(pp_list pp_int_pair)
 
-let create_get_weights_test
+let create_calc_upvotes_test
     (name : string)
-    (data : int array list)
-    (percent_training : float)
-    (regression_type : regression)
+    (encoded_matrix : int array list)
+    (percentage_training : float)
+    (regression_type : CustomRegression.regression)
     (expected_output : int) : test =
   name >:: fun _ ->
+  let matrix = CustomRegression.create_matrix encoded_matrix in
+  let training_data =
+    CustomRegression.get_training_data matrix percentage_training
+  in
+  let weights =
+    CustomRegression.get_weights encoded_matrix percentage_training
+      regression_type
+  in
   assert_equal expected_output
-    (Array.length (get_weights data percent_training regression_type))
+    (Array.length
+       (CustomRegression.calc_upvotes training_data.features_test
+          weights))
     ~printer:string_of_int
 
 let regression_tests =
   [
-    create_get_training_data_test "check test and training data shapes"
-      cornell_matrix 0.75
+    create_get_training_data_test
+      "check test and training data shapes 75%" cornell_encoded 0.75
       [ (21, 483); (7, 483); (21, 1); (7, 1) ];
-    create_get_weights_test "check number of weights OLS"
-      cornell_encoded 0.75 OLS
-      (Array.length (Array.of_list cornell_encoded).(0));
-    create_get_weights_test "check number of weights Ridge"
-      cornell_encoded 0.5 Ridge
-      (Array.length (Array.of_list cornell_encoded).(0));
-    create_get_weights_test "check number of weights LASSO"
-      cornell_encoded 0.25 LASSO
-      (Array.length (Array.of_list cornell_encoded).(0));
-    create_get_weights_test "check number of weights Logistic"
-      cornell_encoded 0.1 Logistic
-      (Array.length (Array.of_list cornell_encoded).(0));
-    create_get_weights_test "check number of weights SVM"
-      cornell_encoded 0.0 SVM
-      (Array.length (Array.of_list cornell_encoded).(0));
+    create_get_training_data_test
+      "check test and training data shapes 0%" cornell_encoded 0.0
+      [ (1, 483); (27, 483); (1, 1); (27, 1) ];
+    create_get_training_data_test
+      "check test and training data shapes 100%" cornell_encoded 1.0
+      [ (27, 483); (1, 483); (27, 1); (1, 1) ];
+    create_calc_upvotes_test "check number of predicted upvotes OLS 75%"
+      cornell_encoded 0.75 OLS 7;
+    create_calc_upvotes_test
+      "check number of predicted upvotes Ridge 1%" cornell_encoded 0.1
+      Ridge 25;
+    create_calc_upvotes_test
+      "check number of predicted upvotes Lasso 90%" cornell_encoded 0.9
+      LASSO 3;
+    create_calc_upvotes_test
+      "check number of predicted upvotes Logistic 1.0%" cornell_encoded
+      1.0 Logistic 1;
   ]
 
 let food_theme_json =
@@ -774,7 +796,7 @@ let school_theme_json =
 
 let theme_test_post =
   {
-    author = "maria";
+    Intake.author = "maria";
     created_utc = 5.;
     subreddit = "yoyo";
     id = "identifier";
@@ -814,7 +836,7 @@ let theme_table_of_post_test
     (expected_output : (string, int) Hashtbl.t) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (theme_table_of_post post themes "test_themes")
+    (ThemeEncoder.theme_table_of_post post themes "test_themes")
 
 let theme_array =
   let themes = Array.make 4 "" in
@@ -837,7 +859,7 @@ let theme_breakdown_of_post_test
     (expected_output : (string * float) list) : test =
   name >:: fun _ ->
   assert_equal expected_output
-    (theme_breakdown_of_post post theme_table)
+    (ThemeEncoder.theme_breakdown_of_post post theme_table)
 
 let theme_encoder_tests =
   [
