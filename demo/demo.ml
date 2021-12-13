@@ -293,7 +293,7 @@ let run subreddit_name =
   Surfer art from https://www.asciiart.eu/sports-and-outdoors/surfing*)
 let terminal () =
   print_text_file "data/graphics/logo.txt" ANSITerminal.blue;
-  print_endline "Enter the name of desired subreddit (excluding r/)";
+  print_text_file "data/graphics/subreddits.txt" ANSITerminal.green;
   print_string "> ";
   match read_line () with
   | exception End_of_file -> ()
