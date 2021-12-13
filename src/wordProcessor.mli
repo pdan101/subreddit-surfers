@@ -50,5 +50,3 @@ val replace_suffix : string -> string
 val stem_paragraph : string -> string
 (**[stem_paragraph paragraph] returns the stemmed version of a
    paragraph.*)
-
-val parse_sentence : string -> string list

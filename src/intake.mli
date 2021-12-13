@@ -22,7 +22,8 @@ type subreddit
 
 val post_of_text : string -> post
 (** [post_of_text text] converts text into a dummy post, so it can be
-    used in other functions that take in .*)
+    used in other functions that take in arguments of type post but only
+    care about the text.*)
 
 val from_json : Yojson.Basic.t -> subreddit
 (** [from_json json] is the subreddit that [json] represents. Requires:

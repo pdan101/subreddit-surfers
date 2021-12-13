@@ -29,5 +29,5 @@ clean:
 	dune clean
 	rm -f 3110-final.zip
 
-doc:
+docs:
 	dune build @doc
