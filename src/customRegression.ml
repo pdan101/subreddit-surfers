@@ -5,7 +5,6 @@ type regression =
   | Ridge
   | LASSO
   | Logistic
-  | SVM
   | OLS
 
 type train_test_data = {
@@ -21,7 +20,6 @@ let get_model regression_type features output =
   | Ridge -> Regression.D.ridge ~i:true features output
   | LASSO -> Regression.D.lasso ~i:true features output
   | Logistic -> Regression.D.logistic ~i:true features output
-  | SVM -> Regression.D.svm ~i:true features output
 
 let get_num_posts (rows, cols) = rows
 

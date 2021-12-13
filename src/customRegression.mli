@@ -5,7 +5,6 @@ type regression =
   | Ridge
   | LASSO
   | Logistic
-  | SVM
   | OLS
 
 (**the type containing all possible kinds of regression*)
