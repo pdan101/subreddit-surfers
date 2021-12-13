@@ -197,7 +197,7 @@ let print_encoder subreddit_name =
   subreddit.*)
 let predict_upvotes encoded_arr encoded_subreddit =
   let weights =
-    CustomRegression.train_test_model encoded_subreddit 1.0 OLS
+    CustomRegression.get_weights encoded_subreddit 1.0 OLS
   in
   let float_array = Array.map (fun x -> float_of_int x) encoded_arr in
   let upvotes =
@@ -226,7 +226,7 @@ let graph_error subreddit_name =
   let actual_upvotes = train_test_data.output_testing in
 
   let weights =
-    CustomRegression.train_test_model encoded_subreddit 0.75 OLS
+    CustomRegression.get_weights encoded_subreddit 0.75 OLS
   in
   let predicted_upvotes =
     CustomRegression.calc_upvotes train_test_data.features_test weights

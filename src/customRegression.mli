@@ -16,10 +16,9 @@ type train_test_data = {
 }
 (**the type containing all relevant sections of the encoded matrix*)
 
-val train_test_model :
-  int array list -> float -> regression -> float array
-(**[train_test_model encoded_subreddt percent_training regression_type]
-   is resulting weights of the regression*)
+val get_weights : int array list -> float -> regression -> float array
+(**[get_weights encoded_subreddt percent_training regression_type] is
+   resulting weights of the regression*)
 
 val get_training_data : Owl.Mat.mat -> float -> train_test_data
 (**[get_training_data encoded_matrix percent_training] is a record

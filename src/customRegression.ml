@@ -92,9 +92,9 @@ let calc_error predicted_upvotes actual_upvotes =
   in
   squared_sum /. float_of_int (Array.length predicted_upvotes)
 
-let train_test_model data percent_training regression_type =
+let get_weights data percent_training regression_type =
   let matrix = create_matrix data in
-  let train_test_data = get_training_data matrix 0.75 in
+  let train_test_data = get_training_data matrix percent_training in
   let weights =
     get_model regression_type train_test_data.features_test
       train_test_data.output_testing
