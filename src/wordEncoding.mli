@@ -3,12 +3,12 @@ open Yojson
    encoding*)
 
 val post_text : Intake.post -> string
-(**[post_text post] is the text of the post including the title and
+(**[post_text post] is the text of the [post] including the title and
    selftext*)
 
 val word_json_to_array : Basic.t -> string array
-(**[word_json_to_array vocab_json] is the array of words in the vocab
-   json*)
+(**[word_json_to_array vocab_json] is the array of words in the
+   [vocab_json]*)
 
 val subreddit_json_to_words : Basic.t -> string list
 (**[subreddit_json_to_words subreddit_json] parses the words of every
@@ -20,8 +20,8 @@ val subreddit_json_to_stemmed_words : Basic.t -> string list
 
 val write_words_to_json : out_channel -> string list -> unit
 (**[write_words_to_json file words] writes all the words in the list to
-   a json file that is a list of the words. Requires open brack for json
-   has been written to file*)
+   a json [file] that is a list of the words. Requires open brack for
+   json has been written to file*)
 
 val subreddit_json_to_word_json :
   (Basic.t -> string list) -> Basic.t -> string -> unit
