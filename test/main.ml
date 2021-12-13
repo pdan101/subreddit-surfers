@@ -431,6 +431,7 @@ let word_processor_tests =
   ]
 
 let convert_path_to_json (file_path : string) = file_path |> from_file
+
 let cornell_json = convert_path_to_json "data/cornell.json"
 
 let cornell_sub_post =
@@ -440,7 +441,9 @@ let cornell_json2 =
   convert_path_to_json "data/subredditVocabJsons/cornell.json"
 
 let college_json = convert_path_to_json "data/college.json"
+
 let anime_json = convert_path_to_json "data/anime.json"
+
 let anime_sub_post = Intake.from_json anime_json |> Intake.recent_post
 
 let author_test name input expected_output =
@@ -576,10 +579,15 @@ let test3_json =
   convert_path_to_json "data/subredditVocabJsons/test3.json"
 
 let test3_matrix = Array.make_matrix 2 5 0
+
 let _ = test3_matrix.(0).(0) <- 1
+
 let _ = test3_matrix.(1).(3) <- 1
+
 let cornell_test_1_matrix = Array.make 492 0
+
 let _ = cornell_test_1_matrix.(39) <- 1
+
 let _ = cornell_test_1_matrix.(40) <- 1
 
 let word_encoding_tests =
@@ -657,8 +665,11 @@ let create_find_frequencies_test
     ~printer:pp_print_association_list
 
 let test4_matrix = Array.make_matrix 2 5 0
+
 let _ = test4_matrix.(0).(0) <- 1
+
 let _ = test4_matrix.(1).(0) <- 1
+
 let _ = test4_matrix.(1).(3) <- 1
 
 let statistics_tests =
@@ -684,6 +695,12 @@ let cornell_encoded =
     upvotes
 
 let cornell_matrix = create_matrix cornell_encoded
+
+let cornell_training_data = get_training_data cornell_matrix 0.75
+
+(*let weights = get_weights cornell_encoded 0.75 OLS in
+
+  calc_upvotes cornell_training_data.features_test weights*)
 
 let get_vocab_length matrix =
   match matrix with
@@ -712,11 +729,37 @@ let create_get_training_data_test
        (get_training_data matrix percent_training))
     ~printer:(pp_list pp_int_pair)
 
+let create_get_weights_test
+    (name : string)
+    (data : int array list)
+    (percent_training : float)
+    (regression_type : regression)
+    (expected_output : int) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (Array.length (get_weights data percent_training regression_type))
+    ~printer:string_of_int
+
 let regression_tests =
   [
-    create_get_training_data_test "check number of columns"
+    create_get_training_data_test "check test and training data shapes"
       cornell_matrix 0.75
       [ (21, 483); (7, 483); (21, 1); (7, 1) ];
+    create_get_weights_test "check number of weights OLS"
+      cornell_encoded 0.75 OLS
+      (Array.length (Array.of_list cornell_encoded).(0));
+    create_get_weights_test "check number of weights Ridge"
+      cornell_encoded 0.5 Ridge
+      (Array.length (Array.of_list cornell_encoded).(0));
+    create_get_weights_test "check number of weights LASSO"
+      cornell_encoded 0.25 LASSO
+      (Array.length (Array.of_list cornell_encoded).(0));
+    create_get_weights_test "check number of weights Logistic"
+      cornell_encoded 0.1 Logistic
+      (Array.length (Array.of_list cornell_encoded).(0));
+    create_get_weights_test "check number of weights SVM"
+      cornell_encoded 0.0 SVM
+      (Array.length (Array.of_list cornell_encoded).(0));
   ]
 
 let food_theme_json =
