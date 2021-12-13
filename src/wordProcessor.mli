@@ -12,31 +12,31 @@ type vocabulary
 (**the abstract type containing all the words seen so far*)
 
 val parse : string -> string list
-(**[parse text] is the list of words contained in text excluding
+(**[parse text] is the list of words contained in [text] excluding
    trailing whitespace and punctuation, but including the punctuation of
    a conjunction. Requires text is in English*)
 
 val stemmer : string -> stemmed_word
-(**[stemer word] is the stemmed version of word*)
+(**[stemer word] is the stemmed version of [word]*)
 
 val parse_sentence : string -> string list
-(**[parse text] is the list of words contained in text exlcuding
-   trailing whitespace and punctuation Requires: text is in English and
-   follows English grammar rules*)
+(**[parse text] is the list of words contained in [text] excluding
+   trailing whitespace and punctuation Requires: [text] is in English
+   and follows English grammar rules*)
 
 val stem_word_list : string list -> stemmed_word list
 (**[stem_word_list words] is the list of stemmed_words contained in
-   words. Requires: text is in English*)
+   [words]. Requires: text is in English*)
 
 val stem_text : string -> string list
 (**[stem_text text] is the list of words in [text] stemmed*)
 
 val extract_stemmed : stemmed_word list -> string list
 (**[extract_stemmed stemmed_words] is the list of the stemmed version of
-   words contained in stemmed_words*)
+   words contained in [stemmed_words]*)
 
 val process_sentence : string -> string
-(**[processed_sentence sentence] is the stemmed version of sentence*)
+(**[processed_sentence sentence] is the stemmed version of [sentence]*)
 
 val is_stopword : string -> bool
 (**[is_stopword word] is true if the [word] is a stopword based on
@@ -49,4 +49,4 @@ val replace_suffix : string -> string
 
 val stem_paragraph : string -> string
 (**[stem_paragraph paragraph] returns the stemmed version of a
-   paragraph.*)
+   [paragraph].*)

@@ -14,5 +14,5 @@ val hashtbl_step4 : (string, string) Hashtbl.t
 val find_suffix_binding :
   (string, string) Hashtbl.t -> string -> string -> int -> string * int
 (**[find_suffix_binding tbl word remainder m] finds the new suffix to
-   replace the current word's suffix with based on the hash table of
-   mappings and minimum m value passed in. *)
+   replace the current [word]'s suffix with based on the hash table of
+   mappings and minimum [m] value passed in. *)
