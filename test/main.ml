@@ -709,10 +709,7 @@ let cornell_encoded =
     (Yojson.Basic.from_file "data/cornell.json")
     Intake.upvotes
 
-let cornell_matrix = CustomRegression.create_matrix cornell_encoded
-
-let cornell_training_data =
-  CustomRegression.get_training_data cornell_matrix 0.75
+let predicted_upvotes = CustomRegression.calc_upvotes
 
 let get_vocab_length matrix =
   match matrix with
@@ -732,48 +729,59 @@ let pp_int_pair (row, col) =
 
 let create_get_training_data_test
     (name : string)
-    (matrix : Owl.Mat.mat)
+    (encoded_matrix : int array list)
     (percent_training : float)
     (expected_output : (int * int) list) : test =
   name >:: fun _ ->
+  let matrix = CustomRegression.create_matrix encoded_matrix in
   assert_equal expected_output
     (get_training_data_shapes
        (CustomRegression.get_training_data matrix percent_training))
     ~printer:(pp_list pp_int_pair)
 
-let create_get_weights_test
+let create_calc_upvotes_test
     (name : string)
-    (data : int array list)
-    (percent_training : float)
+    (encoded_matrix : int array list)
+    (percentage_training : float)
     (regression_type : CustomRegression.regression)
     (expected_output : int) : test =
   name >:: fun _ ->
+  let matrix = CustomRegression.create_matrix encoded_matrix in
+  let training_data =
+    CustomRegression.get_training_data matrix percentage_training
+  in
+  let weights =
+    CustomRegression.get_weights encoded_matrix percentage_training
+      regression_type
+  in
   assert_equal expected_output
     (Array.length
-       (CustomRegression.get_weights data percent_training
-          regression_type))
+       (CustomRegression.calc_upvotes training_data.features_test
+          weights))
     ~printer:string_of_int
 
 let regression_tests =
   [
-    create_get_training_data_test "check test and training data shapes"
-      cornell_matrix 0.75
+    create_get_training_data_test
+      "check test and training data shapes 75%" cornell_encoded 0.75
       [ (21, 483); (7, 483); (21, 1); (7, 1) ];
-    create_get_weights_test "check number of weights OLS"
-      cornell_encoded 0.75 OLS
-      (Array.length (Array.of_list cornell_encoded).(0));
-    create_get_weights_test "check number of weights Ridge"
-      cornell_encoded 0.5 Ridge
-      (Array.length (Array.of_list cornell_encoded).(0));
-    create_get_weights_test "check number of weights LASSO"
-      cornell_encoded 0.25 LASSO
-      (Array.length (Array.of_list cornell_encoded).(0));
-    create_get_weights_test "check number of weights Logistic"
-      cornell_encoded 0.1 Logistic
-      (Array.length (Array.of_list cornell_encoded).(0));
-    (*create_get_weights_test "check number of weights SVM"
-      cornell_encoded 0.0 SVM (Array.length (Array.of_list
-      cornell_encoded).(0));*)
+    create_get_training_data_test
+      "check test and training data shapes 0%" cornell_encoded 0.0
+      [ (1, 483); (27, 483); (1, 1); (27, 1) ];
+    create_get_training_data_test
+      "check test and training data shapes 100%" cornell_encoded 1.0
+      [ (27, 483); (1, 483); (27, 1); (1, 1) ];
+    create_calc_upvotes_test "check number of predicted upvotes OLS 75%"
+      cornell_encoded 0.75 OLS 7;
+    create_calc_upvotes_test
+      "check number of predicted upvotes Ridge 1%" cornell_encoded 0.1
+      Ridge 25;
+    create_calc_upvotes_test
+      "check number of predicted upvotes Lasso 90%" cornell_encoded 0.9
+      LASSO 3;
+    create_calc_upvotes_test
+      "check number of predicted upvotes Logistic 1.0%" cornell_encoded
+      1.0 Logistic 1;
   ]
 
 let food_theme_json =
