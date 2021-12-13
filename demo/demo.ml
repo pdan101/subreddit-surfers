@@ -40,23 +40,33 @@ let rec sub subreddit_name =
 
 (*Converts text command into our command type.*)
 let rec get_command () =
-  print_text_file "data/graphics/table.txt" ANSITerminal.green;
+  print_text_file "data/graphics/options.txt" ANSITerminal.green;
   print_string "> ";
   match read_line () with
   | exception End_of_file -> NA
-  | command when command |> String.lowercase_ascii = "frequencies" ->
+  | command
+    when let lower = command |> String.lowercase_ascii in
+         lower = "frequencies" || lower = "1" ->
       Frequencies
-  | command when command |> String.lowercase_ascii = "stemmer" ->
+  | command
+    when let lower = command |> String.lowercase_ascii in
+         lower = "stemmer" || lower = "2" ->
       Stemmer
-  | command when command |> String.lowercase_ascii = "encoder" ->
+  | command
+    when let lower = command |> String.lowercase_ascii in
+         lower = "encoder" || lower = "3" ->
       Encoder
-  | command when command |> String.lowercase_ascii = "popularity" ->
+  | command
+    when let lower = command |> String.lowercase_ascii in
+         lower = "popularity" || lower = "4" ->
       Popularity
-  | command when command |> String.lowercase_ascii = "text prediction"
-    ->
+  | command
+    when let lower = command |> String.lowercase_ascii in
+         lower = "text prediction" || lower = "5" ->
       Prediction
-  | command when command |> String.lowercase_ascii = "upvote prediction"
-    ->
+  | command
+    when let lower = command |> String.lowercase_ascii in
+         lower = "upvote prediction" || lower = "6" ->
       UPrediction
   | _ ->
       print_endline "Did not recognize command. Please try again.\n";
@@ -80,18 +90,34 @@ let rec extract_top5 lst count =
         print_newline ();
         extract_top5 t (count + 1)
 
-(*Prints the top 5 users in a subreddit, and their total upvotes.*)
-let rec print_users lst count =
-  if count >= 5 then ()
-  else
-    match lst with
-    | [] -> print_newline ()
-    | (k, v) :: t ->
-        print_endline
-          ("User Name: " ^ k ^ "\nTotal Upvotes: " ^ string_of_int v
-         ^ "\n");
-        print_users t (count + 1)
+let print_left name total =
+  let num_spaces = total - String.length name in
+  for i = 1 to num_spaces do
+    print_string " "
+  done;
+  print_string name
 
+let print_podium lst =
+  let arr =
+    Array.of_list
+      (lst |> List.map (fun x -> (fst x |> String.trim, snd x)))
+  in
+  let input = open_in "data/graphics/podium.txt" in
+  for i = 1 to 13 do
+    if i = 5 then print_left (fst arr.(2)) 33
+    else if i = 9 then print_left (fst arr.(4)) 23;
+    print_string (input_line input);
+    if i = 1 then print_string (fst arr.(0))
+    else if i = 3 then print_string (fst arr.(1))
+    else if i = 7 then print_string (fst arr.(3));
+    print_newline ()
+  done
+
+(*Prints the top 5 users in a subreddit, and their total upvotes. let
+  rec print_users lst count = if count >= 5 then () else match lst with
+  | [] -> print_newline () | (k, v) :: t -> print_endline ("User Name: "
+  ^ k ^ "\nTotal Upvotes: " ^ string_of_int v ^ "\n"); print_users t
+  (count + 1) *)
 (*Builds a descending order sorted association list of users and their
   total upvotes.*)
 let rec top_users post_list =
@@ -129,7 +155,7 @@ let print_frequencies subreddit_name =
     find_frequencies json (Array.of_list encoded_matrix)
   in
   print_endline
-    ("Finding the most frequent words r" ^ Filename.dir_sep
+    ("Finding the most frequent stemmed words r" ^ Filename.dir_sep
    ^ subreddit_name);
   extract_top5 frequency_list 0
 
@@ -284,7 +310,7 @@ let run subreddit_name =
   | Frequencies -> print_frequencies fixed_sub_name
   | Stemmer -> print_stemmer (subreddit |> recent_post)
   | Encoder -> print_encoder fixed_sub_name
-  | Popularity -> print_users (subreddit |> posts |> top_users) 0
+  | Popularity -> print_podium (subreddit |> posts |> top_users)
   | Prediction -> print_prediction fixed_sub_name
   | UPrediction -> graph_error fixed_sub_name
   | NA -> exit 0
