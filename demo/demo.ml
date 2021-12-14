@@ -95,10 +95,7 @@ let generate_spaces num =
   done;
   !str
 
-let create_column
-    (predicted_vote : float)
-    (actual_vote : float)
-    (start_letter : string) =
+let create_column predicted_vote actual_vote start_letter =
   let col = start_letter ^ " |" in
   if predicted_vote < actual_vote then
     let pred_spaces = generate_spaces (int_of_float predicted_vote) in
@@ -123,9 +120,7 @@ let create_column
     let col = col ^ pred_spaces ^ "🔵" ^ extra_spaces in
     col
 
-let graph_results
-    (predicted_upvotes : int array)
-    (actual_upvotes : float array) =
+let graph_results predicted_upvotes actual_upvotes =
   let actual_upvotes_int =
     Array.map (fun e -> int_of_float e) actual_upvotes
   in
@@ -138,13 +133,10 @@ let graph_results
   let columns =
     [ "   ―――――――――――――――――――――――――――――――――――――――――――――――˃" ]
   in
-
   let predicted_upvotes =
     Array.map (fun e -> float_of_int e) predicted_upvotes
   in
-
   let y_axis = [| " "; "P"; "O"; "S"; "T"; "S" |] in
-
   let additional_cols =
     Array.mapi
       (fun i e ->
