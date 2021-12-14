@@ -119,18 +119,20 @@ let theme_breakdown_of_subreddit
     (theme_dir : string)
     (subreddit_json : Yojson.Basic.t) : float array =
   let theme_breakdown =
-    encoded_theme_breakdown_matrix_of_subreddit "themes" subreddit_json
+    encoded_theme_breakdown_matrix_of_subreddit "data/themes"
+      subreddit_json
   in
   let percentage_matrix =
     Array.of_list (List.map Array.of_list theme_breakdown)
   in
   let themes = get_themes theme_dir in
-  let breakdown = Array.make (Array.length themes) 0. in
+  let breakdown = Array.make (Array.length themes + 1) 0. in
   let posts = subreddit_json |> Intake.from_json |> Intake.posts in
   let posts_size = List.length posts in
-  for col = 0 to Array.length themes do
+
+  for col = 0 to Array.length breakdown - 1 do
     let total_percentage = ref 0. in
-    for row = 0 to Array.length percentage_matrix do
+    for row = 0 to Array.length percentage_matrix - 1 do
       total_percentage :=
         !total_percentage +. percentage_matrix.(row).(col)
     done;

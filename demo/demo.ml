@@ -13,6 +13,8 @@ type command =
   | Popularity
   | Prediction
   | UPrediction
+  | ThemeAnalysis
+  | ThemePrediction
   | NA
 
 let print_text_file filename color =
@@ -70,7 +72,15 @@ let rec get_command () =
       UPrediction
   | command
     when let lower = command |> String.lowercase_ascii in
-         lower = "quit" || lower = "7" ->
+         lower = "theme analysis" || lower = "7" ->
+      ThemeAnalysis
+  | command
+    when let lower = command |> String.lowercase_ascii in
+         lower = "theme prediction" || lower = "8" ->
+      ThemePrediction
+  | command
+    when let lower = command |> String.lowercase_ascii in
+         lower = "quit" || lower = "9" ->
       NA
   | _ ->
       print_endline "Did not recognize command. Please try again.\n";
@@ -388,6 +398,109 @@ let print_prediction subreddit_name =
     ^ string_of_int (int_of_float avg_upvotes)
     ^ " upvotes!")
 
+let subreddit_theme_breakdown_to_assoc subreddit =
+  let subreddit_json =
+    "data" ^ Filename.dir_sep ^ subreddit ^ ".json"
+    |> Yojson.Basic.from_file
+  in
+  let theme_breakdown =
+    ThemeEncoder.theme_breakdown_of_subreddit
+      ("data" ^ Filename.dir_sep ^ "themes")
+      subreddit_json
+    |> Array.to_list
+  in
+  let themes =
+    "data/themes" |> ThemeEncoder.get_themes
+    |> ThemeEncoder.themes_no_suffix |> Array.to_list
+  in
+  let with_misc = "miscellaneous" :: themes in
+  let sorted =
+    with_misc
+    |> List.map String.lowercase_ascii
+    |> List.sort_uniq Stdlib.compare
+  in
+  List.combine sorted theme_breakdown
+
+let print_theme_analysis subreddit =
+  print_string "Here is the Theme Breakdown for This Subreddit";
+  print_endline "";
+  print_endline "";
+  let subreddit_breakdown =
+    subreddit_theme_breakdown_to_assoc subreddit
+  in
+  List.iter
+    (fun (theme, percentage) ->
+      let width = percentage /. 10. in
+      for i = 0 to int_of_float width do
+        print_string "#"
+      done;
+      print_string (" " ^ theme ^ ": ");
+      print_int (int_of_float percentage);
+      print_endline "";
+      print_endline "")
+    subreddit_breakdown
+
+let print_theme_prediction subreddit =
+  let subreddit_json =
+    "data" ^ Filename.dir_sep ^ subreddit ^ ".json"
+    |> Yojson.Basic.from_file
+  in
+  let input_text =
+    print_endline "Enter text to for theme prediction: ";
+    print_string "> ";
+    match read_line () with
+    | exception End_of_file -> ""
+    | text -> text
+  in
+  let theme_breakdown =
+    let themes =
+      "data/themes" |> ThemeEncoder.get_themes
+      |> ThemeEncoder.themes_no_suffix
+    in
+    let dummy_post =
+      {
+        author = "";
+        created_utc = 0.;
+        subreddit = "";
+        id = "";
+        num_comments = 0;
+        num_crossposts = 0;
+        selftext = input_text;
+        spoiler = false;
+        title = "";
+        upvotes = 0;
+      }
+    in
+    let table =
+      ThemeEncoder.theme_table_of_post dummy_post themes "themes"
+    in
+    ThemeEncoder.theme_breakdown_of_post dummy_post table
+  in
+  let theme_encoded =
+    ThemeEncoder.encoded_theme_breakdown_matrix_of_subreddit
+      ("data" ^ Filename.dir_sep ^ "themes")
+      subreddit_json
+  in
+  let upvotes =
+    predict_upvotes
+      (theme_breakdown |> List.split |> snd |> List.map int_of_float
+     |> Array.of_list)
+      (theme_encoded
+      |> List.map (List.map (fun elt -> int_of_float elt))
+      |> List.map (fun lst -> Array.of_list lst))
+  in
+  print_newline ();
+  print_endline "Here is a theme breakdown of the text in your post: ";
+  print_newline ();
+  List.iter
+    (fun (th, perc) ->
+      print_endline (th ^ ": " ^ string_of_float perc ^ "%"))
+    theme_breakdown;
+  print_endline
+    ("Based on this post's theme breakdown it would get" ^ " "
+    ^ string_of_int (int_of_float upvotes)
+    ^ " upvotes!")
+
 let list_of_subs =
   [ "cornell"; "csmajors"; "ocaml"; "running"; "college" ]
 
@@ -412,6 +525,8 @@ let run subreddit_name =
     | Popularity -> print_podium (subreddit |> posts |> top_users)
     | Prediction -> print_prediction fixed_sub_name
     | UPrediction -> graph_error fixed_sub_name
+    | ThemeAnalysis -> print_theme_analysis fixed_sub_name
+    | ThemePrediction -> print_theme_prediction fixed_sub_name
     | NA ->
         print_text_file "data/graphics/waves.txt" ANSITerminal.blue;
         exit 0
