@@ -1,6 +1,13 @@
 (**This module contains the functions and types necessary for theme
    analysis of subreddits*)
 
+val get_themes : string -> string array
+(**[get_themes theme_dir] is the array of theme filenames in theme_dir*)
+
+val themes_no_suffix : string array -> string array
+(**[theme_no_suffix themes] is the array of filenames with suffixes
+   removed*)
+
 val theme_breakdown_of_post :
   Intake.post -> (string, int) Hashtbl.t -> (string * float) list
 (**[theme_breakdown_of_post post theme_table] is the association list
