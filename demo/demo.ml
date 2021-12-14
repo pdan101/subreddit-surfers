@@ -95,29 +95,32 @@ let generate_spaces num =
   done;
   !str
 
-let create_column (predicted_vote : float) (actual_vote : float) =
-  let col = " |" in
+let create_column
+    (predicted_vote : float)
+    (actual_vote : float)
+    (start_letter : string) =
+  let col = start_letter ^ " |" in
   if predicted_vote < actual_vote then
     let pred_spaces = generate_spaces (int_of_float predicted_vote) in
-    let col = col ^ pred_spaces ^ "⊡" in
+    let col = col ^ pred_spaces ^ "🔵" in
     let actual_spaces =
       generate_spaces (int_of_float (actual_vote -. predicted_vote))
     in
     let extra_spaces =
       generate_spaces (int_of_float (50.0 -. actual_vote))
     in
-    let col = col ^ actual_spaces ^ "⊙" ^ extra_spaces in
+    let col = col ^ actual_spaces ^ "🔴" ^ extra_spaces in
     col
   else
     let actual_spaces = generate_spaces (int_of_float actual_vote) in
-    let col = col ^ actual_spaces ^ "⊙" in
+    let col = col ^ actual_spaces ^ "🔴" in
     let pred_spaces =
       generate_spaces (int_of_float (predicted_vote -. actual_vote))
     in
     let extra_spaces =
       generate_spaces (int_of_float (50.0 -. predicted_vote))
     in
-    let col = col ^ pred_spaces ^ "⊡" ^ extra_spaces in
+    let col = col ^ pred_spaces ^ "🔵" ^ extra_spaces in
     col
 
 let graph_results
@@ -133,22 +136,21 @@ let graph_results
   in
   let scaling_factor = 50.0 /. float_of_int max in
   let columns =
-    [ "  ―――――――――――――――――――――――――――――――――――――――――――――――˃" ]
+    [ "   ―――――――――――――――――――――――――――――――――――――――――――――――˃" ]
   in
 
   let predicted_upvotes =
     Array.map (fun e -> float_of_int e) predicted_upvotes
   in
-  print_newline ();
-  print_newline ();
-  print_string "     ⊙- Actual Upvotes, ⊡- Predicted Upvotes";
-  print_newline ();
+
+  let y_axis = [| " "; "P"; "O"; "S"; "T"; "S" |] in
 
   let additional_cols =
     Array.mapi
       (fun i e ->
         create_column (scaling_factor *. e)
-          (scaling_factor *. actual_upvotes.(i)))
+          (scaling_factor *. actual_upvotes.(i))
+          (if i >= Array.length y_axis then " " else y_axis.(i)))
       predicted_upvotes
   in
   let all_columns = columns @ Array.to_list additional_cols in
@@ -157,10 +159,9 @@ let graph_results
       print_string i;
       print_newline ())
     all_columns;
-  print_string " |";
+  print_string "  |";
   print_newline ();
-  print_string " ˅";
-  print_newline ();
+  print_string "  ˅";
   print_newline ()
 
 (*Current representation of 1 instance of a word in a subreddit for the
@@ -326,7 +327,11 @@ let graph_error subreddit_name =
   let predicted_upvotes_int =
     Array.map (fun e -> int_of_float e) predicted_upvotes
   in
+
+  print_text_file "data/graphics/top_of_graph.txt" ANSITerminal.white;
+
   graph_results predicted_upvotes_int (Mat.to_array actual_upvotes);
+
   let error =
     CustomRegression.calc_error predicted_upvotes
       (Mat.to_array actual_upvotes)
