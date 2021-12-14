@@ -1,4 +1,3 @@
-open Yojson
 (**This module contains that functions and types necessary for word
    encoding*)
 
@@ -6,15 +5,15 @@ val post_text : Intake.post -> string
 (**[post_text post] is the text of the [post] including the title and
    selftext*)
 
-val word_json_to_array : Basic.t -> string array
+val word_json_to_array : Yojson.Basic.t -> string array
 (**[word_json_to_array vocab_json] is the array of words in the
    [vocab_json]*)
 
-val subreddit_json_to_words : Basic.t -> string list
+val subreddit_json_to_words : Yojson.Basic.t -> string list
 (**[subreddit_json_to_words subreddit_json] parses the words of every
    post in the subreddit and creates unqiue list of words*)
 
-val subreddit_json_to_stemmed_words : Basic.t -> string list
+val subreddit_json_to_stemmed_words : Yojson.Basic.t -> string list
 (**[subreddit_json_to_words subreddit_json] parses and stems every word
    of the post in the subreddit and creates a unique list of words*)
 
@@ -24,14 +23,14 @@ val write_words_to_json : out_channel -> string list -> unit
    json has been written to file*)
 
 val subreddit_json_to_word_json :
-  (Basic.t -> string list) -> Basic.t -> string -> unit
+  (Yojson.Basic.t -> string list) -> Yojson.Basic.t -> string -> unit
 (**[subreddit_json_to_word_json processor_function subreddit_json filename]
    writes all the words of every post in the subreddit to a json file.
    The way each of these words is processed is based on
    [processor_function]*)
 
 val encode_post :
-  Basic.t ->
+  Yojson.Basic.t ->
   (string -> string list) ->
   Intake.post ->
   (Intake.post -> int) ->
@@ -41,9 +40,9 @@ val encode_post :
    vocabulary json*)
 
 val encode_subreddit :
-  Basic.t ->
+  Yojson.Basic.t ->
   (string -> string list) ->
-  Basic.t ->
+  Yojson.Basic.t ->
   (Intake.post -> int) ->
   int array list
 (**[encode_subreddit word_json processor_function subreddit_json] is a
@@ -51,7 +50,8 @@ val encode_subreddit :
    matrix is a vector representing the number of occurence of each word
    in a post*)
 
-val find_frequencies : Basic.t -> int array array -> (string * int) list
+val find_frequencies :
+  Yojson.Basic.t -> int array array -> (string * int) list
 (**[find_frequencies word_json encoding] is an association list. Each
    item is a key (the vocab word) and a value (how many posts it appears
    in)*)
