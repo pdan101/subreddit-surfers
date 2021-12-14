@@ -461,20 +461,7 @@ let print_theme_prediction subreddit =
       "data/themes" |> ThemeEncoder.get_themes
       |> ThemeEncoder.themes_no_suffix
     in
-    let dummy_post =
-      {
-        author = "";
-        created_utc = 0.;
-        subreddit = "";
-        id = "";
-        num_comments = 0;
-        num_crossposts = 0;
-        selftext = input_text;
-        spoiler = false;
-        title = "";
-        upvotes = 0;
-      }
-    in
+    let dummy_post = post_of_text input_text in
     let table =
       ThemeEncoder.theme_table_of_post dummy_post themes "themes"
     in
