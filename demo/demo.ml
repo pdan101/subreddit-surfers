@@ -158,7 +158,7 @@ let graph_results predicted_upvotes actual_upvotes =
 
 (*Current representation of 1 instance of a word in a subreddit for the
   text based graphic.*)
-let occurence_string = "---"
+let occurence_string = "⚬"
 
 (*Extracts the top 5 words appearing in a subreddit.*)
 let rec extract_top5 lst count =
