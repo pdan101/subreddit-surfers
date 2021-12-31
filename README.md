@@ -4,7 +4,7 @@ Subreddit Surfers is a subreddit analysis tool, presenting various processed dat
 
 ## Installation
 
-Use the package manager [opam](https://opam.ocaml.org/doc/Usage.html) to install Subreddit Surfers locally.
+Use the package manager [opam](https://opam.ocaml.org/doc/Usage.html) to install Subreddit Surfers' dependencies locally, and download the code from the repository to be able to run it.
 
 ```bash
 opam depext conf-openblas.0.2.0
